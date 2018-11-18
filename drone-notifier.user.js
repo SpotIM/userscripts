@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Drone Notifier
 // @namespace    https://droneio.spot.im/
-// @version      0.1
+// @version      0.2
 // @description  notifiy on drone builds
 // @author       You
 // @match        https://droneio.spot.im/*
@@ -33,7 +33,7 @@
   }
 
   function loadSettings() {
-    return JSON.parse(localStorage.getItem(settingsLSKey)) || ['staging-comm.topics'];
+    return JSON.parse(localStorage.getItem(settingsLSKey)) || ['staging-comm.topics, production-comm.topics'];
   }
 
   function saveSettings(data) {
