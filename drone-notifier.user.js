@@ -3,7 +3,7 @@
 // @namespace    https://droneio.spot.im/
 // @version      0.3
 // @description  notifiy on drone builds
-// @author       You
+// @author       Eldad Bercovici
 // @match        https://droneio.spot.im/*
 // @grant        none
 // ==/UserScript==
