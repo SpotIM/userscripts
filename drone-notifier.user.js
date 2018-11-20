@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Drone Notifier
 // @namespace    https://droneio.spot.im/
-// @version      0.3
+// @version      0.4
 // @description  notifiy on drone builds
 // @author       Eldad Bercovici
 // @match        https://droneio.spot.im/*
@@ -47,6 +47,8 @@
     });
 
     notification.onclick = function () {
+      window.focus();
+      this.close();
       location.href = `https://droneio.spot.im/SpotIM/fed.modules/${deployNumber}`;
     };
   }
