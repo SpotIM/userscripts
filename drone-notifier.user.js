@@ -2,7 +2,7 @@
 // @name         Drone Notifier
 // @namespace    https://droneio.spot.im/
 // @version      0.4
-// @description  notifiy on drone builds
+// @description  notifies on drone builds
 // @author       Eldad Bercovici
 // @match        https://droneio.spot.im/*
 // @grant        none
