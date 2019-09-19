@@ -121,7 +121,7 @@
           setScrollColor('#4caf50')
         } else {
           scrollDown();
-          setScrollMessage('not found 😕')
+          setScrollMessage('not found 😕 try scrolling up and down a bit')
           setScrollColor('#f44336')
         }
       }, 100);
