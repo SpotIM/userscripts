@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Scroll Conversation Into View
-// @namespace    http://tampermonkey.net/
+// @namespace    https://spot.im/
 // @version      0.5
 // @description  Scroll Conversation Into View
 // @author       dutzi
@@ -87,6 +87,8 @@
       background: 'red',
       color: 'white',
       fontWeight: 'bold',
+      fontFamily: 'Helvetica',
+      fontSize: '18px',
       padding: '10px',
       zIndex: 100000000000,
       animation: 'spotim-scroll-to-comments-appear 0.2s ease-out'
