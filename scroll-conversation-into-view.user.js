@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         New Userscript
+// @name         Scroll Conversation Into View
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Scroll Conversation Into View
-// @author       You
+// @author       dutzi
 // @match        http*://*/*
 // @grant        none
 // ==/UserScript==
@@ -18,7 +18,9 @@
   let hasScrolledDown;
 
   function handleKeyDown(e) {
-      if (e.key.toLowerCase() === 's') {
+      if (e.key.toLowerCase() === 'escape' && isScrolling) {
+        stopScrolling();
+      } else if (e.key.toLowerCase() === 's') {
           clearTimeout(clickCounterResetTimeout);
           clickCounter++;
           if (clickCounter === 3) {
@@ -38,7 +40,29 @@
 
   document.addEventListener('keydown', handleKeyDown);
 
+  function setScrollMessage(message) {
+    scrollingMessage.innerText = 'Scrolling To Conversation' + (message ? ` (${message})` : '');
+  }
+
   function addScrollingMessage() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes spotim-scroll-to-comments-appear {
+        0% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        90% {
+          transform: scale(1.02);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style)
     scrollingMessage = document.createElement('div');
     Object.assign(scrollingMessage.style, {
       position: 'fixed',
@@ -50,9 +74,10 @@
       color: 'white',
       fontWeight: 'bold',
       padding: '10px',
-      zIndex: 100000000000
+      zIndex: 100000000000,
+      animation: 'spotim-scroll-to-comments-appear 0.2s ease-out'
     });
-    scrollingMessage.innerText = 'Scrolling To Conversation';
+    setScrollMessage()
     document.body.appendChild(scrollingMessage)
   }
 
@@ -75,10 +100,10 @@
         conversation = document.querySelector('[data-conversation-id]') || document.querySelector('[data-spotim-app="conversation"]');
         if (conversation) {
           conversation.scrollIntoView();
-          scrollingMessage.innerText = 'Scrolling To Conversation (found!)';
+          setScrollMessage('found! 😃')
         } else {
           scrollDown();
-          scrollingMessage.innerText = 'Scrolling To Conversation (not found)';
+          setScrollMessage('not found 😕')
         }
       }, 100);
     }
