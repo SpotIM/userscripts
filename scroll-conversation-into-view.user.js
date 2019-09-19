@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Scroll Conversation Into View
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Scroll Conversation Into View
 // @author       dutzi
 // @match        http*://*/*
@@ -43,6 +43,10 @@
 
   function setScrollMessage(message) {
     scrollingMessage.innerText = 'Scrolling To Conversation' + (message ? ` (${message})` : '');
+  }
+
+  function setScrollColor(color) {
+    scrollingMessage.style.backgroundColor = color;
   }
 
   function addStyleTag() {
@@ -88,6 +92,7 @@
       animation: 'spotim-scroll-to-comments-appear 0.2s ease-out'
     });
     setScrollMessage()
+    setScrollColor('#467FDB')
     document.body.appendChild(scrollingMessage)
   }
 
@@ -111,9 +116,11 @@
         if (conversation) {
           conversation.scrollIntoView();
           setScrollMessage('found! 😃')
+          setScrollColor('#4caf50')
         } else {
           scrollDown();
           setScrollMessage('not found 😕')
+          setScrollColor('#f44336')
         }
       }, 100);
     }
