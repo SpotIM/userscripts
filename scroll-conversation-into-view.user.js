@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Scroll Conversation Into View
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Scroll Conversation Into View
 // @author       dutzi
 // @match        http*://*/*
@@ -16,6 +16,7 @@
   let scrollingInterval;
   let scrollingMessage;
   let hasScrolledDown;
+  let hasAddedStyleTag;
 
   function handleKeyDown(e) {
       if (e.key.toLowerCase() === 'escape' && isScrolling) {
@@ -44,7 +45,12 @@
     scrollingMessage.innerText = 'Scrolling To Conversation' + (message ? ` (${message})` : '');
   }
 
-  function addScrollingMessage() {
+  function addStyleTag() {
+    if (hasAddedStyleTag) {
+      return;
+    }
+    hasAddedStyleTag = true;
+
     const style = document.createElement('style');
     style.innerHTML = `
       @keyframes spotim-scroll-to-comments-appear {
@@ -63,6 +69,10 @@
       }
     `;
     document.head.appendChild(style)
+  }
+
+  function addScrollingMessage() {
+    addStyleTag()
     scrollingMessage = document.createElement('div');
     Object.assign(scrollingMessage.style, {
       position: 'fixed',
