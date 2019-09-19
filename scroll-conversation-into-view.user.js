@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Scroll Conversation Into View
 // @namespace    https://spot.im/
-// @version      0.5
+// @version      0.6
 // @description  Scroll Conversation Into View
 // @author       dutzi
 // @match        http*://*/*
