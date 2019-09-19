@@ -42,7 +42,7 @@
   document.addEventListener('keydown', handleKeyDown);
 
   function setScrollMessage(message) {
-    scrollingMessage.innerText = 'Scrolling To Conversation' + (message ? ` (${message})` : '');
+    scrollingMessage.innerText = 'Scroll To Conversation' + (message ? ` (${message})` : '');
   }
 
   function setScrollColor(color) {
