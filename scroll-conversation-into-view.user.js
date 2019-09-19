@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         New Userscript
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Scroll Conversation Into View
 // @author       You
 // @match        http*://*/*
@@ -15,6 +15,7 @@
   let isScrolling;
   let scrollingInterval;
   let scrollingMessage;
+  let hasScrolledDown;
 
   function handleKeyDown(e) {
       if (e.key.toLowerCase() === 's') {
@@ -59,6 +60,13 @@
     scrollingMessage.parentNode.removeChild(scrollingMessage)
   }
 
+  function scrollDown() {
+    if (!hasScrolledDown) {
+      window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+      hasScrolledDown = true;
+    }
+  }
+
   function startScrolling() {
       addScrollingMessage();
       isScrolling = true;
@@ -69,6 +77,7 @@
           conversation.scrollIntoView();
           scrollingMessage.innerText = 'Scrolling To Conversation (found!)';
         } else {
+          scrollDown();
           scrollingMessage.innerText = 'Scrolling To Conversation (not found)';
         }
       }, 100);
