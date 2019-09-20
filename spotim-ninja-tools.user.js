@@ -61,7 +61,7 @@
       const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
       const env = isProduction(launcher) ? 'Production' : 'Dev';
 
-      setMessage(`spot-id: ${spotId} - ${version} - ${env}`, 2000);
+      setMessage(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, 2000);
       setMessageColor(DEFAULT_COLOR);
     } else {
       setMessage(`Could not find launcher script 😕`, 2000);
@@ -83,6 +83,20 @@
     }
   }
 
+  function showHelp() {
+    setMessage(
+      `
+    Available Shortcuts:<br/>
+    sss - Scroll to conversation<br/>
+    ssi - Show Info<br/>
+    ssa - Open Host Panel<br/>
+    ssh - Show Help
+    `,
+      5000,
+    );
+    setMessageColor(DEFAULT_COLOR);
+  }
+
   function executeCommand() {
     const lastCommand = lastKeyStrokes.join('');
 
@@ -94,6 +108,8 @@
       showInfo();
     } else if (lastCommand === 'ssa') {
       openAdminPanel();
+    } else if (lastCommand === 'ssh') {
+      showHelp();
     } else {
       return false;
     }
@@ -133,7 +149,7 @@
     addStyleTag();
     addMessage();
     showMessage();
-    messageEl.innerText = message;
+    messageEl.innerHTML = message;
 
     clearTimeout(hideMessageTimeout);
     if (timeout) {
@@ -192,6 +208,7 @@
       fontFamily: 'Helvetica',
       fontSize: '18px',
       padding: '10px',
+      lineHeight: '1.5',
       zIndex: 100000000000,
       animation: 'spotim-scroll-to-comments-appear 0.2s ease-out',
     });
