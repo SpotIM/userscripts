@@ -37,6 +37,10 @@
     );
   }
 
+  function isProduction(launcher) {
+    return launcher.src.indexOf('//launcher.spot.im') > -1;
+  }
+
   function copySpotId() {
     const launcher = getLauncherEl();
     if (launcher) {
@@ -54,10 +58,25 @@
     const launcher = getLauncherEl();
     if (launcher) {
       const spotId = launcher.src.split('/').pop();
-      const isVer2 = !!window.__SPOTIM__;
+      const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
+      const env = isProduction(launcher) ? 'Production' : 'Dev';
 
-      setMessage(`spot-id: ${spotId} - ${isVer2 ? 'V.2.0' : 'V.1.0'}`, 2000);
+      setMessage(`spot-id: ${spotId} - ${version} - ${env}`, 2000);
       setMessageColor(DEFAULT_COLOR);
+    } else {
+      setMessage(`Could not find launcher script 😕`, 2000);
+      setMessageColor(ERROR_COLOR);
+    }
+  }
+
+  function openAdminPanel() {
+    const launcher = getLauncherEl();
+    if (launcher) {
+      window.open(
+        isProduction(launcher)
+          ? 'https://admin.spot.im/internal/super-admin'
+          : 'https://admin.staging-spot.im/internal/super-admin',
+      );
     } else {
       setMessage(`Could not find launcher script 😕`, 2000);
       setMessageColor(ERROR_COLOR);
@@ -73,6 +92,8 @@
       copySpotId();
     } else if (lastCommand === 'ssi') {
       showInfo();
+    } else if (lastCommand === 'ssa') {
+      openAdminPanel();
     } else {
       return false;
     }
