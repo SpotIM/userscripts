@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      0.1
+// @version      0.2
 // @description  A bunch of tools to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -18,6 +18,7 @@
   let hasScrolledDown;
   let hasAddedMessage;
   let hasAddedStyleTag;
+  let hideMessageTimeout;
 
   const DEFAULT_COLOR = '#467FDB';
   const ERROR_COLOR = '#f44336';
@@ -30,30 +31,53 @@
     }
   }
 
-  function copySpotId() {
-    const launcher = document.querySelector(
+  function getLauncherEl() {
+    return document.querySelector(
       'script[data-spotim-module="spotim-launcher"]',
     );
+  }
+
+  function copySpotId() {
+    const launcher = getLauncherEl();
     if (launcher) {
       const spotId = launcher.src.split('/').pop();
       navigator.clipboard.writeText(spotId);
-      setMessage(`Copied ${spotId} to clipboard`, 2000);
+      setMessage(`Copied ${spotId} to clipboard! 😃`, 2000);
       setMessageColor(DEFAULT_COLOR);
     } else {
-      setMessage(`Could not find launcher script`, 2000);
+      setMessage(`Could not find launcher script 😕`, 2000);
+      setMessageColor(ERROR_COLOR);
+    }
+  }
+
+  function showInfo() {
+    const launcher = getLauncherEl();
+    if (launcher) {
+      const spotId = launcher.src.split('/').pop();
+      const isVer2 = !!window.__SPOTIM__;
+
+      setMessage(`spot-id: ${spotId} - ${isVer2 ? 'V.2.0' : 'V.1.0'}`, 2000);
+      setMessageColor(DEFAULT_COLOR);
+    } else {
+      setMessage(`Could not find launcher script 😕`, 2000);
       setMessageColor(ERROR_COLOR);
     }
   }
 
   function executeCommand() {
     const lastCommand = lastKeyStrokes.join('');
+
     if (lastCommand === 'sss') {
       toggleScrolling();
-      return true;
     } else if (lastCommand === 'ssc') {
       copySpotId();
-      return true;
+    } else if (lastCommand === 'ssi') {
+      showInfo();
+    } else {
+      return false;
     }
+
+    return true;
   }
 
   function handleKeyDown(e) {
@@ -89,8 +113,10 @@
     addMessage();
     showMessage();
     messageEl.innerText = message;
+
+    clearTimeout(hideMessageTimeout);
     if (timeout) {
-      setTimeout(() => {
+      hideMessageTimeout = setTimeout(() => {
         hideMessage();
       }, timeout);
     }
