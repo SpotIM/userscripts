@@ -31,10 +31,17 @@
     }
   }
 
-  function getLauncherEl() {
-    return document.querySelector(
+  function getLauncherEl(displayErrorIfNotFound) {
+    const launcher = document.querySelector(
       'script[data-spotim-module="spotim-launcher"]',
     );
+
+    if (!launcher && displayErrorIfNotFound) {
+      setMessage(`Could not find launcher script 😕`, 2000);
+      setMessageColor(ERROR_COLOR);
+    }
+
+    return launcher;
   }
 
   function isProduction(launcher) {
@@ -42,20 +49,17 @@
   }
 
   function copySpotId() {
-    const launcher = getLauncherEl();
+    const launcher = getLauncherEl(true);
     if (launcher) {
       const spotId = launcher.src.split('/').pop();
       navigator.clipboard.writeText(spotId);
       setMessage(`Copied ${spotId} to clipboard! 😃`, 2000);
       setMessageColor(DEFAULT_COLOR);
-    } else {
-      setMessage(`Could not find launcher script 😕`, 2000);
-      setMessageColor(ERROR_COLOR);
     }
   }
 
   function showInfo() {
-    const launcher = getLauncherEl();
+    const launcher = getLauncherEl(true);
     if (launcher) {
       const spotId = launcher.src.split('/').pop();
       const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
@@ -63,23 +67,17 @@
 
       setMessage(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, 2000);
       setMessageColor(DEFAULT_COLOR);
-    } else {
-      setMessage(`Could not find launcher script 😕`, 2000);
-      setMessageColor(ERROR_COLOR);
     }
   }
 
   function openAdminPanel() {
-    const launcher = getLauncherEl();
+    const launcher = getLauncherEl(true);
     if (launcher) {
       window.open(
         isProduction(launcher)
           ? 'https://admin.spot.im/internal/super-admin'
           : 'https://admin.staging-spot.im/internal/super-admin',
       );
-    } else {
-      setMessage(`Could not find launcher script 😕`, 2000);
-      setMessageColor(ERROR_COLOR);
     }
   }
 
