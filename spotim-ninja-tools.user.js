@@ -115,7 +115,7 @@
     return true;
   }
 
-  function handleKeyDown(e) {
+  function handleKeyPress(e) {
     if (e.key.toLowerCase() === 'escape' && isScrolling) {
       stopScrolling();
     } else {
@@ -131,7 +131,7 @@
     }
   }
 
-  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keypress', handleKeyPress);
 
   function showMessage() {
     if (!messageEl.parentNode) {
