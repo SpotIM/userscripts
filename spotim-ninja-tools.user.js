@@ -209,6 +209,7 @@
       lineHeight: '1.5',
       zIndex: 100000000000,
       animation: 'spotim-scroll-to-comments-appear 0.2s ease-out',
+      direction: 'ltr',
     });
     setMessageColor(DEFAULT_COLOR);
     document.body.appendChild(messageEl);
