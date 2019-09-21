@@ -220,7 +220,7 @@
       zIndex: 100000000000,
       animation: 'spotim-scroll-to-comments-appear 0.2s ease-out',
       direction: 'ltr',
-      width: '600px',
+      maxWidth: '600px',
       margin: '5em auto',
       borderRadius: '1em',
     });
