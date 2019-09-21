@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      0.2
+// @version      0.3
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
