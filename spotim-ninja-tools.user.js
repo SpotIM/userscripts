@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      0.3
+// @version      0.4
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -52,9 +52,18 @@
     const launcher = getLauncherEl(true);
     if (launcher) {
       const spotId = launcher.src.split('/').pop();
-      navigator.clipboard.writeText(spotId);
-      setMessage(`Copied ${spotId} to clipboard! 😃`, 2000);
-      setMessageColor(DEFAULT_COLOR);
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(spotId);
+        setMessage(`Copied ${spotId} to clipboard! 😃`, 2000);
+        setMessageColor(DEFAULT_COLOR);
+      } else {
+        setMessage(
+          `Can't copy ${spotId} to clipboard on non-https sites 😞`,
+          4000,
+        );
+        setMessageColor(ERROR_COLOR);
+      }
     }
   }
 
@@ -87,6 +96,7 @@
     Available Shortcuts:<br/>
     sss - Scroll to conversation<br/>
     ssi - Show Info<br/>
+    ssc - Copy Spot ID to Clipboard (only on HTTPs)<br/>
     ssa - Open Host Panel<br/>
     ssh - Show Help
     `,
