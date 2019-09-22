@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      0.4
+// @version      0.5
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -125,21 +125,26 @@
     return true;
   }
 
-  function handleKeyPress(e) {
+  function handleKeyDown(e) {
     if (e.key.toLowerCase() === 'escape' && isScrolling) {
       stopScrolling();
-    } else {
-      lastKeyStrokes.push(e.key.toLowerCase());
-      clearTimeout(lastKeyStrokesResetTimeout);
-      if (executeCommand()) {
-        lastKeyStrokes = [];
-      } else {
-        lastKeyStrokesResetTimeout = setTimeout(() => {
-          lastKeyStrokes = [];
-        }, 500);
-      }
     }
   }
+
+  function handleKeyPress(e) {
+    lastKeyStrokes.push(e.key.toLowerCase());
+    clearTimeout(lastKeyStrokesResetTimeout);
+    if (executeCommand()) {
+      lastKeyStrokes = [];
+    } else {
+      lastKeyStrokesResetTimeout = setTimeout(() => {
+        lastKeyStrokes = [];
+      }, 500);
+    }
+  }
+
+  // for some reason pressing on escape doesn't register as a keypress
+  document.addEventListener('keydown', handleKeyDown);
 
   document.addEventListener('keypress', handleKeyPress);
 
