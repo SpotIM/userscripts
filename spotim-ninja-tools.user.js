@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      0.5
+// @version      0.6
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -51,7 +51,10 @@
   function copySpotId() {
     const launcher = getLauncherEl(true);
     if (launcher) {
-      const spotId = launcher.src.split('/').pop();
+      const spotId = launcher.src
+        .split('/')
+        .pop()
+        .split('?')[0];
 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(spotId);
