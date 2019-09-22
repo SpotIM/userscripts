@@ -37,7 +37,14 @@
     );
 
     if (!launcher && displayErrorIfNotFound) {
-      setMessage(`Could not find launcher script 😕`, 2000);
+      if (window.parent === window) {
+        setMessage(`Could not find launcher script 😕`, 2000);
+      } else {
+        setMessage(
+          `Could not find launcher script 😕<br/>Make sure the main page is focused!`,
+          2000,
+        );
+      }
       setMessageColor(ERROR_COLOR);
     }
 
@@ -261,9 +268,15 @@
         setMessageColor('#4caf50');
       } else {
         scrollDown();
-        setMessage(
-          'Scroll To Conversation (not found 😕 try scrolling up and down a bit)',
-        );
+        if (window.parent === window) {
+          setMessage(
+            'Scroll To Conversation (not found 😕 try scrolling up and down a bit)',
+          );
+        } else {
+          setMessage(
+            `Scroll To Conversation (not found 😕 try scrolling up and down a bit)<br/>And make sure the main page is focused!`,
+          );
+        }
         setMessageColor(ERROR_COLOR);
       }
     }, 100);
