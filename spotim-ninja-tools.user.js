@@ -169,6 +169,7 @@
     }
 
     function startScrolling() {
+      scrollDown();
       message.set('Scroll To Conversation');
       isScrolling = true;
       scrollingInterval = setInterval(() => {
@@ -182,7 +183,6 @@
             color: SUCCESS_COLOR,
           });
         } else {
-          scrollDown();
           if (window.parent === window) {
             message.set(
               'Scroll To Conversation (not found 😕 try scrolling up and down a bit)',
