@@ -456,7 +456,7 @@
     let lastKeyStrokes = [];
 
     function handleKeyDown(e) {
-      if (e.key.toLowerCase() === 'escape') {
+      if (e.key && e.key.toLowerCase() === 'escape') {
         scrolling.stop();
         message.hide();
       }
