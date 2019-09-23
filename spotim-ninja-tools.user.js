@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.5
+// @version      1.6
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -14,9 +14,11 @@
 (function() {
   'use strict';
 
-  const DEFAULT_COLOR = '#467FDB';
-  const ERROR_COLOR = '#f44336';
-  const SUCCESS_COLOR = '#4caf50';
+  const colors = {
+    default: '#467FDB',
+    error: '#f44336',
+    success: '#4caf50',
+  };
 
   // global methods
   (() => {
@@ -36,12 +38,12 @@
         if (window.parent === window) {
           message.set(`Could not find launcher script 😕`, {
             timeout: 2000,
-            color: ERROR_COLOR,
+            color: colors.error,
           });
         } else {
           message.set(
             `Could not find launcher script 😕<br/>Make sure the main page is focused!`,
-            { timeout: 2000, color: ERROR_COLOR },
+            { timeout: 2000, color: colors.error },
           );
         }
       }
@@ -131,7 +133,7 @@
         margin: '5em auto',
         borderRadius: '1em',
       });
-      setMessageColor(DEFAULT_COLOR);
+      setMessageColor(colors.default);
       document.body.appendChild(messageEl);
     }
 
@@ -201,18 +203,18 @@
         if (conversation) {
           conversation.scrollIntoView();
           message.set('Scroll To Conversation (found! 😃)', {
-            color: SUCCESS_COLOR,
+            color: colors.success,
           });
         } else {
           if (window.parent === window) {
             message.set(
               'Scroll To Conversation (not found 😕 try scrolling up and down a bit)',
-              { color: ERROR_COLOR },
+              { color: colors.error },
             );
           } else {
             message.set(
               `Scroll To Conversation (not found 😕 try scrolling up and down a bit)<br/>And make sure the main page is focused!`,
-              { color: ERROR_COLOR },
+              { color: colors.error },
             );
           }
         }
@@ -261,20 +263,20 @@
 
         var networkName = 'spotim';
 
-        message.set('Fetching network id...', { color: DEFAULT_COLOR });
+        message.set('Fetching network id...', { color: colors.default });
 
         var networkIdJson = await fetch(
           `https://www.spot.im/api/me/network-id-by-name/${networkName}`,
         ).then(r => r.json());
 
-        message.set('Fetching network token...', { color: DEFAULT_COLOR });
+        message.set('Fetching network token...', { color: colors.default });
 
         var networkTokenJson = await fetch(
           `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
           { method: 'post' },
         ).then(r => r.json());
 
-        message.set('Logging in...', { color: DEFAULT_COLOR });
+        message.set('Logging in...', { color: colors.default });
 
         var emailConnectJson = await fetch(
           `https://www.spot.im/api/email-connect/login`,
@@ -291,13 +293,13 @@
 
         if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
           message.set('Too many login attempts 😕', {
-            color: ERROR_COLOR,
+            color: colors.error,
             timeout: 2000,
           });
           return;
         }
 
-        message.set('Fetching login json...', { color: DEFAULT_COLOR });
+        message.set('Fetching login json...', { color: colors.default });
 
         var loginRegisteredJson = await fetch(
           `https://www.spot.im/api/me/login-registered`,
@@ -310,7 +312,7 @@
           },
         ).then(r => r.json());
 
-        message.set('Calling me-make-admin...', { color: DEFAULT_COLOR });
+        message.set('Calling me-make-admin...', { color: colors.default });
 
         var makeMeAdminJson = await fetch(
           `https://www.spot.im/api/moderation/internal/make-me-admin?spot_id=${spotId}`,
@@ -322,7 +324,7 @@
           },
         ).then(r => r.json());
 
-        message.set('Fetching token JSON...', { color: DEFAULT_COLOR });
+        message.set('Fetching token JSON...', { color: colors.default });
 
         var tokenByTicketJson = await fetch(
           `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
@@ -330,7 +332,7 @@
         ).then(r => r.json());
 
         message.set('Openning Host Panel...', {
-          color: SUCCESS_COLOR,
+          color: colors.success,
           timeout: 2000,
         });
 
@@ -361,12 +363,12 @@
           navigator.clipboard.writeText(spotId);
           message.set(`Copied ${spotId} to clipboard! 😃`, {
             timeout: 2000,
-            color: DEFAULT_COLOR,
+            color: colors.default,
           });
         } else {
           message.set(
             `Can't copy ${spotId} to clipboard on non-https sites 😞`,
-            { timeout: 4000, color: ERROR_COLOR },
+            { timeout: 4000, color: colors.error },
           );
         }
       }
@@ -384,7 +386,7 @@
 
         message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
           timeout: 2000,
-          color: DEFAULT_COLOR,
+          color: colors.default,
         });
       }
     },
@@ -417,7 +419,7 @@
         ssa - Open Host Panel<br/>
         ssh - Show Help
         `,
-        { timeout: 5000, color: DEFAULT_COLOR },
+        { timeout: 5000, color: colors.default },
       );
     },
   };
