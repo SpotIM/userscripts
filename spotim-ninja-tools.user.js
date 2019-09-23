@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.2
+// @version      1.3
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -50,14 +50,24 @@
     },
 
     isProduction: launcher => {
-      return launcher.src.indexOf('//launcher.spot.im') > -1;
+      if (unsafeWindow.__SPOTIMENV__) {
+        return unsafeWindow.__SPOTIMENV__ === 'production';
+      } else {
+        return launcher.src.indexOf('//launcher.spot.im') > -1;
+      }
     },
 
     getSpotId: launcher => {
-      return launcher.src
+      const possibleSpotId = launcher.src
         .split('/')
         .pop()
         .split('?')[0];
+
+      if (possibleSpotId === 'launcher-bundle.js') {
+        return launcher.getAttribute('data-spot-id');
+      } else {
+        return possibleSpotId;
+      }
     },
   };
 
@@ -310,10 +320,6 @@
           `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
           { method: 'post' },
         ).then(r => r.json());
-        // console.log('tokenByTicketJson', tokenByTicketJson);
-        // console.log(
-        //   `open window spotName: ${makeMeAdminJson.spot_name} token: ${tokenByTicketJson.token} networkName: ${tokenByTicketJson.network_id}`
-        // );
 
         message.set('Openning Host Panel...', {
           color: SUCCESS_COLOR,
@@ -375,7 +381,12 @@
     ssa: () => {
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
-        hostPanel.open({ spotId: utils.getSpotId(launcher) });
+        if (!utils.isProduction(launcher)) {
+          // todo - fix staging host panel login
+          window.open('https://admin.staging-spot.im/internal/super-admin');
+        } else {
+          hostPanel.open({ spotId: utils.getSpotId(launcher) });
+        }
       }
     },
 
