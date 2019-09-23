@@ -10,7 +10,6 @@
 
 (function() {
   'use strict';
-  let isScrolling;
 
   const DEFAULT_COLOR = '#467FDB';
   const ERROR_COLOR = '#f44336';
@@ -155,6 +154,7 @@
   })();
 
   const scrolling = (() => {
+    let isScrolling;
     let scrollingInterval;
     let hasScrolledDown;
 
@@ -199,25 +199,32 @@
     }
 
     function stopScrolling() {
-      message.hide();
-      clearInterval(scrollingInterval);
-      isScrolling = false;
+      if (isScrolling) {
+        message.hide();
+        clearInterval(scrollingInterval);
+        isScrolling = false;
+      }
+    }
+
+    function toggleScrolling() {
+      if (isScrolling) {
+        stopScrolling();
+      } else {
+        startScrolling();
+      }
     }
 
     return {
       start: startScrolling,
       stop: stopScrolling,
+      toggle: toggleScrolling,
     };
   })();
 
   const commands = {
     // scroll to conversation
     sss: () => {
-      if (isScrolling) {
-        scrolling.stop();
-      } else {
-        scrolling.start();
-      }
+      scrolling.toggle();
     },
 
     // copy spot id
@@ -302,7 +309,7 @@
     let lastKeyStrokes = [];
 
     function handleKeyDown(e) {
-      if (e.key.toLowerCase() === 'escape' && isScrolling) {
+      if (e.key.toLowerCase() === 'escape') {
         scrolling.stop();
       }
     }
