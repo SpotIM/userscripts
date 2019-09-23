@@ -151,7 +151,10 @@
       addStyleTag();
       addMessage();
       showMessage();
-      messageEl.innerHTML = message;
+
+      if (messageEl.innerHTML !== message) {
+        messageEl.innerHTML = message;
+      }
 
       clearTimeout(hideMessageTimeout);
       if (timeout) {
