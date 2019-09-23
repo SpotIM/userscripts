@@ -1,11 +1,14 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.0
+// @version      1.2
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @grant        unsafeWindow
 // ==/UserScript==
 
 (function() {
@@ -14,6 +17,14 @@
   const DEFAULT_COLOR = '#467FDB';
   const ERROR_COLOR = '#f44336';
   const SUCCESS_COLOR = '#4caf50';
+
+  // global methods
+  (() => {
+    unsafeWindow.__spotim_ninja_tools_set_creds__ = (email, password) => {
+      GM_setValue('email', email);
+      GM_setValue('password', password);
+    };
+  })();
 
   const utils = {
     getLauncherEl: displayErrorIfNotFound => {
@@ -221,6 +232,103 @@
     };
   })();
 
+  const hostPanel = (() => {
+    return {
+      open: async ({ spotId }) => {
+        const email = await GM_getValue('email');
+        const password = await GM_getValue('password');
+
+        if (!email || !password) {
+          message.set(
+            "First you need to enter you're credentials for the Host Panel<br/>" +
+              'Do so by running the following command in the console<br/>' +
+              '__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")<br/>' +
+              "Note: the creds will be saved as cleartext somewhere in TamperMonkey's storgae",
+          );
+
+          return;
+        }
+
+        var networkName = 'spotim';
+
+        message.set('Fetching network id...', { color: DEFAULT_COLOR });
+
+        var networkIdJson = await fetch(
+          `https://www.spot.im/api/me/network-id-by-name/${networkName}`,
+        ).then(r => r.json());
+
+        message.set('Fetching network token...', { color: DEFAULT_COLOR });
+
+        var networkTokenJson = await fetch(
+          `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
+          { method: 'post' },
+        ).then(r => r.json());
+
+        message.set('Logging in...', { color: DEFAULT_COLOR });
+
+        var emailConnectJson = await fetch(
+          `https://www.spot.im/api/email-connect/login`,
+          {
+            method: 'post',
+            headers: new Headers({
+              'x-spotim-networkid': networkIdJson.network_id,
+              'x-spotim-token': networkTokenJson.token,
+              'Content-Type': 'application/json',
+            }),
+            body: JSON.stringify({ email, password }),
+          },
+        ).then(r => r.json());
+
+        message.set('Fetching login json...', { color: DEFAULT_COLOR });
+
+        var loginRegisteredJson = await fetch(
+          `https://www.spot.im/api/me/login-registered`,
+          {
+            method: 'post',
+            headers: new Headers({
+              'x-spotim-networkid': networkIdJson.network_id,
+              'x-spotim-token': networkTokenJson.token,
+            }),
+          },
+        ).then(r => r.json());
+
+        message.set('Calling me-make-admin...', { color: DEFAULT_COLOR });
+
+        var makeMeAdminJson = await fetch(
+          `https://www.spot.im/api/moderation/internal/make-me-admin?spot_id=${spotId}`,
+          {
+            headers: new Headers({
+              'x-spotim-networkid': networkIdJson.network_id,
+              'x-spotim-token': networkTokenJson.token,
+            }),
+          },
+        ).then(r => r.json());
+
+        message.set('Fetching token JSON...', { color: DEFAULT_COLOR });
+
+        var tokenByTicketJson = await fetch(
+          `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
+          { method: 'post' },
+        ).then(r => r.json());
+        // console.log('tokenByTicketJson', tokenByTicketJson);
+        // console.log(
+        //   `open window spotName: ${makeMeAdminJson.spot_name} token: ${tokenByTicketJson.token} networkName: ${tokenByTicketJson.network_id}`
+        // );
+
+        message.set('Openning Host Panel...', {
+          color: SUCCESS_COLOR,
+          timeout: 2000,
+        });
+
+        const isStaging = !utils.isProduction(utils.getLauncherEl());
+        var hostPrefix = isStaging ? 'staging-' : '';
+        window.open(
+          `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`,
+        );
+      },
+    };
+  })();
+
   const commands = {
     // scroll to conversation
     sss: () => {
@@ -267,11 +375,7 @@
     ssa: () => {
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
-        window.open(
-          utils.isProduction(launcher)
-            ? 'https://admin.spot.im/internal/super-admin'
-            : 'https://admin.staging-spot.im/internal/super-admin',
-        );
+        hostPanel.open({ spotId: utils.getSpotId(launcher) });
       }
     },
 
@@ -295,6 +399,7 @@
     const commandImpl = commands[keyCombo];
 
     if (commandImpl) {
+      scrolling.stop();
       commandImpl();
       return true;
     } else {
@@ -311,6 +416,7 @@
     function handleKeyDown(e) {
       if (e.key.toLowerCase() === 'escape') {
         scrolling.stop();
+        message.hide();
       }
     }
 
