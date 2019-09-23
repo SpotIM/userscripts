@@ -15,6 +15,7 @@
   const DEFAULT_COLOR = '#467FDB';
   const ERROR_COLOR = '#f44336';
   const SUCCESS_COLOR = '#4caf50';
+
   const utils = {
     getLauncherEl: displayErrorIfNotFound => {
       const launcher = document.querySelector(
@@ -50,122 +51,7 @@
     },
   };
 
-  const commands = {
-    // scroll to conversation
-    sss: () => {
-      if (isScrolling) {
-        scrolling.stop();
-      } else {
-        scrolling.start();
-      }
-    },
-    // copy spot id
-    ssc: () => {
-      const launcher = utils.getLauncherEl(true);
-      if (launcher) {
-        const spotId = utils.getSpotId(launcher);
-
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(spotId);
-          message.set(`Copied ${spotId} to clipboard! 😃`, {
-            timeout: 2000,
-            color: DEFAULT_COLOR,
-          });
-        } else {
-          message.set(
-            `Can't copy ${spotId} to clipboard on non-https sites 😞`,
-            { timeout: 4000, color: ERROR_COLOR },
-          );
-        }
-      }
-    },
-
-    // show info
-    ssi: () => {
-      const launcher = utils.getLauncherEl(true);
-      if (launcher) {
-        const spotId = utils.getSpotId(launcher);
-        const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
-        const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
-
-        message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
-          timeout: 2000,
-          color: DEFAULT_COLOR,
-        });
-      }
-    },
-
-    // open admin panel
-    ssa: () => {
-      const launcher = utils.getLauncherEl(true);
-      if (launcher) {
-        window.open(
-          utils.isProduction(launcher)
-            ? 'https://admin.spot.im/internal/super-admin'
-            : 'https://admin.staging-spot.im/internal/super-admin',
-        );
-      }
-    },
-
-    // show help
-    ssh: () => {
-      message.set(
-        `
-        Available Shortcuts:<br/>
-        sss - Scroll to conversation<br/>
-        ssi - Show Info<br/>
-        ssc - Copy Spot ID to Clipboard (only on HTTPs)<br/>
-        ssa - Open Host Panel<br/>
-        ssh - Show Help
-        `,
-        { timeout: 5000, color: DEFAULT_COLOR },
-      );
-    },
-  };
-
-  function executeCommand(keyCombo) {
-    const commandImpl = commands[keyCombo];
-
-    if (commandImpl) {
-      commandImpl();
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // handle keystrokes
-  (() => {
-    let lastKeyStrokesResetTimeout;
-
-    let lastKeyStrokes = [];
-
-    function handleKeyDown(e) {
-      if (e.key.toLowerCase() === 'escape' && isScrolling) {
-        scrolling.stop();
-      }
-    }
-
-    function handleKeyPress(e) {
-      lastKeyStrokes.push(e.key.toLowerCase());
-      clearTimeout(lastKeyStrokesResetTimeout);
-
-      const keyCombo = lastKeyStrokes.join('');
-
-      if (executeCommand(keyCombo)) {
-        lastKeyStrokes = [];
-      } else {
-        lastKeyStrokesResetTimeout = setTimeout(() => {
-          lastKeyStrokes = [];
-        }, 500);
-      }
-    }
-
-    // for some reason pressing on escape doesn't register as a keypress
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keypress', handleKeyPress);
-  })();
-
+  // apis
   const message = (() => {
     let messageEl;
     let hasAddedMessage;
@@ -322,5 +208,122 @@
       start: startScrolling,
       stop: stopScrolling,
     };
+  })();
+
+  const commands = {
+    // scroll to conversation
+    sss: () => {
+      if (isScrolling) {
+        scrolling.stop();
+      } else {
+        scrolling.start();
+      }
+    },
+
+    // copy spot id
+    ssc: () => {
+      const launcher = utils.getLauncherEl(true);
+      if (launcher) {
+        const spotId = utils.getSpotId(launcher);
+
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(spotId);
+          message.set(`Copied ${spotId} to clipboard! 😃`, {
+            timeout: 2000,
+            color: DEFAULT_COLOR,
+          });
+        } else {
+          message.set(
+            `Can't copy ${spotId} to clipboard on non-https sites 😞`,
+            { timeout: 4000, color: ERROR_COLOR },
+          );
+        }
+      }
+    },
+
+    // show info
+    ssi: () => {
+      const launcher = utils.getLauncherEl(true);
+      if (launcher) {
+        const spotId = utils.getSpotId(launcher);
+        const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
+        const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
+
+        message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
+          timeout: 2000,
+          color: DEFAULT_COLOR,
+        });
+      }
+    },
+
+    // open admin panel
+    ssa: () => {
+      const launcher = utils.getLauncherEl(true);
+      if (launcher) {
+        window.open(
+          utils.isProduction(launcher)
+            ? 'https://admin.spot.im/internal/super-admin'
+            : 'https://admin.staging-spot.im/internal/super-admin',
+        );
+      }
+    },
+
+    // show help
+    ssh: () => {
+      message.set(
+        `
+        Available Shortcuts:<br/>
+        sss - Scroll to conversation<br/>
+        ssi - Show Info<br/>
+        ssc - Copy Spot ID to Clipboard (only on HTTPs)<br/>
+        ssa - Open Host Panel<br/>
+        ssh - Show Help
+        `,
+        { timeout: 5000, color: DEFAULT_COLOR },
+      );
+    },
+  };
+
+  function executeCommand(keyCombo) {
+    const commandImpl = commands[keyCombo];
+
+    if (commandImpl) {
+      commandImpl();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // handle keystrokes
+  (() => {
+    let lastKeyStrokesResetTimeout;
+
+    let lastKeyStrokes = [];
+
+    function handleKeyDown(e) {
+      if (e.key.toLowerCase() === 'escape' && isScrolling) {
+        scrolling.stop();
+      }
+    }
+
+    function handleKeyPress(e) {
+      lastKeyStrokes.push(e.key.toLowerCase());
+      clearTimeout(lastKeyStrokesResetTimeout);
+
+      const keyCombo = lastKeyStrokes.join('');
+
+      if (executeCommand(keyCombo)) {
+        lastKeyStrokes = [];
+      } else {
+        lastKeyStrokesResetTimeout = setTimeout(() => {
+          lastKeyStrokes = [];
+        }, 500);
+      }
+    }
+
+    // for some reason pressing on escape doesn't register as a keypress
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keypress', handleKeyPress);
   })();
 })();
