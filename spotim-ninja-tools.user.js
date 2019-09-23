@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.4
+// @version      1.5
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -351,6 +351,8 @@
 
     // copy spot id
     ssc: () => {
+      scrolling.stop();
+
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
@@ -372,6 +374,8 @@
 
     // show info
     ssi: () => {
+      scrolling.stop();
+
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
@@ -387,6 +391,8 @@
 
     // open admin panel
     ssa: () => {
+      scrolling.stop();
+
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         if (!utils.isProduction(launcher)) {
@@ -400,6 +406,8 @@
 
     // show help
     ssh: () => {
+      scrolling.stop();
+
       message.set(
         `
         Available Shortcuts:<br/>
@@ -418,7 +426,6 @@
     const commandImpl = commands[keyCombo];
 
     if (commandImpl) {
-      scrolling.stop();
       commandImpl();
       return true;
     } else {
