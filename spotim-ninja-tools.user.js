@@ -102,6 +102,17 @@
             opacity: 1;
           }
         }
+
+        .sptmninja_code {
+          font-family: monaco;
+          font-size: 13px;
+          color: #d3d5da;
+          margin: 10px 0px;
+          display: inline-block;
+          background: #2b579c;
+          padding: 4px 8px;
+          border-radius: 5px;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -205,18 +216,18 @@
           document.querySelector('[data-spotim-app="conversation"]');
         if (conversation) {
           conversation.scrollIntoView();
-          message.set('Scroll To Conversation (found! 😃)', {
+          message.set('Scroll To Conversation... found! 😃', {
             color: colors.success,
           });
         } else {
           if (window.parent === window) {
             message.set(
-              'Scroll To Conversation (not found 😕 try scrolling up and down a bit)',
+              'Scroll To Conversation... not found 😕 try scrolling up and down a bit',
               { color: colors.error },
             );
           } else {
             message.set(
-              `Scroll To Conversation (not found 😕 try scrolling up and down a bit)<br/>And make sure the main page is focused!`,
+              `Scroll To Conversation... not found 😕 try scrolling up and down a bit<br/>And make sure the main page is focused!`,
               { color: colors.error },
             );
           }
@@ -255,10 +266,10 @@
 
         if (!email || !password) {
           message.set(
-            "First you need to enter you're credentials for the Host Panel<br/>" +
-              'Do so by running the following command in the console<br/>' +
-              '__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")<br/>' +
-              "Note: the creds will be saved as cleartext somewhere in TamperMonkey's storgae",
+            "First you need to enter you're credentials for the Host Panel.<br/>" +
+              'Do so by running the following command in the console:<br/>' +
+              '<span class="sptmninja_code">__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")</span><br/>' +
+              "Note that the credentials will be saved as clear text somewhere in TamperMonkey's storage!",
           );
 
           return;
