@@ -2,7 +2,7 @@
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
 // @version      1.6
-// @description  A bunch of tools that will make our lives easier
+// @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
 // @grant        GM_setValue
