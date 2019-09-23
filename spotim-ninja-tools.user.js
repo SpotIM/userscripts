@@ -406,6 +406,20 @@
       }
     },
 
+    // dump open admin panel
+    ssda: () => {
+      scrolling.stop();
+
+      const launcher = utils.getLauncherEl(true);
+      if (launcher) {
+        if (!utils.isProduction(launcher)) {
+          window.open('https://admin.staging-spot.im/internal/super-admin');
+        } else {
+          window.open('https://admin.spot.im/internal/super-admin');
+        }
+      }
+    },
+
     // show help
     ssh: () => {
       scrolling.stop();
