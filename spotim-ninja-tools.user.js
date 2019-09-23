@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.3
+// @version      1.4
 // @description  A bunch of tools that will make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -288,6 +288,14 @@
             body: JSON.stringify({ email, password }),
           },
         ).then(r => r.json());
+
+        if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
+          message.set('Too many login attempts 😕', {
+            color: ERROR_COLOR,
+            timeout: 2000,
+          });
+          return;
+        }
 
         message.set('Fetching login json...', { color: DEFAULT_COLOR });
 
