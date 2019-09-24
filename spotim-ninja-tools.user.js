@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.6
+// @version      1.7
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -13,6 +13,9 @@
 
 (function() {
   'use strict';
+
+  const FOCUS_WARNING =
+    '⚠️⚠️️⚠️ Moving focus to parent frame (try again) ️⚠️⚠️️⚠️';
 
   const colors = {
     default: '#467FDB',
@@ -41,9 +44,10 @@
             color: colors.error,
           });
         } else {
+          window.parent.focus();
           message.set(
-            `Could not find launcher script 😕<br/>Make sure the main page is focused!`,
-            { timeout: 2000, color: colors.error },
+            `Could not find launcher script 😕<br/>️${FOCUS_WARNING}`,
+            { timeout: 3000, color: colors.error },
           );
         }
       }
@@ -226,18 +230,22 @@
               { color: colors.error },
             );
           } else {
+            window.parent.focus();
             message.set(
-              `Scroll To Conversation... not found 😕 try scrolling up and down a bit<br/>And make sure the main page is focused!`,
-              { color: colors.error },
+              `Scroll To Conversation... not found 😕 try scrolling up and down a bit.<br/>${FOCUS_WARNING}`,
+              { color: colors.error, timeout: 3000 },
             );
+            stopScrolling({ hideMessage: false });
           }
         }
       }, 100);
     }
 
-    function stopScrolling() {
+    function stopScrolling({ hideMessage } = { hideMessage: true }) {
       if (isScrolling) {
-        message.hide();
+        if (hideMessage) {
+          message.hide();
+        }
         clearInterval(scrollingInterval);
         isScrolling = false;
       }
