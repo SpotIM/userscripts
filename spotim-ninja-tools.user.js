@@ -267,8 +267,15 @@
   })();
 
   const hostPanel = (() => {
+    let windowRef;
+
     return {
       open: async ({ spotId }) => {
+        if (windowRef && !windowRef.closed) {
+          windowRef.focus();
+          return;
+        }
+
         const email = await GM_getValue('email');
         const password = await GM_getValue('password');
 
@@ -361,7 +368,7 @@
 
         const isStaging = !utils.isProduction(utils.getLauncherEl());
         var hostPrefix = isStaging ? 'staging-' : '';
-        window.open(
+        windowRef = window.open(
           `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`,
         );
       },
