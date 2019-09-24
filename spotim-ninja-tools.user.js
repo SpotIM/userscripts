@@ -404,7 +404,7 @@
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
-        const version = !!window.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
+        const version = !!unsafeWindow.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
         const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
 
         message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
