@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.8
+// @version      1.9
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -268,9 +268,24 @@
 
   const hostPanel = (() => {
     let windowRef;
+    let lastUrl;
 
     return {
       open: async ({ spotId }) => {
+        function showSuccessMessage() {
+          message.set('Openning Host Panel...', {
+            color: colors.success,
+            timeout: 2000,
+          });
+        }
+
+        if (lastUrl) {
+          windowRef = window.open(lastUrl);
+          lastUrl = null;
+
+          showSuccessMessage();
+        }
+
         if (windowRef && !windowRef.closed) {
           windowRef.focus();
           return;
@@ -361,16 +376,20 @@
           { method: 'post' },
         ).then(r => r.json());
 
-        message.set('Openning Host Panel...', {
-          color: colors.success,
-          timeout: 2000,
-        });
-
         const isStaging = !utils.isProduction(utils.getLauncherEl());
         var hostPrefix = isStaging ? 'staging-' : '';
-        windowRef = window.open(
-          `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`,
-        );
+
+        const url = `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`;
+
+        windowRef = window.open(url);
+
+        if (windowRef === null) {
+          message.set(
+            'Popup blocker probably blocked us 😞<br/>But type ssa again and it will work immediately!',
+            { timeout: 6000, color: colors.error },
+          );
+          lastUrl = url;
+        }
       },
     };
   })();
