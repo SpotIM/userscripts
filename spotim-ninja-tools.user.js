@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.11
+// @version      1.12
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -284,6 +284,7 @@
     let scrollingInterval;
     let hasScrolledDown;
     let isConversationHighlighted;
+    let isInViewport;
 
     function highlightConversation(conversation) {
       Object.assign(conversation.style, {
@@ -317,6 +318,16 @@
     }
 
     function startScrolling() {
+      let observer = new IntersectionObserver(
+        data => {
+          isInViewport = data[0].isIntersecting;
+        },
+        {
+          rootMargin: '0px',
+          threshold: 0,
+        },
+      );
+
       if (isScrolling) {
         return;
       }
@@ -328,8 +339,12 @@
         let conversation;
         conversation = utils.findConversation();
         if (conversation) {
-          conversation.scrollIntoView();
-          window.scrollBy(0, -200);
+          observer.observe(conversation);
+
+          if (!isInViewport) {
+            conversation.scrollIntoView();
+            window.scrollBy(0, -200);
+          }
           message.set('Scroll To Conversation... found! 😃', {
             color: colors.success,
           });
