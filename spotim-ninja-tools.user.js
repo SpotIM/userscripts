@@ -507,7 +507,12 @@
         const isStaging = !utils.isProduction(utils.getLauncherEl());
         var hostPrefix = isStaging ? 'staging-' : '';
 
-        const url = `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`;
+        const url = [
+          `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?`,
+          `name=${makeMeAdminJson.spot_name}&`,
+          `token=${tokenByTicketJson.token}&`,
+          `network_name=${tokenByTicketJson.network_name}`,
+        ].join('');
 
         message.set('Opening Host Panel 😃', {
           color: colors.success,
