@@ -628,22 +628,22 @@
     },
   };
 
-  function executeCommand(keyCombo) {
-    const commandImpl = commands[keyCombo];
-
-    if (commandImpl) {
-      commandImpl();
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   // handle keystrokes
   (() => {
     let lastKeyStrokesResetTimeout;
 
     let lastKeyStrokes = [];
+
+    function executeCommand(keyCombo) {
+      const commandImpl = commands[keyCombo];
+
+      if (commandImpl) {
+        commandImpl();
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     function handleKeyDown(e) {
       if (e.key && e.key.toLowerCase() === 'escape') {
