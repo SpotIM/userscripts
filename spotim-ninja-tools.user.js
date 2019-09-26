@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.9
+// @version      1.10
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -474,15 +474,16 @@
       scrolling.stop();
 
       message.set(
-        `
-        Available Shortcuts:<br/>
-        sss - Scroll to conversation<br/>
-        ssi - Show Info<br/>
-        ssc - Copy Spot ID to Clipboard (only on HTTPs)<br/>
-        ssa - Open Host Panel<br/>
-        ssh - Show Help
-        `,
-        { timeout: 5000, color: colors.default },
+        [
+          'Available Shortcuts:',
+          'sss - Scroll to conversation',
+          'ssi - Show Info',
+          'ssc - Copy Spot ID to Clipboard (only on HTTPs)',
+          'ssa - Open Host Panel',
+          'ssh - Show Help',
+          'escape - Hides floating message',
+        ].join('<br/>'),
+        { color: colors.default },
       );
     },
   };
