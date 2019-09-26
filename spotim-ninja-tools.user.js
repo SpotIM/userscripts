@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.10
+// @version      1.11
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -15,7 +15,7 @@
   'use strict';
 
   const FOCUS_WARNING =
-    '⚠️⚠️️⚠️ Moving focus to parent frame (try again) ️⚠️⚠️️⚠️';
+    '⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️';
 
   const colors = {
     default: '#467FDB',
@@ -23,22 +23,75 @@
     success: '#4caf50',
   };
 
-  // global methods
+  const prefs = (() => {
+    return {
+      get: () => {
+        return GM_getValue('prefs', {});
+      },
+      set: prefs => {
+        return GM_setValue('prefs', prefs);
+      },
+    };
+  })();
+
+  // first run message
+  (async () => {
+    const isNotFirstRun = await prefs.get().isNotFirstRun;
+    if (!isNotFirstRun) {
+      message.set(
+        "Welcome to Ninja Tools<br/>(you'll only see this message once)",
+        { timeout: 3000, color: colors.default },
+      );
+
+      setTimeout(() => {
+        help.show();
+      }, 3500);
+
+      await prefs.set({ isNotFirstRun: true });
+    }
+  })();
+
+  // set settings/creds method
   (() => {
-    unsafeWindow.__spotim_ninja_tools_set_creds__ = (email, password) => {
-      GM_setValue('email', email);
-      GM_setValue('password', password);
+    unsafeWindow.__spotim_ninja_tools_set_creds__ = async (email, password) => {
+      await GM_setValue('email', email);
+      await GM_setValue('password', password);
+      console.log('successfully set creds!');
+    };
+
+    unsafeWindow.__spotim_ninja_tools_set_prefs__ = async newPrefs => {
+      const currentPrefs = await prefs.get();
+
+      const mergedPrefs = {
+        ...currentPrefs,
+        ...newPrefs,
+      };
+      await prefs.set(mergedPrefs);
+
+      console.log('successfully set prefs!');
+      console.log(mergedPrefs);
     };
   })();
 
   const utils = {
+    isTopMostFrame: () => {
+      return window.parent === window;
+    },
+
+    findConversation: () => {
+      return (
+        document.querySelector('[data-conversation-id]') ||
+        document.querySelector('[data-spotim-app="conversation"]')
+      );
+    },
+
     getLauncherEl: displayErrorIfNotFound => {
       const launcher = document.querySelector(
         'script[data-spotim-module="spotim-launcher"]',
       );
 
       if (!launcher && displayErrorIfNotFound) {
-        if (window.parent === window) {
+        if (utils.isTopMostFrame()) {
           message.set(`Could not find launcher script 😕`, {
             timeout: 2000,
             color: colors.error,
@@ -46,7 +99,7 @@
         } else {
           window.parent.focus();
           message.set(
-            `Could not find launcher script 😕<br/>️${FOCUS_WARNING}`,
+            `${FOCUS_WARNING}<br/>Could not find launcher script 😕️`,
             { timeout: 3000, color: colors.error },
           );
         }
@@ -75,7 +128,35 @@
         return possibleSpotId;
       }
     },
+
+    getSpotimVersion: () => {
+      if (
+        unsafeWindow.__SPOTIM__ &&
+        (utils.findConversation() || {}).tagName !== 'IFRAME'
+      ) {
+        return 2;
+      } else {
+        return 1;
+      }
+    },
   };
+
+  // autoscroll
+  (async () => {
+    let findConversationInterval;
+
+    if (utils.isTopMostFrame() && (await prefs.get().autoScroll)) {
+      findConversationInterval = setInterval(() => {
+        let conversation = utils.findConversation();
+
+        if (conversation) {
+          console.log('scrolling.start()', findConversationInterval);
+          scrolling.start();
+          clearInterval(findConversationInterval);
+        }
+      }, 100);
+    }
+  })();
 
   // apis
   const message = (() => {
@@ -91,7 +172,7 @@
       hasAddedStyleTag = true;
 
       const style = document.createElement('style');
-      style.innerHTML = `
+      style.innerHTML = /*css*/ `
         @keyframes spotim-scroll-to-comments-appear {
           0% {
             transform: scale(0.7);
@@ -128,26 +209,30 @@
       hasAddedMessage = true;
 
       messageEl = document.createElement('div');
-      Object.assign(messageEl.style, {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        background: 'red',
-        color: 'white',
-        fontWeight: 'bold',
-        fontFamily: 'Helvetica',
-        fontSize: '18px',
-        padding: '10px',
-        lineHeight: '1.5',
-        zIndex: 100000000000,
-        animation: 'spotim-scroll-to-comments-appear 0.2s ease-out',
-        direction: 'ltr',
-        maxWidth: '600px',
-        margin: '5em auto',
-        borderRadius: '1em',
-      });
+      messageEl.setAttribute(
+        'style',
+        /* css */ `{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            background: red;
+            color: white;
+            font-weight: bold;
+            font-family: Helvetica;
+            font-size: 18px;
+            padding: 10px;
+            line-height: 1.5;
+            z-index: 100000000000;
+            animation: spotim-scroll-to-comments-appear 0.2s ease-out;
+            direction: ltr;
+            max-width: 600px;
+            margin: 5em auto;
+            border-radius: 1em;
+          }
+        `.slice(1, -1),
+      );
       setMessageColor(colors.default);
       document.body.appendChild(messageEl);
     }
@@ -198,6 +283,28 @@
     let isScrolling;
     let scrollingInterval;
     let hasScrolledDown;
+    let isConversationHighlighted;
+
+    function highlightConversation(conversation) {
+      Object.assign(conversation.style, {
+        boxShadow: '#4caf50 0px 0px 0px 12px, black 0px 0px 40px 22px',
+        // outline: 'solid 2000px #00000070',
+      });
+
+      isConversationHighlighted = true;
+    }
+
+    function unhighlightConversation(conversation) {
+      if (!isConversationHighlighted) {
+        return;
+      }
+
+      conversation.style.transition = 'all 1s ease-out';
+      conversation.style.boxShadow = null;
+      conversation.style.outline = null;
+
+      isConversationHighlighted = false;
+    }
 
     function scrollDown() {
       if (!hasScrolledDown) {
@@ -210,21 +317,25 @@
     }
 
     function startScrolling() {
+      if (isScrolling) {
+        return;
+      }
+
       scrollDown();
       message.set('Scroll To Conversation');
       isScrolling = true;
       scrollingInterval = setInterval(() => {
         let conversation;
-        conversation =
-          document.querySelector('[data-conversation-id]') ||
-          document.querySelector('[data-spotim-app="conversation"]');
+        conversation = utils.findConversation();
         if (conversation) {
           conversation.scrollIntoView();
+          window.scrollBy(0, -200);
           message.set('Scroll To Conversation... found! 😃', {
             color: colors.success,
           });
+          highlightConversation(conversation);
         } else {
-          if (window.parent === window) {
+          if (utils.isTopMostFrame()) {
             message.set(
               'Scroll To Conversation... not found 😕 try scrolling up and down a bit',
               { color: colors.error },
@@ -232,7 +343,7 @@
           } else {
             window.parent.focus();
             message.set(
-              `Scroll To Conversation... not found 😕 try scrolling up and down a bit.<br/>${FOCUS_WARNING}`,
+              `${FOCUS_WARNING}<br/>Scroll To Conversation... not found 😕 try scrolling up and down a bit.`,
               { color: colors.error, timeout: 3000 },
             );
             stopScrolling({ hideMessage: false });
@@ -242,6 +353,7 @@
     }
 
     function stopScrolling({ hideMessage } = { hideMessage: true }) {
+      unhighlightConversation(utils.findConversation());
       if (isScrolling) {
         if (hideMessage) {
           message.hide();
@@ -381,6 +493,11 @@
 
         const url = `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?name=${makeMeAdminJson.spot_name}&token=${tokenByTicketJson.token}&network_name=${tokenByTicketJson.network_name}`;
 
+        message.set('Opening Host Panel 😃', {
+          color: colors.success,
+          timeout: 2000,
+        });
+
         windowRef = window.open(url);
 
         if (windowRef === null) {
@@ -390,6 +507,25 @@
           );
           lastUrl = url;
         }
+      },
+    };
+  })();
+
+  const help = (() => {
+    return {
+      show: () => {
+        message.set(
+          [
+            'Available Shortcuts:',
+            'sss - Scroll to Conversation',
+            'ssi - Show Info',
+            'ssc - Copy Spot ID to Clipboard (only on HTTPs)',
+            'ssa - Open Host Panel',
+            'ssh - Show Help',
+            'escape - Hides Floating Messages',
+          ].join('<br/>'),
+          { color: colors.default },
+        );
       },
     };
   })();
@@ -430,7 +566,7 @@
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
-        const version = !!unsafeWindow.__SPOTIM__ ? 'V.2.0' : 'V.1.0';
+        const version = utils.getSpotimVersion() === 2 ? 'V.2.0' : 'V.1.0';
         const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
 
         message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
@@ -472,19 +608,7 @@
     // show help
     ssh: () => {
       scrolling.stop();
-
-      message.set(
-        [
-          'Available Shortcuts:',
-          'sss - Scroll to conversation',
-          'ssi - Show Info',
-          'ssc - Copy Spot ID to Clipboard (only on HTTPs)',
-          'ssa - Open Host Panel',
-          'ssh - Show Help',
-          'escape - Hides floating message',
-        ].join('<br/>'),
-        { color: colors.default },
-      );
+      help.show();
     },
   };
 
