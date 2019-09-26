@@ -283,7 +283,7 @@
     let isScrolling;
     let scrollingInterval;
     let hasScrolledDown;
-    let isConversationHighlighted;
+    let isHighlighted;
     let isInViewport;
 
     function highlightConversation(conversation) {
@@ -292,11 +292,11 @@
         // outline: 'solid 2000px #00000070',
       });
 
-      isConversationHighlighted = true;
+      isHighlighted = true;
     }
 
     function unhighlightConversation(conversation) {
-      if (!isConversationHighlighted) {
+      if (!isHighlighted) {
         return;
       }
 
@@ -304,7 +304,7 @@
       conversation.style.boxShadow = null;
       conversation.style.outline = null;
 
-      isConversationHighlighted = false;
+      isHighlighted = false;
     }
 
     function scrollDown() {
@@ -318,6 +318,10 @@
     }
 
     function startScrolling() {
+      if (isScrolling) {
+        return;
+      }
+
       let observer = new IntersectionObserver(
         data => {
           isInViewport = data[0].isIntersecting;
@@ -327,10 +331,6 @@
           threshold: 0,
         },
       );
-
-      if (isScrolling) {
-        return;
-      }
 
       scrollDown();
       message.set('Scroll To Conversation');
@@ -375,6 +375,7 @@
         }
         clearInterval(scrollingInterval);
         isScrolling = false;
+        hasScrolledDown = false;
       }
     }
 
