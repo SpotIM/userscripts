@@ -1,5 +1,9 @@
 # userscripts
 
+# ********* IMPORTANT *********
+
+### This repository is PUBLIC, don't add anything you don't want the whole world to know!!!
+
 ## Installing
 
 1. Install [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
