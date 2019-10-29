@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.13
+// @version      1.14
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -81,7 +81,8 @@
     findConversation: () => {
       return (
         document.querySelector('[data-conversation-id]') ||
-        document.querySelector('[data-spotim-app="conversation"]')
+        document.querySelector('[data-spotim-app="conversation"]') ||
+        document.querySelector('[data-spotim-module="conversation"]')
       );
     },
 
@@ -346,7 +347,6 @@
         },
       );
 
-      scrollDown();
       message.set('Scroll To Conversation');
       isScrolling = true;
       scrollingInterval = setInterval(() => {
@@ -364,6 +364,8 @@
           });
           highlightConversation(conversation);
         } else {
+          scrollDown();
+
           if (utils.isTopMostFrame()) {
             message.set(
               'Scroll To Conversation... not found 😕 try scrolling up and down a bit',
