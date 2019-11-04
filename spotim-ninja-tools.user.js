@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.15
+// @version      1.16
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -211,6 +211,16 @@
           background: #2b579c;
           padding: 4px 8px;
           border-radius: 5px;
+        }
+
+        .sptmninja_mono {
+          background: #0000004f;
+          padding: 0px 8px 3px;
+          border-radius: 5px;
+          box-shadow: 0px 1px 0px #00000052 inset;
+          color: white;
+          font-family: monaco;
+          line-height: 1.9;
         }
       `;
       document.head.appendChild(style);
@@ -583,12 +593,12 @@
         message.set(
           [
             'Available Shortcuts:',
-            'sss - Scroll to Conversation',
-            'ssi - Show Info',
-            'ssc - Copy Spot ID to Clipboard (only on HTTPs)',
-            'ssa - Open Host Panel',
-            'ssh - Show Help',
-            'escape - Hides Floating Messages',
+            '<span class="sptmninja_mono">sss</span> - Scroll to Conversation',
+            '<span class="sptmninja_mono">ssi</span> - Show Info',
+            '<span class="sptmninja_mono">ssc</span> - Copy Spot ID to Clipboard (only on HTTPs)',
+            '<span class="sptmninja_mono">ssa</span> - Open Host Panel',
+            '<span class="sptmninja_mono">ssh</span> - Show Help',
+            '<span class="sptmninja_mono">escape</span> - Hides Floating Messages',
           ].join('<br/>'),
           { color: colors.default },
         );
