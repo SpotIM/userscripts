@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.14
+// @version      1.15
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -177,6 +177,7 @@
     let hasAddedMessage;
     let hasAddedStyleTag;
     let hideMessageTimeout;
+    let isMouseOver;
 
     function addStyleTag() {
       if (hasAddedStyleTag) {
@@ -246,20 +247,48 @@
           }
         `.slice(1, -1),
       );
+
+      messageEl.addEventListener('mouseenter', () => {
+        isMouseOver = true;
+      });
+
+      messageEl.addEventListener('mouseleave', () => {
+        isMouseOver = false;
+      });
+
       setMessageColor(colors.default);
       document.body.appendChild(messageEl);
     }
 
     function showMessage() {
+      isMouseOver = false;
+
       if (!messageEl.parentNode) {
         document.body.appendChild(messageEl);
       }
     }
 
+    function mouseOut() {
+      return new Promise(resolve => {
+        if (!isMouseOver) {
+          resolve();
+        } else {
+          const interval = setInterval(() => {
+            if (!isMouseOver) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        }
+      });
+    }
+
     function hideMessage() {
-      if (messageEl && messageEl.parentNode) {
-        messageEl.parentNode.removeChild(messageEl);
-      }
+      mouseOut().then(() => {
+        if (messageEl && messageEl.parentNode) {
+          messageEl.parentNode.removeChild(messageEl);
+        }
+      });
     }
 
     function setMessage(message, { timeout, color } = {}) {
