@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.18
+// @version      1.19
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -587,7 +587,7 @@
 
         if (windowRef === null) {
           message.set(
-            'Popup blocker probably blocked us 😞<br/>But type ssa again and it will work immediately!',
+            'Popup blocker probably blocked us 😞<br/>But type <span class="sptmninja_mono">ssa</span> again and it will work immediately!',
             { timeout: 6000, color: colors.error },
           );
           lastUrl = url;
