@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.19
+// @version      1.20
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -405,7 +405,7 @@
             window.scrollBy(0, -200);
           }
           message.set(
-            'Scroll To Conversation... found! 😃<br/>Hit <span class="sptmninja_mono">Escape</span> to stop',
+            'Scroll To Conversation... found! 😃<br/>Hit <span class="sptmninja_mono">esc</span> to stop',
             {
               color: colors.success,
             },
@@ -423,6 +423,7 @@
             window.parent.focus();
             message.set(
               `${FOCUS_WARNING}<br/>Scroll To Conversation... not found 😕 try scrolling up and down a bit.`,
+
               { color: colors.error, timeout: 3000 },
             );
             stopScrolling({ hideMessage: false });
