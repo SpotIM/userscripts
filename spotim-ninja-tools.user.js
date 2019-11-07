@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.17
+// @version      1.18
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -404,9 +404,12 @@
             conversation.scrollIntoView();
             window.scrollBy(0, -200);
           }
-          message.set('Scroll To Conversation... found! 😃', {
-            color: colors.success,
-          });
+          message.set(
+            'Scroll To Conversation... found! 😃<br/>Hit <span class="sptmninja_mono">Escape</span> to stop',
+            {
+              color: colors.success,
+            },
+          );
           highlightConversation(conversation);
         } else {
           scrollDown();
