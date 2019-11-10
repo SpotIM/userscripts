@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.20
+// @version      1.21
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -704,6 +704,11 @@
 
     let lastKeyStrokes = [];
 
+    function isFocusedOnInput() {
+      const el = document.activeElement;
+      return el.getAttribute('contenteditable') || el.tagName === 'INPUT';
+    }
+
     function executeCommand(keyCombo) {
       const commandImpl = commands[keyCombo];
 
@@ -723,6 +728,10 @@
     }
 
     function handleKeyPress(e) {
+      if (isFocusedOnInput()) {
+        return;
+      }
+
       lastKeyStrokes.push(e.key.toLowerCase());
       clearTimeout(lastKeyStrokesResetTimeout);
 
