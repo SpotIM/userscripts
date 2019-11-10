@@ -163,7 +163,6 @@
         let conversation = utils.findConversation();
 
         if (conversation) {
-          console.log('scrolling.start()', findConversationInterval);
           scrolling.start();
           clearInterval(findConversationInterval);
         }
