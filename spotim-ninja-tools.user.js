@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.22
+// @version      1.23
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -128,6 +128,10 @@
       } else {
         return possibleSpotId;
       }
+    },
+
+    getPostId: launcher => {
+      return launcher.getAttribute('data-post-id');
     },
 
     getSpotimVersion: () => {
@@ -663,6 +667,7 @@
             '<span class="sptmninja_mono">ssi</span> - Show Info',
             '<span class="sptmninja_mono">ssc</span> - Copy Spot ID to Clipboard (only on HTTPs)',
             '<span class="sptmninja_mono">ssa</span> - Open Host Panel',
+            '<span class="sptmninja_mono">ssv</span> - Open config data',
             '<span class="sptmninja_mono">ssh</span> - Show Help',
             '<span class="sptmninja_mono">escape</span> - Hides Floating Messages',
           ].join('<br/>'),
@@ -733,7 +738,7 @@
       }
     },
 
-    // dump open admin panel
+    // dumb open admin panel
     ssda: () => {
       scrolling.stop();
 
@@ -744,6 +749,19 @@
         } else {
           window.open('https://admin.spot.im/internal/super-admin');
         }
+      }
+    },
+
+    ssv: () => {
+      scrolling.stop();
+
+      const launcher = utils.getLauncherEl(true);
+      if (utils.isProduction(launcher)) {
+        window.open(
+          `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
+            launcher,
+          )}/${utils.getPostId(launcher)}/vendor,init,conversation`,
+        );
       }
     },
 
