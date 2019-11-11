@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.21
+// @version      1.22
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -173,6 +173,8 @@
   // apis
   const message = (() => {
     let messageEl;
+    let messageBodyEl;
+    let messageProgressEl;
     let hasAddedMessage;
     let hasAddedStyleTag;
     let hideMessageTimeout;
@@ -199,6 +201,40 @@
             transform: scale(1);
             opacity: 1;
           }
+        }
+
+        .sptmninja_message {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          text-align: center;
+          background: red;
+          color: white;
+          font-weight: bold;
+          font-family: Helvetica;
+          font-size: 18px;
+          padding: 10px;
+          line-height: 1.5;
+          z-index: 100000000000;
+          animation: spotim-scroll-to-comments-appear 0.2s ease-out;
+          direction: ltr;
+          max-width: 600px;
+          margin: 5em auto;
+          border-radius: 1em;
+          overflow: hidden;
+        }
+
+        .sptmninja_message_progress {
+          background: black;
+          position: absolute;
+          left: 0px;
+          height: 100%;
+          width: 0%;
+          top: 0px;
+          opacity: 0.2;
+          z-index: -1;
+          transition: width 0.2s ease-out;
         }
 
         .sptmninja_code {
@@ -232,30 +268,15 @@
       hasAddedMessage = true;
 
       messageEl = document.createElement('div');
-      messageEl.setAttribute(
-        'style',
-        /* css */ `{
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-            background: red;
-            color: white;
-            font-weight: bold;
-            font-family: Helvetica;
-            font-size: 18px;
-            padding: 10px;
-            line-height: 1.5;
-            z-index: 100000000000;
-            animation: spotim-scroll-to-comments-appear 0.2s ease-out;
-            direction: ltr;
-            max-width: 600px;
-            margin: 5em auto;
-            border-radius: 1em;
-          }
-        `.slice(1, -1),
-      );
+      messageEl.className = 'sptmninja_message';
+
+      messageBodyEl = document.createElement('div');
+
+      messageProgressEl = document.createElement('div');
+      messageProgressEl.className = 'sptmninja_message_progress';
+
+      messageEl.appendChild(messageBodyEl);
+      messageEl.appendChild(messageProgressEl);
 
       messageEl.addEventListener('mouseenter', () => {
         isMouseOver = true;
@@ -294,6 +315,8 @@
 
     function hideMessage(force) {
       function hideMessageImpl() {
+        setMessageProgress(0);
+
         if (messageEl && messageEl.parentNode) {
           messageEl.parentNode.removeChild(messageEl);
         }
@@ -306,13 +329,13 @@
       mouseOut().then(hideMessageImpl);
     }
 
-    function setMessage(message, { timeout, color } = {}) {
+    function setMessage(message, { timeout, color, step, numSteps } = {}) {
       addStyleTag();
       addMessage();
       showMessage();
 
-      if (messageEl.innerHTML !== message) {
-        messageEl.innerHTML = message;
+      if (messageBodyEl.innerHTML !== message) {
+        messageBodyEl.innerHTML = message;
       }
 
       clearTimeout(hideMessageTimeout);
@@ -325,6 +348,16 @@
       if (color) {
         setMessageColor(color);
       }
+
+      if (!isNaN(step / numSteps)) {
+        setMessageProgress(step / numSteps);
+      } else {
+        setMessageProgress(0);
+      }
+    }
+
+    function setMessageProgress(progress) {
+      messageProgressEl.style.width = progress * 100 + '%';
     }
 
     function setMessageColor(color) {
@@ -500,20 +533,32 @@
 
         var networkName = 'spotim';
 
-        message.set('Fetching network id...', { color: colors.default });
+        message.set('Fetching network id...', {
+          color: colors.default,
+          step: 0,
+          numSteps: 5,
+        });
 
         var networkIdJson = await fetch(
           `https://www.spot.im/api/me/network-id-by-name/${networkName}`,
         ).then(r => r.json());
 
-        message.set('Fetching network token...', { color: colors.default });
+        message.set('Fetching network token...', {
+          color: colors.default,
+          step: 1,
+          numSteps: 5,
+        });
 
         var networkTokenJson = await fetch(
           `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
           { method: 'post' },
         ).then(r => r.json());
 
-        message.set('Logging in...', { color: colors.default });
+        message.set('Logging in...', {
+          color: colors.default,
+          step: 2,
+          numSteps: 5,
+        });
 
         var emailConnectJson = await fetch(
           `https://www.spot.im/api/email-connect/login`,
@@ -536,7 +581,11 @@
           return;
         }
 
-        message.set('Fetching login json...', { color: colors.default });
+        message.set('Fetching login json...', {
+          color: colors.default,
+          step: 3,
+          numSteps: 5,
+        });
 
         var loginRegisteredJson = await fetch(
           `https://www.spot.im/api/me/login-registered`,
@@ -549,7 +598,11 @@
           },
         ).then(r => r.json());
 
-        message.set('Calling me-make-admin...', { color: colors.default });
+        message.set('Calling me-make-admin...', {
+          color: colors.default,
+          step: 4,
+          numSteps: 5,
+        });
 
         var makeMeAdminJson = await fetch(
           `https://www.spot.im/api/moderation/internal/make-me-admin?spot_id=${spotId}`,
@@ -561,7 +614,11 @@
           },
         ).then(r => r.json());
 
-        message.set('Fetching token JSON...', { color: colors.default });
+        message.set('Fetching token JSON...', {
+          color: colors.default,
+          step: 5,
+          numSteps: 5,
+        });
 
         var tokenByTicketJson = await fetch(
           `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
