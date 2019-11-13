@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.23
+// @version      1.24
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -12,25 +12,25 @@
 // ==/UserScript==
 
 (function() {
-  'use strict';
+  "use strict";
 
   const FOCUS_WARNING =
-    '⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️';
+    "⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️";
 
   const colors = {
-    default: '#467FDB',
-    error: '#f44336',
-    success: '#4caf50',
+    default: "#467FDB",
+    error: "#f44336",
+    success: "#4caf50"
   };
 
   const prefs = (() => {
     return {
       get: () => {
-        return GM_getValue('prefs', {});
+        return GM_getValue("prefs", {});
       },
       set: prefs => {
-        return GM_setValue('prefs', prefs);
-      },
+        return GM_setValue("prefs", prefs);
+      }
     };
   })();
 
@@ -40,7 +40,7 @@
     if (!isNotFirstRun) {
       message.set(
         "Welcome to Ninja Tools<br/>(you'll only see this message once)",
-        { timeout: 3000, color: colors.default },
+        { timeout: 3000, color: colors.default }
       );
 
       setTimeout(() => {
@@ -54,9 +54,9 @@
   // set settings/creds method
   (() => {
     unsafeWindow.__spotim_ninja_tools_set_creds__ = async (email, password) => {
-      await GM_setValue('email', email);
-      await GM_setValue('password', password);
-      console.log('successfully set creds!');
+      await GM_setValue("email", email);
+      await GM_setValue("password", password);
+      console.log("successfully set creds!");
     };
 
     unsafeWindow.__spotim_ninja_tools_set_prefs__ = async newPrefs => {
@@ -64,11 +64,11 @@
 
       const mergedPrefs = {
         ...currentPrefs,
-        ...newPrefs,
+        ...newPrefs
       };
       await prefs.set(mergedPrefs);
 
-      console.log('successfully set prefs!');
+      console.log("successfully set prefs!");
       console.log(mergedPrefs);
     };
   })();
@@ -80,7 +80,7 @@
 
     findConversation: () => {
       return (
-        document.querySelector('[data-conversation-id]') ||
+        document.querySelector("[data-conversation-id]") ||
         document.querySelector('[data-spotim-app="conversation"]') ||
         document.querySelector('[data-spotim-module="conversation"]')
       );
@@ -88,20 +88,20 @@
 
     getLauncherEl: displayErrorIfNotFound => {
       const launcher = document.querySelector(
-        'script[data-spotim-module="spotim-launcher"]',
+        'script[data-spotim-module="spotim-launcher"]'
       );
 
       if (!launcher && displayErrorIfNotFound) {
         if (utils.isTopMostFrame()) {
           message.set(`Could not find launcher script 😕`, {
             timeout: 2000,
-            color: colors.error,
+            color: colors.error
           });
         } else {
           window.parent.focus();
           message.set(
             `${FOCUS_WARNING}<br/>Could not find launcher script 😕️`,
-            { timeout: 3000, color: colors.error },
+            { timeout: 3000, color: colors.error }
           );
         }
       }
@@ -111,39 +111,39 @@
 
     isProduction: launcher => {
       if (unsafeWindow.__SPOTIMENV__) {
-        return unsafeWindow.__SPOTIMENV__ === 'production';
+        return unsafeWindow.__SPOTIMENV__ === "production";
       } else {
-        return launcher.src.indexOf('//launcher.spot.im') > -1;
+        return launcher.src.indexOf("//launcher.spot.im") > -1;
       }
     },
 
     getSpotId: launcher => {
       const possibleSpotId = launcher.src
-        .split('/')
+        .split("/")
         .pop()
-        .split('?')[0];
+        .split("?")[0];
 
-      if (possibleSpotId === 'launcher-bundle.js') {
-        return launcher.getAttribute('data-spot-id');
+      if (possibleSpotId === "launcher-bundle.js") {
+        return launcher.getAttribute("data-spot-id");
       } else {
         return possibleSpotId;
       }
     },
 
     getPostId: launcher => {
-      return launcher.getAttribute('data-post-id');
+      return launcher.getAttribute("data-post-id");
     },
 
     getSpotimVersion: () => {
       if (
         unsafeWindow.__SPOTIM__ &&
-        (utils.findConversation() || {}).tagName !== 'IFRAME'
+        (utils.findConversation() || {}).tagName !== "IFRAME"
       ) {
         return 2;
       } else {
         return 1;
       }
-    },
+    }
   };
 
   // autoscroll
@@ -152,8 +152,8 @@
 
     function shouldAutoScrollInDomain() {
       return (
-        ['s3.amazonaws.com', 'www.spotim.name', 'localhost'].indexOf(
-          location.hostname,
+        ["s3.amazonaws.com", "www.spotim.name", "localhost"].indexOf(
+          location.hostname
         ) === -1
       );
     }
@@ -190,7 +190,7 @@
       }
       hasAddedStyleTag = true;
 
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.innerHTML = /*css*/ `
         @keyframes spotim-scroll-to-comments-appear {
           0% {
@@ -271,22 +271,22 @@
       }
       hasAddedMessage = true;
 
-      messageEl = document.createElement('div');
-      messageEl.className = 'sptmninja_message';
+      messageEl = document.createElement("div");
+      messageEl.className = "sptmninja_message";
 
-      messageBodyEl = document.createElement('div');
+      messageBodyEl = document.createElement("div");
 
-      messageProgressEl = document.createElement('div');
-      messageProgressEl.className = 'sptmninja_message_progress';
+      messageProgressEl = document.createElement("div");
+      messageProgressEl.className = "sptmninja_message_progress";
 
       messageEl.appendChild(messageBodyEl);
       messageEl.appendChild(messageProgressEl);
 
-      messageEl.addEventListener('mouseenter', () => {
+      messageEl.addEventListener("mouseenter", () => {
         isMouseOver = true;
       });
 
-      messageEl.addEventListener('mouseleave', () => {
+      messageEl.addEventListener("mouseleave", () => {
         isMouseOver = false;
       });
 
@@ -319,10 +319,9 @@
 
     function hideMessage(force) {
       function hideMessageImpl() {
-        setMessageProgress(0);
-
         if (messageEl && messageEl.parentNode) {
           messageEl.parentNode.removeChild(messageEl);
+          setMessageProgress(0);
         }
       }
 
@@ -361,7 +360,7 @@
     }
 
     function setMessageProgress(progress) {
-      messageProgressEl.style.width = progress * 100 + '%';
+      messageProgressEl.style.width = progress * 100 + "%";
     }
 
     function setMessageColor(color) {
@@ -371,7 +370,7 @@
     return {
       set: setMessage,
       show: showMessage,
-      hide: hideMessage,
+      hide: hideMessage
     };
   })();
 
@@ -384,7 +383,7 @@
 
     function highlightConversation(conversation) {
       Object.assign(conversation.style, {
-        boxShadow: '#4caf50 0px 0px 0px 12px, black 0px 0px 40px 22px',
+        boxShadow: "#4caf50 0px 0px 0px 12px, black 0px 0px 40px 22px"
         // outline: 'solid 2000px #00000070',
       });
 
@@ -396,7 +395,7 @@
         return;
       }
 
-      conversation.style.transition = 'all 1s ease-out';
+      conversation.style.transition = "all 1s ease-out";
       conversation.style.boxShadow = null;
       conversation.style.outline = null;
 
@@ -407,7 +406,7 @@
       if (!hasScrolledDown) {
         window.scrollTo({
           top: document.body.scrollHeight,
-          behavior: 'smooth',
+          behavior: "smooth"
         });
         hasScrolledDown = true;
       }
@@ -423,12 +422,12 @@
           isInViewport = data[0].isIntersecting;
         },
         {
-          rootMargin: '0px',
-          threshold: 0,
-        },
+          rootMargin: "0px",
+          threshold: 0
+        }
       );
 
-      message.set('Scroll To Conversation');
+      message.set("Scroll To Conversation");
       isScrolling = true;
       scrollingInterval = setInterval(() => {
         let conversation;
@@ -443,8 +442,8 @@
           message.set(
             'Scroll To Conversation... found! 😃<br/>Hit <span class="sptmninja_mono">esc</span> to stop',
             {
-              color: colors.success,
-            },
+              color: colors.success
+            }
           );
           highlightConversation(conversation);
         } else {
@@ -452,15 +451,15 @@
 
           if (utils.isTopMostFrame()) {
             message.set(
-              'Scroll To Conversation... not found 😕 try scrolling up and down a bit',
-              { color: colors.error },
+              "Scroll To Conversation... not found 😕 try scrolling up and down a bit",
+              { color: colors.error }
             );
           } else {
             window.parent.focus();
             message.set(
               `${FOCUS_WARNING}<br/>Scroll To Conversation... not found 😕 try scrolling up and down a bit.`,
 
-              { color: colors.error, timeout: 3000 },
+              { color: colors.error, timeout: 3000 }
             );
             stopScrolling({ hideMessage: false });
           }
@@ -491,7 +490,7 @@
     return {
       start: startScrolling,
       stop: stopScrolling,
-      toggle: toggleScrolling,
+      toggle: toggleScrolling
     };
   })();
 
@@ -502,9 +501,9 @@
     return {
       open: async ({ spotId }) => {
         function showSuccessMessage() {
-          message.set('Openning Host Panel...', {
+          message.set("Openning Host Panel...", {
             color: colors.success,
-            timeout: 2000,
+            timeout: 2000
           });
         }
 
@@ -520,128 +519,128 @@
           return;
         }
 
-        const email = await GM_getValue('email');
-        const password = await GM_getValue('password');
+        const email = await GM_getValue("email");
+        const password = await GM_getValue("password");
 
         if (!email || !password) {
           message.set(
             "First you need to enter you're credentials for the Host Panel.<br/>" +
-              'Do so by running the following command in the console:<br/>' +
+              "Do so by running the following command in the console:<br/>" +
               '<span class="sptmninja_code">__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")</span><br/>' +
               "Note that the credentials will be saved as clear text somewhere in TamperMonkey's storage!",
-            colors.default,
+            colors.default
           );
 
           return;
         }
 
-        var networkName = 'spotim';
+        var networkName = "spotim";
 
-        message.set('Fetching network id...', {
+        message.set("Fetching network id...", {
           color: colors.default,
           step: 0,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var networkIdJson = await fetch(
-          `https://www.spot.im/api/me/network-id-by-name/${networkName}`,
+          `https://www.spot.im/api/me/network-id-by-name/${networkName}`
         ).then(r => r.json());
 
-        message.set('Fetching network token...', {
+        message.set("Fetching network token...", {
           color: colors.default,
           step: 1,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var networkTokenJson = await fetch(
           `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
-          { method: 'post' },
+          { method: "post" }
         ).then(r => r.json());
 
-        message.set('Logging in...', {
+        message.set("Logging in...", {
           color: colors.default,
           step: 2,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var emailConnectJson = await fetch(
           `https://www.spot.im/api/email-connect/login`,
           {
-            method: 'post',
+            method: "post",
             headers: new Headers({
-              'x-spotim-networkid': networkIdJson.network_id,
-              'x-spotim-token': networkTokenJson.token,
-              'Content-Type': 'application/json',
+              "x-spotim-networkid": networkIdJson.network_id,
+              "x-spotim-token": networkTokenJson.token,
+              "Content-Type": "application/json"
             }),
-            body: JSON.stringify({ email, password }),
-          },
+            body: JSON.stringify({ email, password })
+          }
         ).then(r => r.json());
 
-        if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
-          message.set('Too many login attempts 😕', {
+        if (emailConnectJson.type === "EmailLogin_TooManyLoginAttemptsError") {
+          message.set("Too many login attempts 😕", {
             color: colors.error,
-            timeout: 2000,
+            timeout: 2000
           });
           return;
         }
 
-        message.set('Fetching login json...', {
+        message.set("Fetching login json...", {
           color: colors.default,
           step: 3,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var loginRegisteredJson = await fetch(
           `https://www.spot.im/api/me/login-registered`,
           {
-            method: 'post',
+            method: "post",
             headers: new Headers({
-              'x-spotim-networkid': networkIdJson.network_id,
-              'x-spotim-token': networkTokenJson.token,
-            }),
-          },
+              "x-spotim-networkid": networkIdJson.network_id,
+              "x-spotim-token": networkTokenJson.token
+            })
+          }
         ).then(r => r.json());
 
-        message.set('Calling me-make-admin...', {
+        message.set("Calling me-make-admin...", {
           color: colors.default,
           step: 4,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var makeMeAdminJson = await fetch(
           `https://www.spot.im/api/moderation/internal/make-me-admin?spot_id=${spotId}`,
           {
             headers: new Headers({
-              'x-spotim-networkid': networkIdJson.network_id,
-              'x-spotim-token': networkTokenJson.token,
-            }),
-          },
+              "x-spotim-networkid": networkIdJson.network_id,
+              "x-spotim-token": networkTokenJson.token
+            })
+          }
         ).then(r => r.json());
 
-        message.set('Fetching token JSON...', {
+        message.set("Fetching token JSON...", {
           color: colors.default,
           step: 5,
-          numSteps: 5,
+          numSteps: 5
         });
 
         var tokenByTicketJson = await fetch(
           `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
-          { method: 'post' },
+          { method: "post" }
         ).then(r => r.json());
 
         const isStaging = !utils.isProduction(utils.getLauncherEl());
-        var hostPrefix = isStaging ? 'staging-' : '';
+        var hostPrefix = isStaging ? "staging-" : "";
 
         const url = [
           `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?`,
           `name=${makeMeAdminJson.spot_name}&`,
           `token=${tokenByTicketJson.token}&`,
-          `network_name=${tokenByTicketJson.network_name}`,
-        ].join('');
+          `network_name=${tokenByTicketJson.network_name}`
+        ].join("");
 
-        message.set('Opening Host Panel 😃', {
+        message.set("Opening Host Panel 😃", {
           color: colors.success,
-          timeout: 2000,
+          timeout: 2000
         });
 
         windowRef = window.open(url);
@@ -649,11 +648,11 @@
         if (windowRef === null) {
           message.set(
             'Popup blocker probably blocked us 😞<br/>But type <span class="sptmninja_mono">ssa</span> again and it will work immediately!',
-            { timeout: 6000, color: colors.error },
+            { timeout: 6000, color: colors.error }
           );
           lastUrl = url;
         }
-      },
+      }
     };
   })();
 
@@ -662,18 +661,18 @@
       show: () => {
         message.set(
           [
-            'Available Shortcuts:',
+            "Available Shortcuts:",
             '<span class="sptmninja_mono">sss</span> - Scroll to Conversation',
             '<span class="sptmninja_mono">ssi</span> - Show Info',
             '<span class="sptmninja_mono">ssc</span> - Copy Spot ID to Clipboard (only on HTTPs)',
             '<span class="sptmninja_mono">ssa</span> - Open Host Panel',
             '<span class="sptmninja_mono">ssv</span> - Open config data',
             '<span class="sptmninja_mono">ssh</span> - Show Help',
-            '<span class="sptmninja_mono">escape</span> - Hides Floating Messages',
-          ].join('<br/>'),
-          { color: colors.default },
+            '<span class="sptmninja_mono">escape</span> - Hides Floating Messages'
+          ].join("<br/>"),
+          { color: colors.default }
         );
-      },
+      }
     };
   })();
 
@@ -695,12 +694,12 @@
           navigator.clipboard.writeText(spotId);
           message.set(`Copied ${spotId} to clipboard! 😃`, {
             timeout: 2000,
-            color: colors.default,
+            color: colors.default
           });
         } else {
           message.set(
             `Can't copy ${spotId} to clipboard on non-https sites 😞`,
-            { timeout: 4000, color: colors.error },
+            { timeout: 4000, color: colors.error }
           );
         }
       }
@@ -713,12 +712,12 @@
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
-        const version = utils.getSpotimVersion() === 2 ? 'V.2.0' : 'V.1.0';
-        const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
+        const version = utils.getSpotimVersion() === 2 ? "V.2.0" : "V.1.0";
+        const env = utils.isProduction(launcher) ? "Production" : "Dev";
 
         message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
           timeout: 2000,
-          color: colors.default,
+          color: colors.default
         });
       }
     },
@@ -731,7 +730,7 @@
       if (launcher) {
         if (!utils.isProduction(launcher)) {
           // todo - fix staging host panel login
-          window.open('https://admin.staging-spot.im/internal/super-admin');
+          window.open("https://admin.staging-spot.im/internal/super-admin");
         } else {
           hostPanel.open({ spotId: utils.getSpotId(launcher) });
         }
@@ -745,9 +744,9 @@
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         if (!utils.isProduction(launcher)) {
-          window.open('https://admin.staging-spot.im/internal/super-admin');
+          window.open("https://admin.staging-spot.im/internal/super-admin");
         } else {
-          window.open('https://admin.spot.im/internal/super-admin');
+          window.open("https://admin.spot.im/internal/super-admin");
         }
       }
     },
@@ -759,8 +758,8 @@
       if (utils.isProduction(launcher)) {
         window.open(
           `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
-            launcher,
-          )}/${utils.getPostId(launcher)}/vendor,init,conversation`,
+            launcher
+          )}/${utils.getPostId(launcher)}/vendor,init,conversation`
         );
       }
     },
@@ -769,7 +768,7 @@
     ssh: () => {
       scrolling.stop();
       help.show();
-    },
+    }
   };
 
   // handle keystrokes
@@ -780,7 +779,7 @@
 
     function isFocusedOnInput() {
       const el = document.activeElement;
-      return el.getAttribute('contenteditable') || el.tagName === 'INPUT';
+      return el.getAttribute("contenteditable") || el.tagName === "INPUT";
     }
 
     function executeCommand(keyCombo) {
@@ -795,7 +794,7 @@
     }
 
     function handleKeyDown(e) {
-      if (e.key && e.key.toLowerCase() === 'escape') {
+      if (e.key && e.key.toLowerCase() === "escape") {
         scrolling.stop();
         message.hide(true);
       }
@@ -809,7 +808,7 @@
       lastKeyStrokes.push(e.key.toLowerCase());
       clearTimeout(lastKeyStrokesResetTimeout);
 
-      const keyCombo = lastKeyStrokes.join('');
+      const keyCombo = lastKeyStrokes.join("");
 
       if (executeCommand(keyCombo)) {
         lastKeyStrokes = [];
@@ -821,7 +820,7 @@
     }
 
     // for some reason pressing on escape doesn't register as a keypress
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keypress', handleKeyPress);
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keypress", handleKeyPress);
   })();
 })();
