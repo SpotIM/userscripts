@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      2.0
+// @version      2.1
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -259,9 +259,8 @@
         }
 
         .sptmninja_title {
-          border-bottom: 2px solid #00000012;
           padding: 12px 0px 10px;
-          box-shadow: 0px -20px 50px -24px #00ffff36 inset;
+          box-shadow: 0px -20px 50px -24px #00ffff36 inset, 0px 1px 1px #00000038;
           margin: -10px -10px 8px;
           position: relative;
           z-index: 10;
