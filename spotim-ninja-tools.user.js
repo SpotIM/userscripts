@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.25
+// @version      1.26
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -228,7 +228,17 @@
           border-radius: 1em;
           overflow: hidden;
           border: 3px solid;
-          box-shadow: 0px 1px 4px #00000075, 0px 1px 24px #00000075;
+          box-shadow: 0px 1px 4px #00000075, 0px 1px 24px #00000075, 0px 0px 40px 5px #0000001c inset;
+          text-shadow: 0px 2px #00000033;
+        }
+
+        .sptmninja_title {
+          border-bottom: 2px solid #00000012;
+          padding: 12px 0px 10px;
+          box-shadow: 0px -20px 50px -24px #00ffff36 inset;
+          margin: -10px -10px 8px;
+          position: relative;
+          z-index: 10;
         }
 
         .sptmninja_message_progress {
@@ -334,13 +344,23 @@
       mouseOut().then(hideMessageImpl);
     }
 
-    function setMessage(message, { timeout, color, step, numSteps } = {}) {
+    function setMessage(
+      message,
+      { timeout, color, step, numSteps, title } = {}
+    ) {
       addStyleTag();
       addMessage();
       showMessage();
 
-      if (messageBodyEl.innerHTML !== message) {
-        messageBodyEl.innerHTML = message;
+      let fullMessageHTML;
+      if (title) {
+        fullMessageHTML = `<div class="sptmninja_title">${title}</div>${message}`;
+      } else {
+        fullMessageHTML = message;
+      }
+
+      if (messageBodyEl.innerHTML !== fullMessageHTML) {
+        messageBodyEl.innerHTML = fullMessageHTML;
       }
 
       clearTimeout(hideMessageTimeout);
@@ -367,6 +387,10 @@
 
     function setMessageColor(color) {
       messageEl.style.backgroundColor = color.bg;
+      if (messageEl.querySelector(".sptmninja_title")) {
+        messageEl.querySelector(".sptmninja_title").style.backgroundColor =
+          color.bg;
+      }
       messageEl.style.borderColor = color.border;
     }
 
@@ -542,7 +566,8 @@
         message.set("Fetching network id...", {
           color: colors.default,
           step: 0,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var networkIdJson = await fetch(
@@ -552,7 +577,8 @@
         message.set("Fetching network token...", {
           color: colors.default,
           step: 1,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var networkTokenJson = await fetch(
@@ -563,7 +589,8 @@
         message.set("Logging in...", {
           color: colors.default,
           step: 2,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var emailConnectJson = await fetch(
@@ -590,7 +617,8 @@
         message.set("Fetching login json...", {
           color: colors.default,
           step: 3,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var loginRegisteredJson = await fetch(
@@ -607,7 +635,8 @@
         message.set("Calling me-make-admin...", {
           color: colors.default,
           step: 4,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var makeMeAdminJson = await fetch(
@@ -623,7 +652,8 @@
         message.set("Fetching token JSON...", {
           color: colors.default,
           step: 5,
-          numSteps: 5
+          numSteps: 5,
+          title: "Open Admin Panel"
         });
 
         var tokenByTicketJson = await fetch(
@@ -664,7 +694,6 @@
       show: () => {
         message.set(
           [
-            "Available Shortcuts:",
             '<span class="sptmninja_mono">sss</span> - Scroll to Conversation',
             '<span class="sptmninja_mono">ssi</span> - Show Info',
             '<span class="sptmninja_mono">ssc</span> - Copy Spot ID to Clipboard (only on HTTPs)',
@@ -673,7 +702,7 @@
             '<span class="sptmninja_mono">ssh</span> - Show Help',
             '<span class="sptmninja_mono">escape</span> - Hides Floating Messages'
           ].join("<br/>"),
-          { color: colors.default }
+          { color: colors.default, title: "Available Shortcuts" }
         );
       }
     };
