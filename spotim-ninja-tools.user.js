@@ -783,7 +783,14 @@
     }
 
     function executeCommand(keyCombo) {
-      const commandImpl = commands[keyCombo];
+      let commandImpl = commands[keyCombo];
+      if (
+        !commandImpl &&
+        keyCombo.length === 3 &&
+        keyCombo.slice(0, 2) === "sp"
+      ) {
+        commandImpl = commands[`ss${keyCombo.slice(2)}`];
+      }
 
       if (commandImpl) {
         commandImpl();
