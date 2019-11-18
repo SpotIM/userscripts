@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.26
+// @version      2.0
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -93,16 +93,18 @@
 
       if (!launcher && displayErrorIfNotFound) {
         if (utils.isTopMostFrame()) {
-          message.set(`Could not find launcher script 😕`, {
+          message.set(`Could not find launcher script`, {
             timeout: 2000,
-            color: colors.error
+            color: colors.error,
+            emoji: "😕"
           });
         } else {
           window.parent.focus();
-          message.set(
-            `${FOCUS_WARNING}<br/>Could not find launcher script 😕️`,
-            { timeout: 3000, color: colors.error }
-          );
+          message.set(`${FOCUS_WARNING}<br/>Could not find launcher script`, {
+            timeout: 3000,
+            color: colors.error,
+            emoji: "😕️"
+          });
         }
       }
 
@@ -179,6 +181,7 @@
     let messageEl;
     let messageBodyEl;
     let messageProgressEl;
+    let messageEmojiEl;
     let hasAddedMessage;
     let hasAddedStyleTag;
     let hideMessageTimeout;
@@ -232,6 +235,29 @@
           text-shadow: 0px 2px #00000033;
         }
 
+        .sptmninja_close_button {
+          position: absolute;
+          top: 0px;
+          right: 0px;
+          color: #ffffff73;
+          cursor: pointer;
+          padding: 10px;
+          line-height: 11px;
+          z-index: 11;
+        }
+
+        .sptmninja_inset_shadow {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          box-shadow: 0px 0px 3px black inset;
+          z-index: 100;
+          border-radius: 14px;
+          pointer-events: none;
+        }
+
         .sptmninja_title {
           border-bottom: 2px solid #00000012;
           padding: 12px 0px 10px;
@@ -239,6 +265,16 @@
           margin: -10px -10px 8px;
           position: relative;
           z-index: 10;
+        }
+
+        .sptmninja_emoji {
+          position: absolute;
+          font-size: 6em;
+          transform: translateY(-50%);
+          top: 50%;
+          left: -15px;
+          z-index: -1;
+          text-shadow: 0px 0px 10px #0000006e;
         }
 
         .sptmninja_message_progress {
@@ -286,13 +322,29 @@
       messageEl = document.createElement("div");
       messageEl.className = "sptmninja_message";
 
+      const insetShadow = document.createElement("div");
+      insetShadow.className = "sptmninja_inset_shadow";
+
       messageBodyEl = document.createElement("div");
 
       messageProgressEl = document.createElement("div");
       messageProgressEl.className = "sptmninja_message_progress";
 
+      messageEmojiEl = document.createElement("div");
+      messageEmojiEl.className = "sptmninja_emoji";
+
+      const messageCloseEl = document.createElement("div");
+      messageCloseEl.innerText = "×";
+      messageCloseEl.className = "sptmninja_close_button";
+      messageCloseEl.addEventListener("click", () => {
+        hideMessage(true);
+      });
+
       messageEl.appendChild(messageBodyEl);
+      messageEl.appendChild(messageCloseEl);
+      messageEl.appendChild(insetShadow);
       messageEl.appendChild(messageProgressEl);
+      messageEl.appendChild(messageEmojiEl);
 
       messageEl.addEventListener("mouseenter", () => {
         isMouseOver = true;
@@ -339,24 +391,25 @@
 
       if (force) {
         hideMessageImpl();
+      } else {
+        mouseOut().then(hideMessageImpl);
       }
-
-      mouseOut().then(hideMessageImpl);
     }
 
     function setMessage(
       message,
-      { timeout, color, step, numSteps, title } = {}
+      { timeout, color, step, numSteps, title, emoji } = {}
     ) {
       addStyleTag();
       addMessage();
       showMessage();
 
-      let fullMessageHTML;
+      let fullMessageHTML = message;
       if (title) {
-        fullMessageHTML = `<div class="sptmninja_title">${title}</div>${message}`;
-      } else {
-        fullMessageHTML = message;
+        fullMessageHTML = `<div class="sptmninja_title">${title}</div>${fullMessageHTML}`;
+      }
+      if (emoji) {
+        fullMessageHTML = `<div class="sptmninja_emoji">${emoji}</div>${fullMessageHTML}`;
       }
 
       if (messageBodyEl.innerHTML !== fullMessageHTML) {
@@ -467,9 +520,10 @@
             window.scrollBy(0, -200);
           }
           message.set(
-            'Scroll To Conversation... found! 😃<br/>Hit <span class="sptmninja_mono">esc</span> to stop',
+            'Scroll To Conversation... found!<br/>Hit <span class="sptmninja_mono">esc</span> to stop',
             {
-              color: colors.success
+              color: colors.success,
+              emoji: "😃"
             }
           );
           highlightConversation(conversation);
@@ -478,15 +532,15 @@
 
           if (utils.isTopMostFrame()) {
             message.set(
-              "Scroll To Conversation... not found 😕 try scrolling up and down a bit",
-              { color: colors.error }
+              "Scroll To Conversation... not found. Try scrolling up and down a bit",
+              { color: colors.error, emoji: "😕" }
             );
           } else {
             window.parent.focus();
             message.set(
-              `${FOCUS_WARNING}<br/>Scroll To Conversation... not found 😕 try scrolling up and down a bit.`,
+              `${FOCUS_WARNING}<br/>Scroll To Conversation... not found. Try scrolling up and down a bit.`,
 
-              { color: colors.error, timeout: 3000 }
+              { color: colors.error, timeout: 3000, emoji: "😕" }
             );
             stopScrolling({ hideMessage: false });
           }
@@ -607,9 +661,10 @@
         ).then(r => r.json());
 
         if (emailConnectJson.type === "EmailLogin_TooManyLoginAttemptsError") {
-          message.set("Too many login attempts 😕", {
+          message.set("Too many login attempts", {
             color: colors.error,
-            timeout: 2000
+            timeout: 2000,
+            emoji: "😕"
           });
           return;
         }
@@ -671,17 +726,18 @@
           `network_name=${tokenByTicketJson.network_name}`
         ].join("");
 
-        message.set("Opening Host Panel 😃", {
+        message.set("Opening Host Panel", {
           color: colors.success,
-          timeout: 2000
+          timeout: 2000,
+          emoji: "😃"
         });
 
         windowRef = window.open(url);
 
         if (windowRef === null) {
           message.set(
-            'Popup blocker probably blocked us 😞<br/>But type <span class="sptmninja_mono">ssa</span> again and it will work immediately!',
-            { timeout: 6000, color: colors.error }
+            'Popup blocker probably blocked us<br/>But type <span class="sptmninja_mono">ssa</span> again and it will work immediately!',
+            { timeout: 8000, color: colors.error, emoji: "😞" }
           );
           lastUrl = url;
         }
@@ -724,15 +780,17 @@
 
         if (navigator.clipboard) {
           navigator.clipboard.writeText(spotId);
-          message.set(`Copied ${spotId} to clipboard! 😃`, {
+          message.set(`Copied ${spotId} to clipboard!`, {
             timeout: 2000,
-            color: colors.default
+            color: colors.default,
+            emoji: "😃"
           });
         } else {
-          message.set(
-            `Can't copy ${spotId} to clipboard on non-https sites 😞`,
-            { timeout: 4000, color: colors.error }
-          );
+          message.set(`Can't copy ${spotId} to clipboard on non-https sites`, {
+            timeout: 4000,
+            color: colors.error,
+            emoji: "😞"
+          });
         }
       }
     },
@@ -748,8 +806,9 @@
         const env = utils.isProduction(launcher) ? "Production" : "Dev";
 
         message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
-          timeout: 2000,
-          color: colors.default
+          timeout: 8000,
+          color: colors.default,
+          emoji: "💁‍♂️"
         });
       }
     },
