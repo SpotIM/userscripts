@@ -38,10 +38,11 @@
   (async () => {
     const isNotFirstRun = await prefs.get().isNotFirstRun;
     if (!isNotFirstRun) {
-      message.set(
-        "Welcome to Ninja Tools<br/>(you'll only see this message once)",
-        { timeout: 3000, color: colors.default }
-      );
+      message.set("(you'll only see this message once)", {
+        timeout: 3000,
+        color: colors.default,
+        title: "Welcome to Spot.IM Ninja Tools!"
+      });
 
       setTimeout(() => {
         help.show();
