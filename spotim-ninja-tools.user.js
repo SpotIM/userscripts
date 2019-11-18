@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      2.1
+// @version      2.2
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -233,6 +233,26 @@
           border: 3px solid;
           box-shadow: 0px 1px 4px #00000075, 0px 1px 24px #00000075, 0px 0px 40px 5px #0000001c inset;
           text-shadow: 0px 2px #00000033;
+        }
+
+        .sptmninja_message table {
+          width: 100%;
+          text-align: left;
+          border-collapse: collapse;
+          margin: 0;
+        }
+
+        .sptmninja_message table td {
+          border-bottom: 1px solid #00000021;
+        }
+
+        .sptmninja_message table tr:last-child td {
+          border-bottom: none;
+        }
+
+        .sptmninja_message table td:first-child {
+          text-align: right;
+          padding-right: 12px;
         }
 
         .sptmninja_close_button {
@@ -748,15 +768,17 @@
     return {
       show: () => {
         message.set(
-          [
-            '<span class="sptmninja_mono">sss</span> - Scroll to Conversation',
-            '<span class="sptmninja_mono">ssi</span> - Show Info',
-            '<span class="sptmninja_mono">ssc</span> - Copy Spot ID to Clipboard (only on HTTPs)',
-            '<span class="sptmninja_mono">ssa</span> - Open Host Panel',
-            '<span class="sptmninja_mono">ssv</span> - Open config data',
-            '<span class="sptmninja_mono">ssh</span> - Show Help',
-            '<span class="sptmninja_mono">escape</span> - Hides Floating Messages'
-          ].join("<br/>"),
+          "<table><tbody>" +
+            [
+              '<tr><td><span class="sptmninja_mono">sss</span></td><td>Scroll to Conversation</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssi</span></td><td>Show Info</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssc</span></td><td>Copy Spot ID to Clipboard (only on HTTPs)</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssa</span></td><td>Open Host Panel</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssv</span></td><td>Open config data</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssh</span></td><td>Show Help</td></tr>',
+              '<tr><td><span class="sptmninja_mono">escape</span></td><td>Hide Floating Message</td></tr>'
+            ].join("") +
+            "</tbody></table>",
           { color: colors.default, title: "Available Shortcuts" }
         );
       }
