@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      1.24
+// @version      1.25
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -18,9 +18,9 @@
     "⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️";
 
   const colors = {
-    default: "#467FDB",
-    error: "#f44336",
-    success: "#4caf50"
+    default: { bg: "#467FDB", border: "#46abdb" },
+    error: { bg: "#f44336", border: "#d81054" },
+    success: { bg: "#4caf50", border: "#4dd052" }
   };
 
   const prefs = (() => {
@@ -227,6 +227,8 @@
           margin: 5em auto;
           border-radius: 1em;
           overflow: hidden;
+          border: 3px solid;
+          box-shadow: 0px 1px 4px #00000075, 0px 1px 24px #00000075;
         }
 
         .sptmninja_message_progress {
@@ -364,7 +366,8 @@
     }
 
     function setMessageColor(color) {
-      messageEl.style.backgroundColor = color;
+      messageEl.style.backgroundColor = color.bg;
+      messageEl.style.borderColor = color.border;
     }
 
     return {
