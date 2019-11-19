@@ -146,6 +146,13 @@
       } else {
         return 1;
       }
+    },
+
+    getConfigUrl: () => {
+      const launcher = utils.getLauncherEl(true);
+      return `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
+        launcher
+      )}/${utils.getPostId(launcher)}/vendor,init,conversation`;
     }
   };
 
@@ -237,13 +244,20 @@
         }
 
         .sptmninja_message table {
+          border: none;
           width: 100%;
           text-align: left;
           border-collapse: collapse;
           margin: 0;
         }
 
+        .sptmninja_message table tr {
+          background: initial !important;
+        }
+
         .sptmninja_message table td {
+          padding: initial;
+          border: none;
           border-bottom: 1px solid #00000021;
         }
 
@@ -321,13 +335,15 @@
         }
 
         .sptmninja_mono {
-          background: #0000004f;
-          padding: 0px 8px 3px;
+          background: #0000003d;
+          padding: 1px 7px;
           border-radius: 5px;
-          box-shadow: 0px 1px 0px #00000052 inset;
+          box-shadow: 0px 1px 0px #00000063;
           color: white;
           font-family: monaco;
-          line-height: 1.9;
+          font-size: 15px;
+          margin: 4px 0px;
+          display: inline-block;
         }
       `;
       document.head.appendChild(style);
@@ -775,7 +791,8 @@
               '<tr><td><span class="sptmninja_mono">ssi</span></td><td>Show Info</td></tr>',
               '<tr><td><span class="sptmninja_mono">ssc</span></td><td>Copy Spot ID to Clipboard (only on HTTPs)</td></tr>',
               '<tr><td><span class="sptmninja_mono">ssa</span></td><td>Open Host Panel</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssv</span></td><td>Open config data</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssv</span></td><td>Show Versions</td></tr>',
+              '<tr><td><span class="sptmninja_mono">sso</span></td><td>Open Config Data</td></tr>',
               '<tr><td><span class="sptmninja_mono">ssh</span></td><td>Show Help</td></tr>',
               '<tr><td><span class="sptmninja_mono">escape</span></td><td>Hide Floating Message</td></tr>'
             ].join("") +
@@ -835,6 +852,42 @@
       }
     },
 
+    // show versions
+    ssv: async () => {
+      scrolling.stop();
+
+      if (unsafeWindow.__SPOTIM__) {
+        const assetsConfig =
+          unsafeWindow.__SPOTIM__.SERVICES.configProvider._data.assets_config;
+
+        const table =
+          "<table><tbody>" +
+          assetsConfig
+            .filter(item => item.url.indexOf("tags") > -1)
+            .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
+            .map(
+              item =>
+                `<tr><td><span class="sptmninja_mono">${
+                  item.url.match(/tags\/(.*?)\//)[1]
+                }</span></td><td>${item.name}</td>`
+            )
+            .join("") +
+          "</table></tbody>";
+
+        message.set(table, {
+          color: colors.default,
+          emoji: "🎈",
+          title: "Assets"
+        });
+      } else {
+        message.set(`Could not find __SPOTIM__ object`, {
+          timeout: 2000,
+          color: colors.error,
+          emoji: "😕"
+        });
+      }
+    },
+
     // open admin panel
     ssa: () => {
       scrolling.stop();
@@ -864,16 +917,12 @@
       }
     },
 
-    ssv: () => {
+    sso: () => {
       scrolling.stop();
 
       const launcher = utils.getLauncherEl(true);
       if (utils.isProduction(launcher)) {
-        window.open(
-          `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
-            launcher
-          )}/${utils.getPostId(launcher)}/vendor,init,conversation`
-        );
+        window.open(utils.getConfigUrl());
       }
     },
 
