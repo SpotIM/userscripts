@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      2.4
+// @version      2.5
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -309,6 +309,7 @@
           left: -15px;
           z-index: -1;
           text-shadow: 0px 0px 10px #0000006e;
+          height: 150px;
         }
 
         .sptmninja_message_progress {
@@ -860,25 +861,37 @@
         const assetsConfig =
           unsafeWindow.__SPOTIM__.SERVICES.configProvider._data.assets_config;
 
-        const table =
-          "<table><tbody>" +
-          assetsConfig
-            .filter(item => item.url.indexOf("tags") > -1)
-            .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
-            .map(
-              item =>
-                `<tr><td><span class="sptmninja_mono">${
-                  item.url.match(/tags\/(.*?)\//)[1]
-                }</span></td><td>${item.name}</td>`
-            )
-            .join("") +
-          "</table></tbody>";
+        const relevantAssets = assetsConfig.filter(
+          item => item.url.indexOf("tags") > -1
+        );
 
-        message.set(table, {
-          color: colors.default,
-          emoji: "🎈",
-          title: "Assets"
-        });
+        if (relevantAssets.length) {
+          const table =
+            "<table><tbody>" +
+            assetsConfig
+              .filter(item => item.url.indexOf("tags") > -1)
+              .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
+              .map(
+                item =>
+                  `<tr><td><span class="sptmninja_mono">${
+                    item.url.match(/tags\/(.*?)\//)[1]
+                  }</span></td><td>${item.name}</td>`
+              )
+              .join("") +
+            "</table></tbody>";
+
+          message.set(table, {
+            color: colors.default,
+            emoji: "🎈",
+            title: "Assets"
+          });
+        } else {
+          message.set(`No assets found. Are you running locally?`, {
+            timeout: 2000,
+            color: colors.error,
+            emoji: "😕"
+          });
+        }
       } else {
         message.set(`Could not find __SPOTIM__ object`, {
           timeout: 2000,
