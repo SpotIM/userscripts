@@ -153,8 +153,21 @@
       return `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
         launcher
       )}/${utils.getPostId(launcher)}/vendor,init,conversation`;
+    },
+
+    padTime: str => {
+      if (str.length === 1) {
+        return `0${str}`;
+      } else {
+        return str;
+      }
     }
   };
+
+  const pageLoadTime = (() => {
+    const now = new Date();
+    return now.getHours() + ":" + utils.padTime(now.getMinutes().toString());
+  })();
 
   // autoscroll
   (async () => {
@@ -249,6 +262,8 @@
           text-align: left;
           border-collapse: collapse;
           margin: 0;
+          color: inherit;
+          font-weight: inherit;
         }
 
         .sptmninja_message table tr {
@@ -303,6 +318,13 @@
           margin: -10px -10px 8px;
           position: relative;
           z-index: 10;
+        }
+
+        .sptmninja_muted_text {
+          margin-top: 12px;
+          text-shadow: none;
+          color: #ffffff73;
+          font-weight: normal;
         }
 
         .sptmninja_emoji {
@@ -786,6 +808,92 @@
     };
   })();
 
+  const assetChangeListener = (() => {
+    let configChangeInterval;
+
+    async function notifyOnChange() {
+      if (location.protocol !== "https:") {
+        message.set(`Can't display notifications on non-https sites`, {
+          timeout: 4000,
+          color: colors.error,
+          emoji: "😞"
+        });
+
+        return;
+      }
+
+      const result = await Notification.requestPermission();
+
+      if (result !== "granted") {
+        message.set(`Notification permission denied`, {
+          timeout: 3000,
+          color: colors.error,
+          emoji: "😕"
+        });
+
+        return;
+      }
+
+      let lastConfig;
+
+      function showNotification() {
+        stopListeningToChanges();
+        var notification = new Notification("An asset has been updated");
+      }
+
+      async function checkForUpdates() {
+        const response = await fetch(
+          `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
+            utils.getLauncherEl(true)
+          )}/redesign-post/vendor,init,conversation`
+        );
+
+        const config = JSON.stringify(await response.json().assets_config);
+
+        if (lastConfig && config !== lastConfig) {
+          showNotification();
+        }
+
+        lastConfig = config;
+      }
+
+      checkForUpdates();
+
+      configChangeInterval = setInterval(checkForUpdates, 1000);
+
+      message.set(`I will notify you on asset updates!`, {
+        timeout: 4000,
+        color: colors.success,
+        emoji: "😃"
+      });
+    }
+
+    function stopListeningToChanges(showMessage) {
+      clearInterval(configChangeInterval);
+      configChangeInterval = false;
+
+      if (showMessage) {
+        message.set(`Stopped listening to asset changes`, {
+          timeout: 4000,
+          color: colors.default,
+          emoji: "👍"
+        });
+      }
+    }
+
+    function toggleNotifyOnChange() {
+      if (configChangeInterval) {
+        stopListeningToChanges(true);
+      } else {
+        notifyOnChange();
+      }
+    }
+
+    return {
+      toggleNotifyOnChange
+    };
+  })();
+
   const help = (() => {
     return {
       show: () => {
@@ -798,6 +906,7 @@
               '<tr><td><span class="sptmninja_mono">ssa</span></td><td>Open Host Panel</td></tr>',
               '<tr><td><span class="sptmninja_mono">ssv</span></td><td>Show Versions</td></tr>',
               '<tr><td><span class="sptmninja_mono">sso</span></td><td>Open Config Data</td></tr>',
+              '<tr><td><span class="sptmninja_mono">ssn</span></td><td>Notify On Asset Update</td></tr>',
               '<tr><td><span class="sptmninja_mono">ssh</span></td><td>Show Help</td></tr>',
               '<tr><td><span class="sptmninja_mono">escape</span></td><td>Hide Floating Message</td></tr>'
             ].join("") +
@@ -882,7 +991,8 @@
                   }</span></td><td>${item.name}</td>`
               )
               .join("") +
-            "</table></tbody>";
+            "</table></tbody>" +
+            `<div class="sptmninja_muted_text">Page loaded at ${pageLoadTime}</div>`;
 
           message.set(table, {
             color: colors.default,
@@ -941,6 +1051,12 @@
       if (utils.isProduction(launcher)) {
         window.open(utils.getConfigUrl());
       }
+    },
+
+    ssn: async () => {
+      scrolling.stop();
+
+      assetChangeListener.toggleNotifyOnChange();
     },
 
     // show help
