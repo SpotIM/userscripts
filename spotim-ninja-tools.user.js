@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      2.6
+// @version      3.0
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -45,7 +45,7 @@
       });
 
       setTimeout(() => {
-        help.show();
+        commandPalette.show();
       }, 3500);
 
       await prefs.set({ isNotFirstRun: true });
@@ -161,6 +161,20 @@
       } else {
         return str;
       }
+    },
+
+    renderTable: data => {
+      return (
+        "<table><tbody>" +
+        data
+          .map(line => "<tr><td>" + line.join("</td><td>") + "</td></tr>")
+          .join("") +
+        "</tbody></table>"
+      );
+    },
+
+    createElement: (html, className, tag = "div") => {
+      return `<${tag} class="sptmninja_${className}">${html}</${tag}>`;
     }
   };
 
@@ -202,7 +216,6 @@
     let messageEl;
     let messageBodyEl;
     let messageProgressEl;
-    let messageEmojiEl;
     let hasAddedMessage;
     let hasAddedStyleTag;
     let hideMessageTimeout;
@@ -321,10 +334,17 @@
         }
 
         .sptmninja_muted_text {
-          margin-top: 12px;
           text-shadow: none;
           color: #ffffff73;
           font-weight: normal;
+        }
+
+        .sptmninja_weight_normal {
+          font-weight: normal;
+        }
+
+        .sptmninja_margin_top {
+          margin-top: 12px;
         }
 
         .sptmninja_emoji {
@@ -336,6 +356,10 @@
           z-index: -1;
           text-shadow: 0px 0px 10px #0000006e;
           height: 150px;
+        }
+
+        .sptmninja_title + .sptmninja_emoji {
+          margin-top: 20px;
         }
 
         .sptmninja_message_progress {
@@ -372,6 +396,44 @@
           margin: 4px 0px;
           display: inline-block;
         }
+
+        .sptmninja_mono a {
+          color: inherit;
+          text-decoration: none;
+          outline: none;
+        }
+
+        .sptmninja_mono a:focus, .sptmninja_mono a:hover {
+          text-decoration: underline;
+        }
+
+        .sptmninja_input {
+          width: 100%;
+          padding: 10px;
+          box-sizing: border-box;
+          font-size: 20px;
+          background: #ffffff33;
+          border: none;
+          border-radius: 6px;
+          outline: none;
+          box-shadow: 0px 3px 9px #0000002e inset;
+          border-top: 1px solid #0000004f;
+          border-bottom: 1px solid #ffffff42;
+          color: white;
+          font-weight: bold;
+        }
+
+        .sptmninja_input + .sptmninja_results:not(:empty) {
+          margin-top: 12px;
+        }
+
+        .sptmninja_input + .sptmninja_results table tr td:first-child {
+          padding-right: 20px;
+        }
+
+        .sptmninja_input + .sptmninja_results table tr td:nth-child(2) {
+          width: 100%;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -393,9 +455,6 @@
       messageProgressEl = document.createElement("div");
       messageProgressEl.className = "sptmninja_message_progress";
 
-      messageEmojiEl = document.createElement("div");
-      messageEmojiEl.className = "sptmninja_emoji";
-
       const messageCloseEl = document.createElement("div");
       messageCloseEl.innerText = "×";
       messageCloseEl.className = "sptmninja_close_button";
@@ -407,7 +466,6 @@
       messageEl.appendChild(messageCloseEl);
       messageEl.appendChild(insetShadow);
       messageEl.appendChild(messageProgressEl);
-      messageEl.appendChild(messageEmojiEl);
 
       messageEl.addEventListener("mouseenter", () => {
         isMouseOver = true;
@@ -468,12 +526,15 @@
       showMessage();
 
       let fullMessageHTML = message;
+      let prefix = "";
       if (title) {
-        fullMessageHTML = `<div class="sptmninja_title">${title}</div>${fullMessageHTML}`;
+        prefix = `<div class="sptmninja_title">${title}</div>`;
       }
       if (emoji) {
-        fullMessageHTML = `<div class="sptmninja_emoji">${emoji}</div>${fullMessageHTML}`;
+        prefix += `<div class="sptmninja_emoji">${emoji}</div>`;
       }
+
+      fullMessageHTML = prefix + fullMessageHTML;
 
       if (messageBodyEl.innerHTML !== fullMessageHTML) {
         messageBodyEl.innerHTML = fullMessageHTML;
@@ -495,6 +556,8 @@
       } else {
         setMessageProgress(0);
       }
+
+      return messageBodyEl;
     }
 
     function setMessageProgress(progress) {
@@ -570,7 +633,9 @@
         }
       );
 
-      message.set("Scroll To Conversation");
+      message.set("Looking for conversation element", {
+        title: "Scroll To Conversation"
+      });
       isScrolling = true;
       scrollingInterval = setInterval(() => {
         let conversation;
@@ -583,8 +648,9 @@
             window.scrollBy(0, -200);
           }
           message.set(
-            'Scroll To Conversation... found!<br/>Hit <span class="sptmninja_mono">esc</span> to stop',
+            'Hit <span class="sptmninja_mono">escape</span> to stop',
             {
+              title: "Scroll To Conversation",
               color: colors.success,
               emoji: "😃"
             }
@@ -594,10 +660,11 @@
           scrollDown();
 
           if (utils.isTopMostFrame()) {
-            message.set(
-              "Scroll To Conversation... not found. Try scrolling up and down a bit",
-              { color: colors.error, emoji: "😕" }
-            );
+            message.set("Element not found. Try scrolling up and down a bit.", {
+              color: colors.error,
+              emoji: "😕",
+              title: "Scroll To Conversation"
+            });
           } else {
             window.parent.focus();
             message.set(
@@ -809,7 +876,7 @@
   })();
 
   const assetChangeListener = (() => {
-    let configChangeInterval;
+    let assetChangeInterval;
 
     async function notifyOnChange() {
       if (location.protocol !== "https:") {
@@ -859,7 +926,7 @@
 
       checkForUpdates();
 
-      configChangeInterval = setInterval(checkForUpdates, 1000);
+      assetChangeInterval = setInterval(checkForUpdates, 1000);
 
       message.set(`I will notify you on asset updates!`, {
         timeout: 4000,
@@ -869,11 +936,11 @@
     }
 
     function stopListeningToChanges(showMessage) {
-      clearInterval(configChangeInterval);
-      configChangeInterval = false;
+      clearInterval(assetChangeInterval);
+      assetChangeInterval = false;
 
       if (showMessage) {
-        message.set(`Stopped listening to asset changes`, {
+        message.set(`Stopped listening to asset updates`, {
           timeout: 4000,
           color: colors.default,
           emoji: "👍"
@@ -882,7 +949,7 @@
     }
 
     function toggleNotifyOnChange() {
-      if (configChangeInterval) {
+      if (assetChangeInterval) {
         stopListeningToChanges(true);
       } else {
         notifyOnChange();
@@ -898,26 +965,23 @@
     return {
       show: () => {
         message.set(
-          "<table><tbody>" +
+          utils.renderTable(
             [
-              '<tr><td><span class="sptmninja_mono">sss</span></td><td>Scroll to Conversation</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssi</span></td><td>Show Info</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssc</span></td><td>Copy Spot ID to Clipboard (only on HTTPs)</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssa</span></td><td>Open Host Panel</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssv</span></td><td>Show Versions</td></tr>',
-              '<tr><td><span class="sptmninja_mono">sso</span></td><td>Open Config Data</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssn</span></td><td>Notify On Asset Update</td></tr>',
-              '<tr><td><span class="sptmninja_mono">ssh</span></td><td>Show Help</td></tr>',
-              '<tr><td><span class="sptmninja_mono">escape</span></td><td>Hide Floating Message</td></tr>'
-            ].join("") +
-            "</tbody></table>",
+              { keyCombo: "ctrl+s", description: "Open Command Palette" },
+              ...commands,
+              { keyCombo: "escape", description: "Hide Floating Message" }
+            ].map(command => [
+              `<span class="sptmninja_mono">${command.keyCombo}</span>`,
+              command.description
+            ])
+          ),
           { color: colors.default, title: "Available Shortcuts" }
         );
       }
     };
   })();
 
-  const commands = {
+  const commandsImpl = {
     // scroll to conversation
     sss: () => {
       scrolling.toggle();
@@ -958,11 +1022,19 @@
         const version = utils.getSpotimVersion() === 2 ? "V.2.0" : "V.1.0";
         const env = utils.isProduction(launcher) ? "Production" : "Dev";
 
-        message.set(`spot-id: ${spotId} <br/> ${version} <br/> ${env}`, {
-          timeout: 8000,
-          color: colors.default,
-          emoji: "💁‍♂️"
-        });
+        message.set(
+          utils.renderTable([
+            ["Spot Id", utils.createElement(spotId, "weight_normal")],
+            ["Version", utils.createElement(version, "weight_normal")],
+            ["Environment", utils.createElement(env, "weight_normal")]
+          ]),
+          {
+            // timeout: 8000,
+            color: colors.default,
+            title: "Spot Info",
+            emoji: "💁‍♂️"
+          }
+        );
       }
     },
 
@@ -980,19 +1052,18 @@
 
         if (relevantAssets.length) {
           const table =
-            "<table><tbody>" +
-            assetsConfig
-              .filter(item => item.url.indexOf("tags") > -1)
-              .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
-              .map(
-                item =>
-                  `<tr><td><span class="sptmninja_mono">${
-                    item.url.match(/tags\/(.*?)\//)[1]
-                  }</span></td><td>${item.name}</td>`
-              )
-              .join("") +
-            "</table></tbody>" +
-            `<div class="sptmninja_muted_text">Page loaded at ${pageLoadTime}</div>`;
+            utils.renderTable(
+              assetsConfig
+                .filter(item => item.url.indexOf("tags") > -1)
+                .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
+                .map(item => [
+                  `<span class="sptmninja_mono"><a target="_blank" href="${
+                    item.url
+                  }">${item.url.match(/tags\/(.*?)\//)[1]}</a></span>`,
+                  item.name
+                ])
+            ) +
+            `<div class="sptmninja_muted_text sptmninja_margin_top">Page loaded at ${pageLoadTime}</div>`;
 
           message.set(table, {
             color: colors.default,
@@ -1066,6 +1137,106 @@
     }
   };
 
+  const commands = [
+    { keyCombo: "sss", description: "Scroll to Conversation" },
+    { keyCombo: "ssi", description: "Show Info" },
+    {
+      keyCombo: "ssc",
+      description: "Copy Spot ID to Clipboard"
+    },
+    { keyCombo: "ssa", description: "Open Host Panel", keywords: "admin" },
+    { keyCombo: "ssv", description: "Show Asset Versions", keywords: "assets" },
+    { keyCombo: "sso", description: "Open Config Data" },
+    {
+      keyCombo: "ssn",
+      description: "Notify On Asset Update",
+      keywords: "changes"
+    },
+    { keyCombo: "ssh", description: "Show Help" }
+  ];
+
+  const commandPalette = (() => {
+    function show() {
+      let selectedItemIndex = 0;
+      let relevantCommands;
+
+      const messageBodyEl = message.set(
+        '<input class="sptmninja_input"><div class="sptmninja_results"></div>',
+        {
+          title: "Start Typing A Command",
+          color: colors.default
+        }
+      );
+
+      const input = document.querySelector(".sptmninja_input");
+      updateRelevantResults();
+      renderResults();
+      input.focus();
+
+      function updateRelevantResults() {
+        relevantCommands = commands.filter(
+          command =>
+            command.description.match(
+              new RegExp(input.value.replace(/ /g, "."), "i")
+            ) ||
+            (command.keywords &&
+              command.keywords.match(
+                new RegExp(input.value.replace(/ /g, "."), "i")
+              ))
+        );
+      }
+
+      function renderResults() {
+        messageBodyEl.querySelector(
+          ".sptmninja_results"
+        ).innerHTML = relevantCommands.length
+          ? utils.renderTable(
+              relevantCommands.map((command, index) => [
+                `<span class="sptmninja_mono">${command.keyCombo}</span>`,
+                command.description,
+                selectedItemIndex === index
+                  ? utils.createElement("⏎", "muted_text")
+                  : ""
+              ])
+            )
+          : "";
+      }
+
+      input.addEventListener("keydown", e => {
+        if (e.keyCode === 38) {
+          selectedItemIndex--;
+          if (selectedItemIndex < 0) {
+            selectedItemIndex = relevantCommands.length - 1;
+          }
+          e.preventDefault();
+        } else if (e.keyCode === 40) {
+          selectedItemIndex++;
+          if (selectedItemIndex >= relevantCommands.length) {
+            selectedItemIndex = 0;
+          }
+          e.preventDefault();
+        } else if (e.keyCode === 13) {
+          const selectedCommand = relevantCommands[selectedItemIndex];
+          if (selectedCommand) {
+            message.hide(true);
+            commandsImpl[selectedCommand.keyCombo]();
+            return;
+          }
+        }
+
+        renderResults();
+      });
+
+      input.addEventListener("keyup", e => {
+        updateRelevantResults();
+        renderResults();
+      });
+    }
+    return {
+      show
+    };
+  })();
+
   // handle keystrokes
   (() => {
     let lastKeyStrokesResetTimeout;
@@ -1078,13 +1249,13 @@
     }
 
     function executeCommand(keyCombo) {
-      let commandImpl = commands[keyCombo];
+      let commandImpl = commandsImpl[keyCombo];
       if (
         !commandImpl &&
         keyCombo.length === 3 &&
         keyCombo.slice(0, 2) === "sp"
       ) {
-        commandImpl = commands[`ss${keyCombo.slice(2)}`];
+        commandImpl = commandsImpl[`ss${keyCombo.slice(2)}`];
       }
 
       if (commandImpl) {
@@ -1104,6 +1275,11 @@
 
     function handleKeyPress(e) {
       if (isFocusedOnInput()) {
+        return;
+      }
+
+      if (e.key === "s" && e.ctrlKey) {
+        commandPalette.show();
         return;
       }
 
