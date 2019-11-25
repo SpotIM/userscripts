@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      3.0
+// @version      3.1
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -333,6 +333,10 @@
           z-index: 10;
         }
 
+        .sptmninja_titleIcon {
+          margin-inline-end: 12px;
+        }
+
         .sptmninja_muted_text {
           text-shadow: none;
           color: #ffffff73;
@@ -460,6 +464,7 @@
       messageCloseEl.className = "sptmninja_close_button";
       messageCloseEl.addEventListener("click", () => {
         hideMessage(true);
+        scrolling.stop();
       });
 
       messageEl.appendChild(messageBodyEl);
@@ -866,7 +871,7 @@
 
         if (windowRef === null) {
           message.set(
-            'Popup blocker probably blocked us<br/>But type <span class="sptmninja_mono">ssa</span> again and it will work immediately!',
+            "Popup blocker probably blocked us<br/>But run the command again and it will work immediately!",
             { timeout: 8000, color: colors.error, emoji: "😞" }
           );
           lastUrl = url;
@@ -1156,14 +1161,20 @@
   ];
 
   const commandPalette = (() => {
+    let selectedItemIndex = 0;
+
     function show() {
-      let selectedItemIndex = 0;
+      scrolling.stop({ hideMessage: false });
       let relevantCommands;
+
+      const missingLauncherWarning = `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
 
       const messageBodyEl = message.set(
         '<input class="sptmninja_input"><div class="sptmninja_results"></div>',
         {
-          title: "Start Typing A Command",
+          title: `${
+            !utils.getLauncherEl(false) ? missingLauncherWarning : ""
+          }Start Typing A Command`,
           color: colors.default
         }
       );
@@ -1173,16 +1184,25 @@
       renderResults();
       input.focus();
 
+      function runSelectedCommand() {
+        const selectedCommand = relevantCommands[selectedItemIndex];
+        if (selectedCommand) {
+          message.hide(true);
+          commandsImpl[selectedCommand.keyCombo]();
+          return true;
+        }
+
+        return false;
+      }
+
       function updateRelevantResults() {
+        const value = input.value.replace(/ /g, ".");
+
         relevantCommands = commands.filter(
           command =>
-            command.description.match(
-              new RegExp(input.value.replace(/ /g, "."), "i")
-            ) ||
-            (command.keywords &&
-              command.keywords.match(
-                new RegExp(input.value.replace(/ /g, "."), "i")
-              ))
+            command.description.match(new RegExp(value, "i")) ||
+            command.keyCombo.match(new RegExp(value, "i")) ||
+            (command.keywords && command.keywords.match(new RegExp(value, "i")))
         );
       }
 
@@ -1216,10 +1236,7 @@
           }
           e.preventDefault();
         } else if (e.keyCode === 13) {
-          const selectedCommand = relevantCommands[selectedItemIndex];
-          if (selectedCommand) {
-            message.hide(true);
-            commandsImpl[selectedCommand.keyCombo]();
+          if (runSelectedCommand()) {
             return;
           }
         }
@@ -1229,6 +1246,9 @@
 
       input.addEventListener("keyup", e => {
         updateRelevantResults();
+        if (selectedItemIndex >= relevantCommands.length) {
+          selectedItemIndex = Math.max(relevantCommands.length - 1, 0);
+        }
         renderResults();
       });
     }
@@ -1249,14 +1269,7 @@
     }
 
     function executeCommand(keyCombo) {
-      let commandImpl = commandsImpl[keyCombo];
-      if (
-        !commandImpl &&
-        keyCombo.length === 3 &&
-        keyCombo.slice(0, 2) === "sp"
-      ) {
-        commandImpl = commandsImpl[`ss${keyCombo.slice(2)}`];
-      }
+      const commandImpl = commandsImpl[keyCombo];
 
       if (commandImpl) {
         commandImpl();
