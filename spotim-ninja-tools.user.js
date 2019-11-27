@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      3.1
+// @version      3.2
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -28,8 +28,8 @@
       get: () => {
         return GM_getValue("prefs", {});
       },
-      set: prefs => {
-        return GM_setValue("prefs", prefs);
+      set: newPrefs => {
+        return GM_setValue("prefs", { ...prefs.get(), ...newPrefs });
       }
     };
   })();
@@ -165,16 +165,26 @@
 
     renderTable: data => {
       return (
-        "<table><tbody>" +
+        "<div class='sptmninja_table'><tbody>" +
         data
-          .map(line => "<tr><td>" + line.join("</td><td>") + "</td></tr>")
+          .map(
+            line =>
+              "<div class='sptmninja_tr'><div class='sptmninja_td'>" +
+              line.join("</div><div class='sptmninja_td'>") +
+              "</div></div>"
+          )
           .join("") +
-        "</tbody></table>"
+        "</tbody></div>"
       );
     },
 
     createElement: (html, className, tag = "div") => {
       return `<${tag} class="sptmninja_${className}">${html}</${tag}>`;
+    },
+
+    getRandomOptimisticEmoji: () => {
+      const emojis = ["🎈", "🚀", "🌈", "🦄"];
+      return emojis[Math.floor(Math.random() * emojis.length)];
     }
   };
 
@@ -269,7 +279,12 @@
           text-shadow: 0px 2px #00000033;
         }
 
-        .sptmninja_message table {
+        .sptmninja_below_notifications {
+          margin: 10em auto;
+        }
+
+        .sptmninja_message .sptmninja_table {
+          display: table;
           border: none;
           width: 100%;
           text-align: left;
@@ -279,21 +294,23 @@
           font-weight: inherit;
         }
 
-        .sptmninja_message table tr {
+        .sptmninja_message .sptmninja_table .sptmninja_tr {
+          display: table-row;
           background: initial !important;
         }
 
-        .sptmninja_message table td {
+        .sptmninja_message .sptmninja_table .sptmninja_td {
+          display: table-cell;
           padding: initial;
           border: none;
           border-bottom: 1px solid #00000021;
         }
 
-        .sptmninja_message table tr:last-child td {
+        .sptmninja_message .sptmninja_table .sptmninja_tr:last-child .sptmninja_td {
           border-bottom: none;
         }
 
-        .sptmninja_message table td:first-child {
+        .sptmninja_message .sptmninja_table .sptmninja_td:first-child {
           text-align: right;
           padding-right: 12px;
         }
@@ -345,6 +362,15 @@
 
         .sptmninja_weight_normal {
           font-weight: normal;
+        }
+
+        .sptmninja_muted_result {
+          font-weight: normal;
+          opacity: 0.8;
+        }
+
+        .sptmninja_weight_bold {
+          font-weight: bold;
         }
 
         .sptmninja_margin_top {
@@ -431,11 +457,15 @@
           margin-top: 12px;
         }
 
-        .sptmninja_input + .sptmninja_results table tr td:first-child {
+        .sptmninja_results .sptmninja_tr {
+          cursor: pointer;
+        }
+
+        .sptmninja_input + .sptmninja_results .sptmninja_table .sptmninja_tr .sptmninja_td:first-child {
           padding-right: 20px;
         }
 
-        .sptmninja_input + .sptmninja_results table tr td:nth-child(2) {
+        .sptmninja_input + .sptmninja_results .sptmninja_table .sptmninja_tr .sptmninja_td:nth-child(2) {
           width: 100%;
         }
       `;
@@ -524,7 +554,15 @@
 
     function setMessage(
       message,
-      { timeout, color, step, numSteps, title, emoji } = {}
+      {
+        timeout,
+        color,
+        step,
+        numSteps,
+        title,
+        emoji,
+        belowNotificationPopover
+      } = {}
     ) {
       addStyleTag();
       addMessage();
@@ -543,6 +581,12 @@
 
       if (messageBodyEl.innerHTML !== fullMessageHTML) {
         messageBodyEl.innerHTML = fullMessageHTML;
+      }
+
+      if (belowNotificationPopover) {
+        messageEl.classList.add("sptmninja_below_notifications");
+      } else {
+        messageEl.classList.remove("sptmninja_below_notifications");
       }
 
       clearTimeout(hideMessageTimeout);
@@ -594,8 +638,12 @@
 
     function highlightConversation(conversation) {
       Object.assign(conversation.style, {
-        boxShadow: "#4caf50 0px 0px 0px 12px, black 0px 0px 40px 22px"
-        // outline: 'solid 2000px #00000070',
+        boxShadow: `rgb(76, 175, 80) 0px 0px 0px 4px,
+        rgb(26, 216, 34) 0px 0px 0px 5px,
+        #00000036 0px 0px 40px 12px,
+        #00000085 0px 0px 4px 5px,
+        black 0px 0px 40px -4px`,
+        borderRadius: "8px"
       });
 
       isHighlighted = true;
@@ -606,9 +654,9 @@
         return;
       }
 
-      conversation.style.transition = "all 1s ease-out";
+      // conversation.style.transition = "all 1s ease-out";
       conversation.style.boxShadow = null;
-      conversation.style.outline = null;
+      conversation.style.borderRadius = null;
 
       isHighlighted = false;
     }
@@ -883,6 +931,31 @@
   const assetChangeListener = (() => {
     let assetChangeInterval;
 
+    function isConfigEqualOneWay(config1, config2) {
+      return !config1.find(config1Module => {
+        const config2Module = config2.find(
+          config2Module =>
+            config1Module.module === config2Module.module &&
+            config1Module.name === config2Module.name
+        );
+
+        if (!config2Module) {
+          return true;
+        }
+
+        if (config1Module.url !== config2Module.url) {
+          return true;
+        }
+      });
+    }
+
+    function isConfigEqual(config1, config2) {
+      return (
+        isConfigEqualOneWay(config1, config2) &&
+        isConfigEqualOneWay(config2, config1)
+      );
+    }
+
     async function notifyOnChange() {
       if (location.protocol !== "https:") {
         message.set(`Can't display notifications on non-https sites`, {
@@ -893,6 +966,12 @@
 
         return;
       }
+
+      message.set(`Please allow notifications on this site`, {
+        color: colors.default,
+        emoji: "🚦",
+        belowNotificationPopover: true
+      });
 
       const result = await Notification.requestPermission();
 
@@ -914,15 +993,25 @@
       }
 
       async function checkForUpdates() {
-        const response = await fetch(
-          `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
-            utils.getLauncherEl(true)
-          )}/redesign-post/vendor,init,conversation`
-        );
+        const launcher = utils.getLauncherEl();
+        let response;
+        if (launcher) {
+          response = await fetch(
+            `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
+              utils.getLauncherEl(true)
+            )}/redesign-post/vendor,init,conversation`
+          );
+        } else if (
+          unsafeWindow.location.href.match(
+            /https:\/\/api-2-0.spot.im\/v1.0.0\/config\/launcher\/.*?\/.*?\/.*/
+          )
+        ) {
+          response = await fetch(unsafeWindow.location.href);
+        }
 
-        const config = JSON.stringify(await response.json().assets_config);
+        const config = (await response.json()).assets_config;
 
-        if (lastConfig && config !== lastConfig) {
+        if (lastConfig && !isConfigEqual(config, lastConfig)) {
           showNotification();
         }
 
@@ -1072,7 +1161,7 @@
 
           message.set(table, {
             color: colors.default,
-            emoji: "🎈",
+            emoji: utils.getRandomOptimisticEmoji(),
             title: "Assets"
           });
         } else {
@@ -1161,7 +1250,20 @@
   ];
 
   const commandPalette = (() => {
+    // let selectedItemIndex = prefs.get().selectedItemIndex || 0;
     let selectedItemIndex = 0;
+
+    function handleTableClick(e) {
+      const line = e.target.closest(".sptmninja_tr");
+      if (line && line.children.length) {
+        const command = line.children[0].innerText;
+        const commandImpl = commandsImpl[command];
+
+        if (commandImpl) {
+          commandImpl();
+        }
+      }
+    }
 
     function show() {
       scrolling.stop({ hideMessage: false });
@@ -1178,6 +1280,10 @@
           color: colors.default
         }
       );
+
+      messageBodyEl
+        .querySelector(".sptmninja_results")
+        .addEventListener("click", handleTableClick);
 
       const input = document.querySelector(".sptmninja_input");
       updateRelevantResults();
@@ -1196,7 +1302,8 @@
       }
 
       function updateRelevantResults() {
-        const value = input.value.replace(/ /g, ".");
+        // const value = input.value.replace(/ /g, ".");
+        const value = input.value.split("").join(".*?");
 
         relevantCommands = commands.filter(
           command =>
@@ -1213,7 +1320,11 @@
           ? utils.renderTable(
               relevantCommands.map((command, index) => [
                 `<span class="sptmninja_mono">${command.keyCombo}</span>`,
-                command.description,
+                `<span class="${
+                  selectedItemIndex === index
+                    ? "sptmninja_weight_bold"
+                    : "sptmninja_muted_result"
+                }">${command.description}</span>`,
                 selectedItemIndex === index
                   ? utils.createElement("⏎", "muted_text")
                   : ""
@@ -1228,12 +1339,14 @@
           if (selectedItemIndex < 0) {
             selectedItemIndex = relevantCommands.length - 1;
           }
+          // prefs.set({ selectedItemIndex });
           e.preventDefault();
         } else if (e.keyCode === 40) {
           selectedItemIndex++;
           if (selectedItemIndex >= relevantCommands.length) {
             selectedItemIndex = 0;
           }
+          // prefs.set({ selectedItemIndex });
           e.preventDefault();
         } else if (e.keyCode === 13) {
           if (runSelectedCommand()) {
@@ -1252,6 +1365,7 @@
         renderResults();
       });
     }
+
     return {
       show
     };
