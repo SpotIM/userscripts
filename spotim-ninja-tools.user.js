@@ -185,12 +185,43 @@
     getRandomOptimisticEmoji: () => {
       const emojis = ["🎈", "🚀", "🌈", "🦄"];
       return emojis[Math.floor(Math.random() * emojis.length)];
+    },
+
+    onFoundSpotimObject: callback => {
+      function updateOnFoundSpotimObject() {
+        if (unsafeWindow.__SPOTIM__) {
+          clearInterval(interval);
+          callback();
+        }
+      }
+      const interval = setInterval(updateOnFoundSpotimObject, 500);
+
+      updateOnFoundSpotimObject();
     }
   };
 
   const pageLoadTime = (() => {
     const now = new Date();
     return now.getHours() + ":" + utils.padTime(now.getMinutes().toString());
+  })();
+
+  // show versions on load (__sst)
+  (async () => {
+    if ((await prefs.get()).showVersionsOnLoad) {
+      function handleSpotimObjectFound() {
+        if (
+          unsafeWindow.__SPOTIM__.SERVICES.configProvider._data.assets_config
+        ) {
+          commandsImpl.ssv();
+        } else {
+          setTimeout(() => {
+            utils.onFoundSpotimObject(handleSpotimObjectFound);
+          }, 500);
+        }
+      }
+
+      utils.onFoundSpotimObject(handleSpotimObjectFound);
+    }
   })();
 
   // autoscroll
@@ -427,6 +458,17 @@
           display: inline-block;
         }
 
+        .sptmninja_hidden {
+          opacity: 0.5;
+        }
+
+        .sptmninja_detailed_description {
+          font-weight: normal;
+          font-size: 0.8em;
+          margin: 2px 0px 5px;
+          color: #ffffffbf;
+        }
+
         .sptmninja_mono a {
           color: inherit;
           text-decoration: none;
@@ -646,17 +688,24 @@
         borderRadius: "8px"
       });
 
+      conversation.dataset.sptmninjaHighlighted = true;
+
       isHighlighted = true;
     }
 
-    function unhighlightConversation(conversation) {
+    function unhighlightConversation() {
       if (!isHighlighted) {
         return;
       }
 
-      // conversation.style.transition = "all 1s ease-out";
-      conversation.style.boxShadow = null;
-      conversation.style.borderRadius = null;
+      [...document.querySelectorAll("[data-sptmninja-highlighted]")].forEach(
+        el => {
+          // el.style.transition = "all 1s ease-out";
+          el.style.boxShadow = null;
+          el.style.borderRadius = null;
+          delete el.dataset.sptmninjaHighlighted;
+        }
+      );
 
       isHighlighted = false;
     }
@@ -732,7 +781,7 @@
     }
 
     function stopScrolling({ hideMessage } = { hideMessage: true }) {
-      unhighlightConversation(utils.findConversation());
+      unhighlightConversation();
       if (isScrolling) {
         if (hideMessage) {
           message.hide();
@@ -1065,8 +1114,22 @@
               ...commands,
               { keyCombo: "escape", description: "Hide Floating Message" }
             ].map(command => [
-              `<span class="sptmninja_mono">${command.keyCombo}</span>`,
-              command.description
+              `<span
+                title="${
+                  command.unlisted
+                    ? "This command is unlisted, no key combo assigned to it"
+                    : ""
+                }"
+                class="
+                  sptmninja_mono
+                  ${command.unlisted ? "sptmninja_hidden" : ""}
+                ">
+                ${command.unlisted ? "×" : command.keyCombo}
+              </span>`,
+              command.description +
+                (command.detailedDescription
+                  ? `<div class="sptmninja_detailed_description">${command.detailedDescription}</div>`
+                  : "")
             ])
           ),
           { color: colors.default, title: "Available Shortcuts" }
@@ -1224,6 +1287,43 @@
       assetChangeListener.toggleNotifyOnChange();
     },
 
+    __sst: async () => {
+      const showVersionsOnLoad = await prefs.get().showVersionsOnLoad;
+      await prefs.set({ showVersionsOnLoad: !showVersionsOnLoad });
+
+      if (!showVersionsOnLoad) {
+        message.set("I will now show you asset versions on page load!", {
+          timeout: 4000,
+          emoji: "🤠",
+          color: colors.success
+        });
+      } else {
+        message.set("I will stop showing you asset versions on page load", {
+          timeout: 4000,
+          emoji: "❌",
+          color: colors.default
+        });
+      }
+    },
+
+    __ssr: async () => {
+      try {
+        const spotAB = JSON.parse(unsafeWindow.localStorage.getItem("SPOT_AB"));
+        spotAB[35].variant = "B";
+        unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
+        message.set("Redesign enabled! Hit refresh to see it.", {
+          emoji: "😃",
+          color: colors.success
+        });
+      } catch (err) {
+        message.set("Are you sure this spot has redesign enabled?", {
+          title: "Couldn't enable redesign A/B test",
+          emoji: "😞",
+          color: colors.error
+        });
+      }
+    },
+
     // show help
     ssh: () => {
       scrolling.stop();
@@ -1245,6 +1345,18 @@
       keyCombo: "ssn",
       description: "Notify On Asset Update",
       keywords: "changes"
+    },
+    {
+      keyCombo: "__sst",
+      description: "Toggle Show Asset Versions on Load",
+      detailedDescription:
+        "Once activated, will display the asset versions once the page loads",
+      unlisted: true
+    },
+    {
+      keyCombo: "__ssr",
+      description: "Enable Redesign In A/B Test",
+      unlisted: true
     },
     { keyCombo: "ssh", description: "Show Help" }
   ];
@@ -1304,13 +1416,16 @@
       function updateRelevantResults() {
         // const value = input.value.replace(/ /g, ".");
         const value = input.value.split("").join(".*?");
+        const regExp = new RegExp(value, "i");
 
-        relevantCommands = commands.filter(
-          command =>
-            command.description.match(new RegExp(value, "i")) ||
-            command.keyCombo.match(new RegExp(value, "i")) ||
-            (command.keywords && command.keywords.match(new RegExp(value, "i")))
-        );
+        relevantCommands = commands
+          .filter(
+            command =>
+              command.description.match(regExp) ||
+              command.keyCombo.match(regExp) ||
+              (command.keywords && command.keywords.match(regExp))
+          )
+          .filter(command => value !== "" || !command.unlisted);
       }
 
       function renderResults() {
@@ -1319,7 +1434,9 @@
         ).innerHTML = relevantCommands.length
           ? utils.renderTable(
               relevantCommands.map((command, index) => [
-                `<span class="sptmninja_mono">${command.keyCombo}</span>`,
+                `<span class="sptmninja_mono ${
+                  command.unlisted ? "sptmninja_hidden" : ""
+                }">${command.unlisted ? "×" : command.keyCombo}</span>`,
                 `<span class="${
                   selectedItemIndex === index
                     ? "sptmninja_weight_bold"
