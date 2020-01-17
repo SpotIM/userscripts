@@ -11,11 +11,20 @@
 // @grant        unsafeWindow
 // ==/UserScript==
 
+// This file is looooong.
+//
+// To easily navigate it, use your IDE's code folding feature.
+// For example, hitting Cmd+K Cmd+2 in VSCode will only display the
+// block declarations for blocks of 2nd level indentation.
+// Cmd+K Cmd+0 expands everything back.
+//
 (function() {
   "use strict";
+  let shadow;
 
-  const FOCUS_WARNING =
-    "⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️";
+  const commonMessages = {
+    focusWarning: "⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️"
+  };
 
   const colors = {
     default: { bg: "#467FDB", border: "#46abdb" },
@@ -101,11 +110,14 @@
           });
         } else {
           window.parent.focus();
-          message.set(`${FOCUS_WARNING}<br/>Could not find launcher script`, {
-            timeout: 3000,
-            color: colors.error,
-            emoji: "😕️"
-          });
+          message.set(
+            `${commonMessages.focusWarning}<br/>Could not find launcher script`,
+            {
+              timeout: 3000,
+              color: colors.error,
+              emoji: "😕️"
+            }
+          );
         }
       }
 
@@ -261,6 +273,7 @@
     let hasAddedStyleTag;
     let hideMessageTimeout;
     let isMouseOver;
+    let shadowWrapper;
 
     function addStyleTag() {
       if (hasAddedStyleTag) {
@@ -269,6 +282,9 @@
       hasAddedStyleTag = true;
 
       const style = document.createElement("style");
+
+      // Install https://bit.ly/36X6EOY for syntax highlighting
+      //
       style.innerHTML = /*css*/ `
         @keyframes spotim-scroll-to-comments-appear {
           0% {
@@ -511,7 +527,7 @@
           width: 100%;
         }
       `;
-      document.head.appendChild(style);
+      shadow.appendChild(style);
     }
 
     function addMessage() {
@@ -553,14 +569,19 @@
       });
 
       setMessageColor(colors.default);
-      document.body.appendChild(messageEl);
+
+      shadowWrapper = document.createElement("div");
+      document.body.appendChild(shadowWrapper);
+
+      shadow = shadowWrapper.attachShadow({ mode: "open" });
+      shadow.appendChild(messageEl);
     }
 
     function showMessage() {
       isMouseOver = false;
 
-      if (!messageEl.parentNode) {
-        document.body.appendChild(messageEl);
+      if (!shadowWrapper.parentNode) {
+        document.body.appendChild(shadowWrapper);
       }
     }
 
@@ -581,8 +602,8 @@
 
     function hideMessage(force) {
       function hideMessageImpl() {
-        if (messageEl && messageEl.parentNode) {
-          messageEl.parentNode.removeChild(messageEl);
+        if (shadowWrapper && shadowWrapper.parentNode) {
+          shadowWrapper.parentNode.removeChild(shadowWrapper);
           setMessageProgress(0);
         }
       }
@@ -606,8 +627,8 @@
         belowNotificationPopover
       } = {}
     ) {
-      addStyleTag();
       addMessage();
+      addStyleTag();
       showMessage();
 
       let fullMessageHTML = message;
@@ -770,7 +791,7 @@
           } else {
             window.parent.focus();
             message.set(
-              `${FOCUS_WARNING}<br/>Scroll To Conversation... not found. Try scrolling up and down a bit.`,
+              `${commonMessages.focusWarning}<br/>Scroll To Conversation... not found. Try scrolling up and down a bit.`,
 
               { color: colors.error, timeout: 3000, emoji: "😕" }
             );
@@ -1311,7 +1332,7 @@
         const spotAB = JSON.parse(unsafeWindow.localStorage.getItem("SPOT_AB"));
         spotAB[35].variant = "B";
         unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
-        message.set("Redesign enabled! Hit refresh to see it.", {
+        message.set("Redesign enabled! Refresh the page to see it.", {
           emoji: "😃",
           color: colors.success
         });
@@ -1397,7 +1418,7 @@
         .querySelector(".sptmninja_results")
         .addEventListener("click", handleTableClick);
 
-      const input = document.querySelector(".sptmninja_input");
+      const input = shadow.querySelector(".sptmninja_input");
       updateRelevantResults();
       renderResults();
       input.focus();
