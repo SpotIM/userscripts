@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      3.4
+// @version      3.5
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -86,36 +86,97 @@
   })();
 
   const whatsNew = (() => {
+    const changelog = [
+      {
+        version: 3.5,
+        changes: [{ title: "Fixed some typos" }]
+      },
+      {
+        version: 3.4,
+        changes: [
+          {
+            title: "The following commands were added:",
+            list: [
+              {
+                title: "Toggle Show Asset Versions on Load",
+                description:
+                  "If enabled, will show the asset versions popup once the page loads"
+              },
+              { title: "A/B Test: Toggle Redesign" },
+              { title: "A/B Test: Cycle Through Reaction Variants" },
+              { title: "A/B Test: Toggle Show Scores Before/After Click" },
+              { title: "Show What's New" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    function renderChangesInVersion(versionDetails, isLatest) {
+      return /*html*/ `
+          <div class="whatsNewTitle">${
+            isLatest
+              ? `🌟 What's New in v${versionDetails.version}:`
+              : "v" + versionDetails.version + ":"
+          }</div>
+          <ul>
+            ${versionDetails.changes
+              .map(change => {
+                return /*html*/ `
+                <li>${change.title}</li>
+                ${
+                  change.list
+                    ? /*html*/ `
+                  <ul>
+                    ${change.list
+                      .map(listItem => {
+                        return /*html*/ `
+                        <li>
+                          ${listItem.title}
+                          ${
+                            listItem.description
+                              ? /*html*/ `<div class="whatsNewDescription">${listItem.description}</div>`
+                              : ""
+                          }
+                        </li>
+                      `;
+                      })
+                      .join("")}
+                  </ul>
+                `
+                    : ""
+                }
+              `;
+              })
+              .join("")}
+          </ul>
+        `;
+    }
+
     function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
       return /*html*/ `
-        <div class="whatsNewWrapper">
-          <div class="whatsNewContent">
-            <p>The following commands were added:</p>
-            <ul>
-              <li>
-                <div>Toggle Show Asset Versions on Load</div>
-                <div class="whatsNewDescription">Once enabled, will show the asset versions popup once the page loads</div>
-              </li>
-              <li>A/B Test: Toggle Redesign</li>
-              <li>A/B Test: Cycle Through Reaction Variants</li>
-              <li>A/B Test: Toggle Show Scores Before/After Click</li>
-              <li>Show What's New</li>
-            </ul>
+          <div class="whatsNewWrapper">
+            <div class="whatsNewContent">
+              ${renderChangesInVersion(changelog[0], true)}
+              ${changelog
+                .slice(1)
+                .map(change => renderChangesInVersion(change))
+                .join("")}
+            </div>
+            <div class="whatsNewGutter">
+              <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
+                ${
+                  isShowingWhatsNewOnUpgrade
+                    ? "Don't Show Me What's New Again"
+                    : "Show Me What's New Next Time"
+                }
+              </button>
+              <button class="whatsNewButton whatsNewCloseButton">
+                Close
+              </button>
+            </div>
           </div>
-          <div class="whatsNewGutter">
-            <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
-              ${
-                isShowingWhatsNewOnUpgrade
-                  ? "Don't Show Me What's New Again"
-                  : "Show Me What's New Next Time"
-              }
-            </button>
-            <button class="whatsNewButton whatsNewCloseButton">
-              Close
-            </button>
-          </div>
-        </div>
-      `;
+        `;
     }
 
     async function show() {
@@ -124,8 +185,7 @@
       await prefs.set({ lastWhatsNewVersion: currentVersion });
 
       message.set(renderWhatsNew(!dontShowWhatsNew), {
-        title: `What's New in SpotIM Ninja Tools v${currentVersion}`,
-        emoji: '<div style="margin-top: -25px">🥳</div>'
+        title: `SpotIM Ninja Tools Upgraded! 🥳`
       });
 
       function handleClose() {
@@ -657,12 +717,35 @@
 
         .whatsNewWrapper {
           text-align: left;
-          margin-top: 1em;
+          margin-top: -7px;
           font-weight: normal;
         }
 
         .whatsNewContent {
-          margin-left: 5em;
+          max-height: calc(100vh - 10em);
+          overflow-y: scroll;
+          overflow-x: hidden;
+          padding: 0px 10px;
+          margin: 0px -10px;
+          padding-top: 1em;
+        }
+
+        .whatsNewContent .whatsNewTitle {
+          margin-left: -10px;
+          padding-left: 1em;
+          margin-right: -10px;
+          border-top: 1px solid #00000040;
+          background: linear-gradient(#ffffff14, transparent);
+          padding-top: 1em;
+          font-weight: bold;
+          padding-bottom: 0em;
+          border-bottom: 1px solid #3c3c3c26;
+        }
+
+        .whatsNewContent .whatsNewTitle:first-child {
+          margin-top: -18px;
+          border: none;
+          background: none;
         }
 
         .whatsNewContent p {
@@ -879,10 +962,10 @@
     function highlightConversation(conversation) {
       Object.assign(conversation.style, {
         boxShadow: `rgb(76, 175, 80) 0px 0px 0px 4px,
-        rgb(26, 216, 34) 0px 0px 0px 5px,
-        #00000036 0px 0px 40px 12px,
-        #00000085 0px 0px 4px 5px,
-        black 0px 0px 40px -4px`,
+          rgb(26, 216, 34) 0px 0px 0px 5px,
+          #00000036 0px 0px 40px 12px,
+          #00000085 0px 0px 4px 5px,
+          black 0px 0px 40px -4px`,
         borderRadius: "8px"
       });
 
@@ -1314,17 +1397,17 @@
               { keyCombo: "escape", description: "Hide Floating Message" }
             ].map(command => [
               `<span
-                title="${
-                  command.unlisted
-                    ? "This command is unlisted, no key combo assigned to it"
-                    : ""
-                }"
-                class="
-                  sptmninja_mono
-                  ${command.unlisted ? "sptmninja_hidden" : ""}
-                ">
-                ${command.unlisted ? "×" : command.keyCombo}
-              </span>`,
+                  title="${
+                    command.unlisted
+                      ? "This command is unlisted, no key combo assigned to it"
+                      : ""
+                  }"
+                  class="
+                    sptmninja_mono
+                    ${command.unlisted ? "sptmninja_hidden" : ""}
+                  ">
+                  ${command.unlisted ? "×" : command.keyCombo}
+                </span>`,
               command.description +
                 (command.detailedDescription
                   ? `<div class="sptmninja_detailed_description">${command.detailedDescription}</div>`
@@ -1535,7 +1618,7 @@
       variants: [
         { id: "A", statusText: "Reactions Disabled" },
         { id: "B", statusText: "Reactions Enabled" },
-        { id: "C", statusText: "Reactions With Ads" }
+        { id: "C", statusText: "Reactions Enabled (With Ads)" }
       ]
     },
     {
@@ -1572,10 +1655,9 @@
           spotAB[abCommand.id].variant = nextVariant.id;
           statusText = nextVariant.statusText;
 
-          message.set(`Refresh the page to update the conversation.`, {
+          message.set(statusText, {
             emoji: "😃",
-            color: colors.success,
-            title: `${statusText}`
+            color: colors.success
           });
           unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
         } catch (err) {
@@ -1614,7 +1696,7 @@
       keyCombo: "__ssa",
       description: "Toggle Show Asset Versions on Load",
       detailedDescription:
-        "Once activated, will display the asset versions once the page loads",
+        "If enabled, will display the asset versions once the page loads",
       unlisted: true
     },
     ...abTestCommands.map(abCommand => ({
@@ -1717,15 +1799,15 @@
                   command.unlisted ? "×" : command.keyCombo
                 }</span>`,
                 `<span
-                  class="${
-                    selectedItemIndex === index
-                      ? "sptmninja_weight_bold"
-                      : "sptmninja_muted_result"
-                  }"
-                  ${selectedItemIndex === index ? "data-selected" : ""}
-                  >
-                  ${command.description}
-                </span>`,
+                    class="${
+                      selectedItemIndex === index
+                        ? "sptmninja_weight_bold"
+                        : "sptmninja_muted_result"
+                    }"
+                    ${selectedItemIndex === index ? "data-selected" : ""}
+                    >
+                    ${command.description}
+                  </span>`,
                 selectedItemIndex === index
                   ? utils.createElement("⏎", "muted_text")
                   : ""
@@ -1830,7 +1912,7 @@
         return;
       }
 
-      if (e.key === "s" && e.ctrlKey) {
+      if (e.key.toLowerCase() === "s" && e.ctrlKey) {
         commandPalette.show();
         return;
       }
