@@ -89,7 +89,7 @@
     const changelog = [
       {
         version: 3.5,
-        changes: [{ title: "Some bugs were fixed" }]
+        changes: [{ title: "Bug fixes" }]
       },
       {
         version: 3.4,
@@ -116,8 +116,8 @@
       return /*html*/ `
           <div class="whatsNewTitle">${
             isLatest
-              ? `🌟 What's New in v${versionDetails.version}:`
-              : "v" + versionDetails.version + ":"
+              ? `⭐️ What's New in v${versionDetails.version}:`
+              : "✨ v" + versionDetails.version + ":"
           }</div>
           <ul>
             ${versionDetails.changes
@@ -158,6 +158,7 @@
           <div class="whatsNewWrapper">
             <div class="whatsNewContent">
               ${renderChangesInVersion(changelog[0], true)}
+              <div class="whatsNewPreviousTitle">Previous Versions</div>
               ${changelog
                 .slice(1)
                 .map(change => renderChangesInVersion(change))
@@ -742,6 +743,20 @@
           font-weight: bold;
           padding-bottom: 0em;
           border-bottom: 1px solid #3c3c3c26;
+        }
+
+        .whatsNewContent .whatsNewPreviousTitle {
+          margin-left: -10px;
+          padding-left: 1em;
+          margin-right: -10px;
+          border-top: 1px solid #00000040;
+          padding-top: 1em;
+          font-weight: bold;
+          padding-bottom: 0em;
+          border-bottom: 1px solid #3c3c3c26;
+          padding: 0.5em;
+          background: #00000017;
+          text-align: center;
         }
 
         .whatsNewContent .whatsNewTitle:first-child {
