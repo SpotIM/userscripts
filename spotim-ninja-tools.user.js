@@ -723,7 +723,7 @@
 
         .whatsNewContent {
           max-height: calc(100vh - 10em);
-          overflow-y: scroll;
+          overflow-y: auto;
           overflow-x: hidden;
           padding: 0px 10px;
           margin: 0px -10px;
@@ -1704,21 +1704,6 @@
       description: "A/B Test: " + abCommand.description,
       unlisted: true
     }))
-    // {
-    //   keyCombo: "__ssab1",
-    //   description: "A/B Test: Toggle Redesign",
-    //   unlisted: true
-    // },
-    // {
-    //   keyCombo: "__ssab2",
-    //   description: "A/B Test: Cycle Through Reactions Variations",
-    //   unlisted: true
-    // },
-    // {
-    //   keyCombo: "__ssab3",
-    //   description: "A/B Test: Toggle Show Scores Before/After Click",
-    //   unlisted: true
-    // }
   ];
 
   const commandPalette = (() => {
