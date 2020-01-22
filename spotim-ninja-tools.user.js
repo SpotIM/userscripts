@@ -179,13 +179,15 @@
         `;
     }
 
-    async function show() {
+    async function show(hasUpgraded) {
       const currentVersion = GM_info.script.version;
       const { dontShowWhatsNew } = await prefs.get();
       await prefs.set({ lastWhatsNewVersion: currentVersion });
 
       message.set(renderWhatsNew(!dontShowWhatsNew), {
-        title: `SpotIM Ninja Tools Upgraded! 🥳`
+        title: hasUpgraded
+          ? `SpotIM Ninja Tools Upgraded! 🥳`
+          : "SpotIM Ninja Tools Changelog"
       });
 
       function handleClose() {
@@ -217,7 +219,7 @@
         }
 
         if (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) {
-          show();
+          show(true);
         }
       }
     }
@@ -722,7 +724,7 @@
         }
 
         .whatsNewContent {
-          max-height: calc(100vh - 10em);
+          max-height: calc(100vh - 10em - 100px);
           overflow-y: auto;
           overflow-x: hidden;
           padding: 0px 10px;
