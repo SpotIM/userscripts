@@ -89,7 +89,7 @@
     const changelog = [
       {
         version: 3.5,
-        changes: [{ title: "Fixed some typos" }]
+        changes: [{ title: "Some bugs were fixed" }]
       },
       {
         version: 3.4,
