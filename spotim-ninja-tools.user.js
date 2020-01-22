@@ -7,6 +7,9 @@
 // @match        http*://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_openInTab
+// @grant        GM_setClipboard
+// @grant        GM_deleteValue
 // @grant        unsafeWindow
 // ==/UserScript==
 
