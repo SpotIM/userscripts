@@ -7,6 +7,8 @@
 // @match        http*://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_openInTab
+// @grant        GM_setClipboard
 // @grant        GM_deleteValue
 // @grant        unsafeWindow
 // ==/UserScript==
@@ -1160,15 +1162,16 @@
           emoji: "😃"
         });
 
-        windowRef = window.open(url);
+        // windowRef = window.open(url);
+        GM_openInTab(url, false);
 
-        if (windowRef === null) {
-          message.set(
-            "Popup blocker probably blocked us<br/>But run the command again and it will work immediately!",
-            { timeout: 8000, color: colors.error, emoji: "😞" }
-          );
-          lastUrl = url;
-        }
+        // if (windowRef === null) {
+        //   message.set(
+        //     "Popup blocker probably blocked us<br/>But run the command again and it will work immediately!",
+        //     { timeout: 8000, color: colors.error, emoji: "😞" }
+        //   );
+        //   lastUrl = url;
+        // }
       }
     };
   })();
@@ -1348,20 +1351,20 @@
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
 
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(spotId);
-          message.set(`Copied ${spotId} to clipboard!`, {
-            timeout: 2000,
-            color: colors.default,
-            emoji: "😃"
-          });
-        } else {
-          message.set(`Can't copy ${spotId} to clipboard on non-https sites`, {
-            timeout: 4000,
-            color: colors.error,
-            emoji: "😞"
-          });
-        }
+        // if (navigator.clipboard) {
+        GM_setClipboard(spotId);
+        message.set(`Copied ${spotId} to clipboard!`, {
+          timeout: 2000,
+          color: colors.default,
+          emoji: "😃"
+        });
+        // } else {
+        //   message.set(`Can't copy ${spotId} to clipboard on non-https sites`, {
+        //     timeout: 4000,
+        //     color: colors.error,
+        //     emoji: "😞"
+        //   });
+        // }
       }
     },
 
