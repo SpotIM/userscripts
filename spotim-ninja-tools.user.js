@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      3.2
+// @version      3.3
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
@@ -83,9 +83,8 @@
     }
   })();
 
-  // what's new message
-  (async () => {
-    function renderWhatsNew() {
+  const whatsNew = (() => {
+    function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
       return /*html*/ `
         <div class="whatsNewWrapper">
           <div class="whatsNewContent">
@@ -95,12 +94,19 @@
                 <div>Toggle Show Asset Versions on Load</div>
                 <div class="whatsNewDescription">Once enabled, will show the asset versions popup once the page loads</div>
               </li>
-              <li>Toggle Redesign In A/B Test</li>
+              <li>A/B Test: Toggle Redesign</li>
+              <li>A/B Test: Cycle Through Reaction Variants</li>
+              <li>A/B Test: Toggle Show Scores Before/After Click</li>
+              <li>Show What's New</li>
             </ul>
           </div>
           <div class="whatsNewGutter">
-            <button class="whatsNewButton whatsNewCloseAndDoneShowButton">
-              Don't show me What's New again
+            <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
+              ${
+                isShowingWhatsNewOnUpgrade
+                  ? "Don't Show Me What's New Again"
+                  : "Show Me What's New Next Time"
+              }
             </button>
             <button class="whatsNewButton whatsNewCloseButton">
               Close
@@ -110,52 +116,55 @@
       `;
     }
 
-    const isNotFirstRun = await prefs.get().isNotFirstRun;
-    if (isNotFirstRun) {
-      const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
+    async function show() {
       const currentVersion = GM_info.script.version;
+      const { dontShowWhatsNew } = await prefs.get();
+      await prefs.set({ lastWhatsNewVersion: currentVersion });
 
-      if (dontShowWhatsNew) {
-        return;
+      message.set(renderWhatsNew(!dontShowWhatsNew), {
+        title: `What's New in SpotIM Ninja Tools v${currentVersion}`,
+        emoji: '<div style="margin-top: -25px">🥳</div>'
+      });
+
+      function handleClose() {
+        message.hide(true);
       }
 
-      if (!lastWhatsNewVersion || lastWhatsNewVersion < currentVersion) {
-        message.set(renderWhatsNew(), {
-          title: `What's New in SpotIM Ninja Tools v${currentVersion}`,
-          emoji: '<div style="margin-top: -25px">🥳</div>'
-        });
-
-        function handleClose() {
-          message.hide(true);
-        }
-
-        async function handleCloseAndDontShow() {
-          await prefs.set({ dontShowWhatsNew: true });
-          message.hide(true);
-        }
-
-        shadow
-          .querySelector(".whatsNewCloseButton")
-          .addEventListener("click", handleClose);
-        shadow
-          .querySelector(".whatsNewCloseAndDoneShowButton")
-          .addEventListener("click", handleCloseAndDontShow);
-
-        await prefs.set({ lastWhatsNewVersion: currentVersion });
+      async function handleCloseAndToggleShowNextTime() {
+        const { dontShowWhatsNew } = await prefs.get();
+        await prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
+        message.hide(true);
       }
-      // if ()
-      // message.set("(you'll only see this message once)", {
-      //   timeout: 3000,
-      //   color: colors.default,
-      //   title: "Welcome to Spot.IM Ninja Tools!"
-      // });
 
-      // setTimeout(() => {
-      //   commandPalette.show();
-      // }, 3500);
-
-      // await prefs.set({ isNotFirstRun: true });
+      shadow
+        .querySelector(".whatsNewCloseButton")
+        .addEventListener("click", handleClose);
+      shadow
+        .querySelector(".whatsNewCloseAndToggleShowButton")
+        .addEventListener("click", handleCloseAndToggleShowNextTime);
     }
+
+    async function showIfUpgraded() {
+      const isNotFirstRun = await prefs.get().isNotFirstRun;
+      if (isNotFirstRun) {
+        const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
+        const currentVersion = GM_info.script.version;
+
+        if (dontShowWhatsNew) {
+          return;
+        }
+
+        if (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) {
+          show();
+        }
+      }
+    }
+
+    showIfUpgraded();
+
+    return {
+      show
+    };
   })();
 
   // set settings/creds method
@@ -655,17 +664,13 @@
         }
 
         .whatsNewContent p {
+          font-weight: bold;
           margin: 0px 0.6em;
         }
 
         .whatsNewContent ul {
           margin-top: 0.4em;
-          list-style: lower-roman;
-        }
-
-        .whatsNewContent ul {
-          margin-top: 0.4em;
-          list-style: lower-roman;
+          list-style: disc;
         }
 
         .whatsNewContent .whatsNewDescription {
@@ -676,9 +681,9 @@
         .whatsNewGutter {
           display: flex;
           margin: -10px;
-          padding: 10px;
+          padding: 10px 0px;
           border-top: 1px solid #0000000f;
-          background: linear-gradient(#558adf, #0000001a);
+          background: linear-gradient(#ffffff2b, #0000001a);
           margin-top: 0px;
           z-index: 1;
           position: relative;
@@ -691,7 +696,7 @@
           background: none;
           border: none;
           flex: auto;
-          margin: -10px;
+          margin: -10px 0px;
           border-right: 1px solid #00000038;
           cursor: pointer;
           padding: 1em 0px;
@@ -1329,7 +1334,7 @@
     };
   })();
 
-  const commandsImpl = {
+  let commandsImpl = {
     // scroll to conversation
     sss: () => {
       scrolling.toggle();
@@ -1497,33 +1502,8 @@
       }
     },
 
-    __ssab1: async () => {
-      try {
-        const spotAB = JSON.parse(unsafeWindow.localStorage.getItem("SPOT_AB"));
-        const shouldEnable = spotAB[35].variant === "A";
-        let statusText;
-
-        if (shouldEnable) {
-          spotAB[35].variant = "B";
-          statusText = "Enabled";
-        } else {
-          spotAB[35].variant = "A";
-          statusText = "Disabled";
-        }
-
-        message.set(`Refresh the page to update the conversation.`, {
-          emoji: "😃",
-          color: colors.success,
-          title: `Redesign ${statusText}`
-        });
-        unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
-      } catch (err) {
-        message.set("Are you sure this spot has redesign enabled?", {
-          title: "Couldn't Enable Redesign A/B Test",
-          emoji: "😞",
-          color: colors.error
-        });
-      }
+    __ssn: () => {
+      whatsNew.show();
     },
 
     // show help
@@ -1533,17 +1513,78 @@
     }
   };
 
-  const abTestTogglers = [
+  const abTestCommands = [
     {
       keyCombo: "__ssab1",
-      description: "A/B Test: Toggle Redesign",
+      name: "Redesign",
+      description: "Toggle Redesign",
       id: 35,
       variants: [
-        { id: "A", statusTest: "Redesign Disabled" },
-        { id: "B", statusTest: "Redesign Enabled" }
+        { id: "A", statusText: "Redesign Disabled" },
+        { id: "B", statusText: "Redesign Enabled" }
+      ]
+    },
+    {
+      keyCombo: "__ssab2",
+      name: "Reactions",
+      description: "Cycle Through Reaction Variants",
+      id: 34,
+      variants: [
+        { id: "A", statusText: "Reactions Disabled" },
+        { id: "B", statusText: "Reactions Enabled" },
+        { id: "C", statusText: "Reactions With Ads" }
+      ]
+    },
+    {
+      keyCombo: "__ssab3",
+      name: "Show Scores",
+      description: "Toggle Show Scores Before/After Click",
+      id: 37,
+      variants: [
+        { id: "A", statusText: "Showing Scores After Click" },
+        { id: "B", statusText: "Showing Scores Before Click" }
       ]
     }
   ];
+
+  commandsImpl = abTestCommands.reduce((commands, abCommand) => {
+    return {
+      ...commands,
+      [abCommand.keyCombo]: async () => {
+        try {
+          const spotAB = JSON.parse(
+            unsafeWindow.localStorage.getItem("SPOT_AB")
+          );
+          const currentVariant = spotAB[abCommand.id].variant;
+          const nextPossibleVariantChar = String.fromCharCode(
+            currentVariant.charCodeAt(0) + 1
+          );
+          const nextVariant =
+            abCommand.variants.find(
+              variant => variant.id === nextPossibleVariantChar
+            ) || abCommand.variants[0];
+
+          let statusText;
+
+          spotAB[abCommand.id].variant = nextVariant.id;
+          statusText = nextVariant.statusText;
+
+          message.set(`Refresh the page to update the conversation.`, {
+            emoji: "😃",
+            color: colors.success,
+            title: `${statusText}`
+          });
+          unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
+        } catch (err) {
+          message.set("Are you sure this spot has this test?", {
+            title: `Couldn't ${abCommand.description}`,
+            emoji: "😞",
+            color: colors.error
+          });
+        }
+      }
+    };
+  }, commandsImpl);
 
   const commands = [
     { keyCombo: "sss", description: "Scroll to Conversation" },
@@ -1562,27 +1603,37 @@
     },
     { keyCombo: "ssh", description: "Show Help" },
     {
+      keyCombo: "__ssn",
+      description: "Show What's New",
+      unlisted: true
+    },
+    {
       keyCombo: "__ssa",
       description: "Toggle Show Asset Versions on Load",
       detailedDescription:
         "Once activated, will display the asset versions once the page loads",
       unlisted: true
     },
-    {
-      keyCombo: "__ssab1",
-      description: "A/B Test: Toggle Redesign",
+    ...abTestCommands.map(abCommand => ({
+      keyCombo: abCommand.keyCombo,
+      description: "A/B Test: " + abCommand.description,
       unlisted: true
-    },
-    {
-      keyCombo: "__ssab2",
-      description: "A/B Test: Cycle Through Reactions Variations",
-      unlisted: true
-    },
-    {
-      keyCombo: "__ssab3",
-      description: "A/B Test: Toggle Show Scores Before/After Click",
-      unlisted: true
-    }
+    }))
+    // {
+    //   keyCombo: "__ssab1",
+    //   description: "A/B Test: Toggle Redesign",
+    //   unlisted: true
+    // },
+    // {
+    //   keyCombo: "__ssab2",
+    //   description: "A/B Test: Cycle Through Reactions Variations",
+    //   unlisted: true
+    // },
+    // {
+    //   keyCombo: "__ssab3",
+    //   description: "A/B Test: Toggle Show Scores Before/After Click",
+    //   unlisted: true
+    // }
   ];
 
   const commandPalette = (() => {
