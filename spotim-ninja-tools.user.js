@@ -11,13 +11,35 @@
 // @grant        unsafeWindow
 // ==/UserScript==
 
-// This file is looooong.
+// ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+//                        READ THIS FIRST!
 //
-// To easily navigate it, use your IDE's code folding feature.
-// For example, hitting Cmd+K Cmd+2 in VSCode will only display the
-// block declarations for blocks of 2nd level indentation.
-// Cmd+K Cmd+0 expands everything back.
+// This file grew quite a bit.
+// It hosts JS, HTML and CSS within it, which is why I encourage you to
+// install these two VSCode extension https://bit.ly/36X6EOY and
+// https://bit.ly/37rCLWY that provide syntax highlighting for template
+// literals.
 //
+// To easily navigate this file, use your IDE's code folding feature (or
+// outline explorer).
+// For example, in VSCode, hitting Cmd+K Cmd+2 will display the block
+// declarations for blocks of 2nd level indentation, and fold everything
+// that's within those declarations.
+// Try it now and look at the code (Cmd+K Cmd+0 will expand everything
+// back.)
+//
+// This userscript implements some tools, like Scroll To Conversation,
+// Show Asset Versions, etc...
+// I've used closures to encapsulate every tool's inner logic, exposing
+// only the required api for it to work. Please follow this practice.
+//
+// This file has grown and grown with time, and I probably should have
+// used a bundler at some point, too bad I'm too lazy.
+//
+// - Eldad
+//
+// ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+
 (function() {
   "use strict";
   let shadow;
@@ -58,6 +80,81 @@
       }, 3500);
 
       await prefs.set({ isNotFirstRun: true });
+    }
+  })();
+
+  // what's new message
+  (async () => {
+    function renderWhatsNew() {
+      return /*html*/ `
+        <div class="whatsNewWrapper">
+          <div class="whatsNewContent">
+            <p>The following commands were added:</p>
+            <ul>
+              <li>
+                <div>Toggle Show Asset Versions on Load</div>
+                <div class="whatsNewDescription">Once enabled, will show the asset versions popup once the page loads</div>
+              </li>
+              <li>Toggle Redesign In A/B Test</li>
+            </ul>
+          </div>
+          <div class="whatsNewGutter">
+            <button class="whatsNewButton whatsNewCloseAndDoneShowButton">
+              Don't show me What's New again
+            </button>
+            <button class="whatsNewButton whatsNewCloseButton">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    const isNotFirstRun = await prefs.get().isNotFirstRun;
+    if (isNotFirstRun) {
+      const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
+      const currentVersion = GM_info.script.version;
+
+      if (dontShowWhatsNew) {
+        return;
+      }
+
+      if (!lastWhatsNewVersion || lastWhatsNewVersion < currentVersion) {
+        message.set(renderWhatsNew(), {
+          title: `What's New in SpotIM Ninja Tools v${currentVersion}`,
+          emoji: '<div style="margin-top: -25px">🥳</div>'
+        });
+
+        function handleClose() {
+          message.hide(true);
+        }
+
+        async function handleCloseAndDontShow() {
+          await prefs.set({ dontShowWhatsNew: true });
+          message.hide(true);
+        }
+
+        shadow
+          .querySelector(".whatsNewCloseButton")
+          .addEventListener("click", handleClose);
+        shadow
+          .querySelector(".whatsNewCloseAndDoneShowButton")
+          .addEventListener("click", handleCloseAndDontShow);
+
+        await prefs.set({ lastWhatsNewVersion: currentVersion });
+      }
+      // if ()
+      // message.set("(you'll only see this message once)", {
+      //   timeout: 3000,
+      //   color: colors.default,
+      //   title: "Welcome to Spot.IM Ninja Tools!"
+      // });
+
+      // setTimeout(() => {
+      //   commandPalette.show();
+      // }, 3500);
+
+      // await prefs.set({ isNotFirstRun: true });
     }
   })();
 
@@ -217,7 +314,7 @@
     return now.getHours() + ":" + utils.padTime(now.getMinutes().toString());
   })();
 
-  // show versions on load (__sst)
+  // show versions on load
   (async () => {
     if ((await prefs.get()).showVersionsOnLoad) {
       function handleSpotimObjectFound() {
@@ -283,7 +380,7 @@
 
       const style = document.createElement("style");
 
-      // Install https://bit.ly/36X6EOY for syntax highlighting
+      // For syntax highlighting, install this extension: https://bit.ly/36X6EOY
       //
       style.innerHTML = /*css*/ `
         @keyframes spotim-scroll-to-comments-appear {
@@ -511,6 +608,12 @@
           font-weight: bold;
         }
 
+        .sptmninja_results {
+          max-height: 270px;
+          overflow-y: scroll;
+          padding-right: 10px;
+        }
+
         .sptmninja_input + .sptmninja_results:not(:empty) {
           margin-top: 12px;
         }
@@ -525,6 +628,73 @@
 
         .sptmninja_input + .sptmninja_results .sptmninja_table .sptmninja_tr .sptmninja_td:nth-child(2) {
           width: 100%;
+        }
+
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+          border-radius: 10px;
+          background: #0000001a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          background: #00000036;
+        }
+
+        .whatsNewWrapper {
+          text-align: left;
+          margin-top: 1em;
+          font-weight: normal;
+        }
+
+        .whatsNewContent {
+          margin-left: 5em;
+        }
+
+        .whatsNewContent p {
+          margin: 0px 0.6em;
+        }
+
+        .whatsNewContent ul {
+          margin-top: 0.4em;
+          list-style: lower-roman;
+        }
+
+        .whatsNewContent ul {
+          margin-top: 0.4em;
+          list-style: lower-roman;
+        }
+
+        .whatsNewContent .whatsNewDescription {
+          font-size: 0.8em;
+          opacity: 0.6;
+        }
+
+        .whatsNewGutter {
+          display: flex;
+          margin: -10px;
+          padding: 10px;
+          border-top: 1px solid #0000000f;
+          background: linear-gradient(#558adf, #0000001a);
+          margin-top: 0px;
+          z-index: 1;
+          position: relative;
+        }
+
+        .whatsNewGutter .whatsNewButton {
+          font-size: inherit;
+          font-family: inherit;
+          color: inherit;
+          background: none;
+          border: none;
+          flex: auto;
+          margin: -10px;
+          border-right: 1px solid #00000038;
+          cursor: pointer;
+          padding: 1em 0px;
         }
       `;
       shadow.appendChild(style);
@@ -1308,7 +1478,7 @@
       assetChangeListener.toggleNotifyOnChange();
     },
 
-    __sst: async () => {
+    __ssa: async () => {
       const showVersionsOnLoad = await prefs.get().showVersionsOnLoad;
       await prefs.set({ showVersionsOnLoad: !showVersionsOnLoad });
 
@@ -1327,18 +1497,29 @@
       }
     },
 
-    __ssr: async () => {
+    __ssab1: async () => {
       try {
         const spotAB = JSON.parse(unsafeWindow.localStorage.getItem("SPOT_AB"));
-        spotAB[35].variant = "B";
-        unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
-        message.set("Redesign enabled! Refresh the page to see it.", {
+        const shouldEnable = spotAB[35].variant === "A";
+        let statusText;
+
+        if (shouldEnable) {
+          spotAB[35].variant = "B";
+          statusText = "Enabled";
+        } else {
+          spotAB[35].variant = "A";
+          statusText = "Disabled";
+        }
+
+        message.set(`Refresh the page to update the conversation.`, {
           emoji: "😃",
-          color: colors.success
+          color: colors.success,
+          title: `Redesign ${statusText}`
         });
+        unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
       } catch (err) {
         message.set("Are you sure this spot has redesign enabled?", {
-          title: "Couldn't enable redesign A/B test",
+          title: "Couldn't Enable Redesign A/B Test",
           emoji: "😞",
           color: colors.error
         });
@@ -1351,6 +1532,18 @@
       help.show();
     }
   };
+
+  const abTestTogglers = [
+    {
+      keyCombo: "__ssab1",
+      description: "A/B Test: Toggle Redesign",
+      id: 35,
+      variants: [
+        { id: "A", statusTest: "Redesign Disabled" },
+        { id: "B", statusTest: "Redesign Enabled" }
+      ]
+    }
+  ];
 
   const commands = [
     { keyCombo: "sss", description: "Scroll to Conversation" },
@@ -1367,19 +1560,29 @@
       description: "Notify On Asset Update",
       keywords: "changes"
     },
+    { keyCombo: "ssh", description: "Show Help" },
     {
-      keyCombo: "__sst",
+      keyCombo: "__ssa",
       description: "Toggle Show Asset Versions on Load",
       detailedDescription:
         "Once activated, will display the asset versions once the page loads",
       unlisted: true
     },
     {
-      keyCombo: "__ssr",
-      description: "Enable Redesign In A/B Test",
+      keyCombo: "__ssab1",
+      description: "A/B Test: Toggle Redesign",
       unlisted: true
     },
-    { keyCombo: "ssh", description: "Show Help" }
+    {
+      keyCombo: "__ssab2",
+      description: "A/B Test: Cycle Through Reactions Variations",
+      unlisted: true
+    },
+    {
+      keyCombo: "__ssab3",
+      description: "A/B Test: Toggle Show Scores Before/After Click",
+      unlisted: true
+    }
   ];
 
   const commandPalette = (() => {
@@ -1389,7 +1592,7 @@
     function handleTableClick(e) {
       const line = e.target.closest(".sptmninja_tr");
       if (line && line.children.length) {
-        const command = line.children[0].innerText;
+        const command = line.children[0].dataset.keyCombo;
         const commandImpl = commandsImpl[command];
 
         if (commandImpl) {
@@ -1439,17 +1642,16 @@
         const value = input.value.split("").join(".*?");
         const regExp = new RegExp(value, "i");
 
-        relevantCommands = commands
-          .filter(
-            command =>
-              command.description.match(regExp) ||
-              command.keyCombo.match(regExp) ||
-              (command.keywords && command.keywords.match(regExp))
-          )
-          .filter(command => value !== "" || !command.unlisted);
+        relevantCommands = commands.filter(
+          command =>
+            command.description.match(regExp) ||
+            command.keyCombo.match(regExp) ||
+            (command.keywords && command.keywords.match(regExp))
+        );
+        // .filter(command => value !== "" || !command.unlisted);
       }
 
-      function renderResults() {
+      function renderResults(scrollAlignToTop) {
         messageBodyEl.querySelector(
           ".sptmninja_results"
         ).innerHTML = relevantCommands.length
@@ -1457,18 +1659,45 @@
               relevantCommands.map((command, index) => [
                 `<span class="sptmninja_mono ${
                   command.unlisted ? "sptmninja_hidden" : ""
-                }">${command.unlisted ? "×" : command.keyCombo}</span>`,
-                `<span class="${
-                  selectedItemIndex === index
-                    ? "sptmninja_weight_bold"
-                    : "sptmninja_muted_result"
-                }">${command.description}</span>`,
+                }" data-key-combo="${command.keyCombo}">${
+                  command.unlisted ? "×" : command.keyCombo
+                }</span>`,
+                `<span
+                  class="${
+                    selectedItemIndex === index
+                      ? "sptmninja_weight_bold"
+                      : "sptmninja_muted_result"
+                  }"
+                  ${selectedItemIndex === index ? "data-selected" : ""}
+                  >
+                  ${command.description}
+                </span>`,
                 selectedItemIndex === index
                   ? utils.createElement("⏎", "muted_text")
                   : ""
               ])
             )
           : "";
+
+        function isResultLineVisible(lineEl) {
+          const lineBounds = lineEl.getBoundingClientRect();
+          const resultsBounds = shadow
+            .querySelector(".sptmninja_results")
+            .getBoundingClientRect();
+          return (
+            lineBounds.y > resultsBounds.y &&
+            lineBounds.bottom < resultsBounds.bottom
+          );
+        }
+
+        const selectedLineTr = shadow.querySelector("[data-selected]");
+        if (selectedLineTr) {
+          const selectedLine = selectedLineTr.parentNode.parentNode;
+          if (!isResultLineVisible(selectedLine)) {
+            selectedLine.scrollIntoView(scrollAlignToTop);
+          }
+          unsafeWindow.shadow = shadow;
+        }
       }
 
       input.addEventListener("keydown", e => {
@@ -1479,6 +1708,7 @@
           }
           // prefs.set({ selectedItemIndex });
           e.preventDefault();
+          renderResults(true);
         } else if (e.keyCode === 40) {
           selectedItemIndex++;
           if (selectedItemIndex >= relevantCommands.length) {
@@ -1486,13 +1716,14 @@
           }
           // prefs.set({ selectedItemIndex });
           e.preventDefault();
+          renderResults(false);
         } else if (e.keyCode === 13) {
           if (runSelectedCommand()) {
             return;
           }
+        } else {
+          renderResults();
         }
-
-        renderResults();
       });
 
       input.addEventListener("keyup", e => {
@@ -1500,7 +1731,9 @@
         if (selectedItemIndex >= relevantCommands.length) {
           selectedItemIndex = Math.max(relevantCommands.length - 1, 0);
         }
-        renderResults();
+        if (e.keyCode !== 38 && e.keyCode !== 40) {
+          renderResults();
+        }
       });
     }
 
