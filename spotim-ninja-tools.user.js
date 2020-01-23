@@ -35,7 +35,7 @@
 // This userscript implements some tools, like Scroll To Conversation,
 // Show Asset Versions, etc...
 // I've used closures to encapsulate every tool's inner logic, exposing
-// only the required api for it to work. Please follow this practice.
+// only the required api for them to work. Please follow this practice.
 //
 // This file has grown and grown with time, and I probably should have
 // used a bundler at some point, too bad I'm too lazy.
@@ -46,7 +46,7 @@
 
 (function() {
   "use strict";
-  let shadow;
+  let shadowDOM;
 
   const commonMessages = {
     focusWarning: "⚠️⚠️️⚠️ TRY AGAIN. (Moving focus to parent frame) ️⚠️⚠️️⚠️"
@@ -720,7 +720,7 @@
           padding: 1em 0px;
         }
       `;
-      shadow.appendChild(style);
+      shadowDOM.appendChild(style);
     }
 
     function addMessage() {
@@ -766,8 +766,8 @@
       shadowWrapper = document.createElement("div");
       document.body.appendChild(shadowWrapper);
 
-      shadow = shadowWrapper.attachShadow({ mode: "open" });
-      shadow.appendChild(messageEl);
+      shadowDOM = shadowWrapper.attachShadow({ mode: "open" });
+      shadowDOM.appendChild(messageEl);
     }
 
     function showMessage() {
@@ -1408,20 +1408,20 @@
       const launcher = utils.getLauncherEl(true);
       if (launcher) {
         const spotId = utils.getSpotId(launcher);
+        const postId = utils.getPostId(launcher);
         const version = utils.getSpotimVersion() === 2 ? "V.2.0" : "V.1.0";
         const env = utils.isProduction(launcher) ? "Production" : "Dev";
 
         message.set(
           utils.renderTable([
             ["Spot Id", utils.createElement(spotId, "weight_normal")],
-            ["Version", utils.createElement(version, "weight_normal")],
+            ["Post Id", utils.createElement(postId, "weight_normal")],
             ["Environment", utils.createElement(env, "weight_normal")]
           ]),
           {
             // timeout: 8000,
             color: colors.default,
-            title: "Spot Info",
-            emoji: "💁‍♂️"
+            title: "Spot Info"
           }
         );
       }
@@ -1632,12 +1632,21 @@
       keyCombo: "ssc",
       description: "Copy Spot ID to Clipboard"
     },
-    { keyCombo: "ssa", description: "Open Host Panel", keywords: "admin" },
+    {
+      keyCombo: "ssa",
+      description: "Open Host Panel",
+      detailedDescription:
+        "Will require you to enter the username and password you use to log in to the host panel on first run " +
+        "and not work if you use Google to sign in",
+      keywords: "admin"
+    },
     { keyCombo: "ssv", description: "Show Asset Versions", keywords: "assets" },
     { keyCombo: "sso", description: "Open Config Data" },
     {
       keyCombo: "ssn",
-      description: "Notify On Asset Update",
+      description: "Notify On Asset Updates",
+      detailedDescription:
+        "Will start constantly checking if an update to one of our products was released for this spot and pop a notification once that happens",
       keywords: "changes"
     },
     { keyCombo: "ssh", description: "Show Help" },
@@ -1706,7 +1715,7 @@
         .querySelector(".sptmninja_results")
         .addEventListener("click", handleTableClick);
 
-      const input = shadow.querySelector(".sptmninja_input");
+      const input = shadowDOM.querySelector(".sptmninja_input");
       updateRelevantResults();
       renderResults();
       input.focus();
@@ -1786,7 +1795,7 @@
 
         function isResultLineVisible(lineEl) {
           const lineBounds = lineEl.getBoundingClientRect();
-          const resultsBounds = shadow
+          const resultsBounds = shadowDOM
             .querySelector(".sptmninja_results")
             .getBoundingClientRect();
           return (
@@ -1795,13 +1804,13 @@
           );
         }
 
-        const selectedLineTr = shadow.querySelector("[data-selected]");
+        const selectedLineTr = shadowDOM.querySelector("[data-selected]");
         if (selectedLineTr) {
           const selectedLine = selectedLineTr.parentNode.parentNode;
           if (!isResultLineVisible(selectedLine)) {
             selectedLine.scrollIntoView(scrollAlignToTop);
           }
-          unsafeWindow.shadow = shadow;
+          // unsafeWindow.shadow = shadowDOM;
         }
       }
 
@@ -1964,10 +1973,10 @@
         message.hide(true);
       }
 
-      shadow
+      shadowDOM
         .querySelector(".whatsNewCloseButton")
         .addEventListener("click", handleClose);
-      shadow
+      shadowDOM
         .querySelector(".whatsNewCloseAndToggleShowButton")
         .addEventListener("click", handleCloseAndToggleShowNextTime);
     }
