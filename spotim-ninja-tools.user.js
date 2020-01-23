@@ -1869,10 +1869,6 @@
         ]
       },
       {
-        version: "3.5",
-        list: [{ title: "Bug fixes" }]
-      },
-      {
         version: "3.4",
         list: [
           {
