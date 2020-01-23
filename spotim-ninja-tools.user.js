@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         SpotIM Ninja Tools
 // @namespace    https://spot.im/
-// @version      3.5
+// @version      3.7
 // @description  A bunch of shortcuts to make our lives easier
 // @author       dutzi
 // @match        http*://*/*
+// @noframes
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_openInTab
@@ -83,153 +84,6 @@
 
       await prefs.set({ isNotFirstRun: true });
     }
-  })();
-
-  const whatsNew = (() => {
-    const changelog = [
-      {
-        version: 3.5,
-        changes: [{ title: "Bug fixes" }]
-      },
-      {
-        version: 3.4,
-        changes: [
-          {
-            title: "The following commands were added:",
-            list: [
-              {
-                title: "Toggle Show Asset Versions on Load",
-                description:
-                  "If enabled, will show the asset versions popup once the page loads"
-              },
-              { title: "A/B Test: Toggle Redesign" },
-              { title: "A/B Test: Cycle Through Reaction Variants" },
-              { title: "A/B Test: Toggle Show Scores Before/After Click" },
-              { title: "Show What's New" }
-            ]
-          }
-        ]
-      }
-    ];
-
-    function renderChangesInVersion(versionDetails, isLatest) {
-      return /*html*/ `
-          <div class="whatsNewTitle">${
-            isLatest
-              ? `⭐️ What's New in v${versionDetails.version}:`
-              : "✨ v" + versionDetails.version + ":"
-          }</div>
-          <ul>
-            ${versionDetails.changes
-              .map(change => {
-                return /*html*/ `
-                <li>${change.title}</li>
-                ${
-                  change.list
-                    ? /*html*/ `
-                  <ul>
-                    ${change.list
-                      .map(listItem => {
-                        return /*html*/ `
-                        <li>
-                          ${listItem.title}
-                          ${
-                            listItem.description
-                              ? /*html*/ `<div class="whatsNewDescription">${listItem.description}</div>`
-                              : ""
-                          }
-                        </li>
-                      `;
-                      })
-                      .join("")}
-                  </ul>
-                `
-                    : ""
-                }
-              `;
-              })
-              .join("")}
-          </ul>
-        `;
-    }
-
-    function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
-      return /*html*/ `
-          <div class="whatsNewWrapper">
-            <div class="whatsNewContent">
-              ${renderChangesInVersion(changelog[0], true)}
-              <div class="whatsNewPreviousTitle">Previous Versions</div>
-              ${changelog
-                .slice(1)
-                .map(change => renderChangesInVersion(change))
-                .join("")}
-            </div>
-            <div class="whatsNewGutter">
-              <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
-                ${
-                  isShowingWhatsNewOnUpgrade
-                    ? "Don't Show Me What's New Again"
-                    : "Show Me What's New Next Time"
-                }
-              </button>
-              <button class="whatsNewButton whatsNewCloseButton">
-                Close
-              </button>
-            </div>
-          </div>
-        `;
-    }
-
-    async function show(hasUpgraded) {
-      const currentVersion = GM_info.script.version;
-      const { dontShowWhatsNew } = await prefs.get();
-      await prefs.set({ lastWhatsNewVersion: currentVersion });
-
-      message.set(renderWhatsNew(!dontShowWhatsNew), {
-        title: hasUpgraded
-          ? `SpotIM Ninja Tools Upgraded! 🥳`
-          : "SpotIM Ninja Tools Changelog"
-      });
-
-      function handleClose() {
-        message.hide(true);
-      }
-
-      async function handleCloseAndToggleShowNextTime() {
-        const { dontShowWhatsNew } = await prefs.get();
-        await prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
-        message.hide(true);
-      }
-
-      shadow
-        .querySelector(".whatsNewCloseButton")
-        .addEventListener("click", handleClose);
-      shadow
-        .querySelector(".whatsNewCloseAndToggleShowButton")
-        .addEventListener("click", handleCloseAndToggleShowNextTime);
-    }
-
-    async function showIfUpgraded() {
-      const isNotFirstRun = await prefs.get().isNotFirstRun;
-      if (isNotFirstRun) {
-        const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
-        const currentVersion = GM_info.script.version;
-
-        if (dontShowWhatsNew) {
-          return;
-        }
-
-        if (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) {
-          show(true);
-        }
-      }
-    }
-
-    showIfUpgraded();
-
-    return {
-      show
-    };
   })();
 
   // set settings/creds method
@@ -533,6 +387,11 @@
           padding-right: 12px;
         }
 
+        .scrollable_area {
+          max-height: calc(100vh - 300px);
+          overflow-y: auto;
+        }
+
         .sptmninja_close_button {
           position: absolute;
           top: 0px;
@@ -589,6 +448,31 @@
 
         .sptmninja_weight_bold {
           font-weight: bold;
+        }
+
+        .sptmninja_pallete_row_main_col {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .palette_row_description {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .palette_row_recently_used {
+          font-weight: normal;
+          font-size: 0.7em;
+          opacity: 0.7;
+          margin: 0px 7px;
+          flex: 0 0 auto;
+          transform: translateX(26px);
+        }
+
+        [data-selected] .palette_row_recently_used {
+          transform: translateX(0px);
         }
 
         .sptmninja_margin_top {
@@ -725,7 +609,7 @@
         }
 
         .whatsNewContent {
-          max-height: calc(100vh - 10em - 100px);
+          max-height: calc(100vh - 10em - 180px);
           overflow-y: auto;
           overflow-x: hidden;
           padding: 0px 10px;
@@ -737,12 +621,17 @@
           margin-left: -10px;
           padding-left: 1em;
           margin-right: -10px;
-          border-top: 1px solid #00000040;
-          background: linear-gradient(#ffffff14, transparent);
           padding-top: 1em;
           font-weight: bold;
           padding-bottom: 0em;
-          border-bottom: 1px solid #3c3c3c26;
+        }
+
+        .whatsNewContent .whatsNewTitle.latest {
+          text-shadow: 0px 0px 10px #ffffff91;
+        }
+
+        .whatsNewContent .whatsNewTitle:not(.latest) {
+          opacity: 0.75;
         }
 
         .whatsNewContent .whatsNewPreviousTitle {
@@ -754,9 +643,22 @@
           font-weight: bold;
           padding-bottom: 0em;
           border-bottom: 1px solid #3c3c3c26;
-          padding: 0.5em;
+          padding: 0.5em 1em;
           background: #00000017;
-          text-align: center;
+          text-align: left;
+        }
+
+        .whatsNewFeatureRequest {
+          text-align: left;
+          padding: 0.5em calc(0.5em + 10px);
+          background: #8BC34A;
+          margin: 0px -10px;
+          text-align: left;
+          border-top: 1px solid #3F51B5;
+        }
+
+        .whatsNewFeatureRequest a {
+          color: white;
         }
 
         .whatsNewContent .whatsNewTitle:first-child {
@@ -773,6 +675,19 @@
         .whatsNewContent ul {
           margin-top: 0.4em;
           list-style: disc;
+          margin-bottom: 0px;
+        }
+
+        .whatsNewContent ul:last-child {
+          margin-bottom: 1em;
+        }
+
+        .whatsNewContent ul.latest {
+          text-shadow: 0px 0px 10px #ffffff70;
+        }
+
+        .whatsNewContent ul:not(.latest) {
+          opacity: 0.75;
         }
 
         .whatsNewContent .whatsNewDescription {
@@ -901,7 +816,8 @@
         numSteps,
         title,
         emoji,
-        belowNotificationPopover
+        belowNotificationPopover,
+        overflow
       } = {}
     ) {
       addMessage();
@@ -909,6 +825,11 @@
       showMessage();
 
       let fullMessageHTML = message;
+
+      if (overflow === "scroll") {
+        fullMessageHTML = `<div class="scrollable_area">${fullMessageHTML}</div>`;
+      }
+
       let prefix = "";
       if (title) {
         prefix = `<div class="sptmninja_title">${title}</div>`;
@@ -1431,7 +1352,11 @@
                   : "")
             ])
           ),
-          { color: colors.default, title: "Available Shortcuts" }
+          {
+            color: colors.default,
+            title: "Available Shortcuts",
+            overflow: "scroll"
+          }
         );
       }
     };
@@ -1616,77 +1541,81 @@
     }
   };
 
-  const abTestCommands = [
-    {
-      keyCombo: "__ssab1",
-      name: "Redesign",
-      description: "Toggle Redesign",
-      id: 35,
-      variants: [
-        { id: "A", statusText: "Redesign Disabled" },
-        { id: "B", statusText: "Redesign Enabled" }
-      ]
-    },
-    {
-      keyCombo: "__ssab2",
-      name: "Reactions",
-      description: "Cycle Through Reaction Variants",
-      id: 34,
-      variants: [
-        { id: "A", statusText: "Reactions Disabled" },
-        { id: "B", statusText: "Reactions Enabled" },
-        { id: "C", statusText: "Reactions Enabled (With Ads)" }
-      ]
-    },
-    {
-      keyCombo: "__ssab3",
-      name: "Show Scores",
-      description: "Toggle Show Scores Before/After Click",
-      id: 37,
-      variants: [
-        { id: "A", statusText: "Showing Scores After Click" },
-        { id: "B", statusText: "Showing Scores Before Click" }
-      ]
-    }
-  ];
-
-  commandsImpl = abTestCommands.reduce((commands, abCommand) => {
-    return {
-      ...commands,
-      [abCommand.keyCombo]: async () => {
-        try {
-          const spotAB = JSON.parse(
-            unsafeWindow.localStorage.getItem("SPOT_AB")
-          );
-          const currentVariant = spotAB[abCommand.id].variant;
-          const nextPossibleVariantChar = String.fromCharCode(
-            currentVariant.charCodeAt(0) + 1
-          );
-          const nextVariant =
-            abCommand.variants.find(
-              variant => variant.id === nextPossibleVariantChar
-            ) || abCommand.variants[0];
-
-          let statusText;
-
-          spotAB[abCommand.id].variant = nextVariant.id;
-          statusText = nextVariant.statusText;
-
-          message.set(statusText, {
-            emoji: "😃",
-            color: colors.success
-          });
-          unsafeWindow.localStorage.setItem("SPOT_AB", JSON.stringify(spotAB));
-        } catch (err) {
-          message.set("Are you sure this spot has this test?", {
-            title: `Couldn't ${abCommand.description}`,
-            emoji: "😞",
-            color: colors.error
-          });
-        }
+  const abTestCommands = (() => {
+    return [
+      {
+        name: "Redesign",
+        description: "Toggle Redesign",
+        id: 35,
+        variants: [
+          { id: "A", statusText: "Redesign Disabled" },
+          { id: "B", statusText: "Redesign Enabled" }
+        ]
+      },
+      {
+        name: "Reactions",
+        description: "Cycle Through Reaction Variants",
+        id: 34,
+        variants: [
+          { id: "A", statusText: "Reactions Disabled" },
+          { id: "B", statusText: "Reactions Enabled" },
+          { id: "C", statusText: "Reactions Enabled (With Ads)" }
+        ]
+      },
+      {
+        name: "Show Scores",
+        description: "Toggle Show Scores Before/After Click",
+        id: 37,
+        variants: [
+          { id: "A", statusText: "Showing Scores After Click" },
+          { id: "B", statusText: "Showing Scores Before Click" }
+        ]
       }
-    };
-  }, commandsImpl);
+    ].map((command, index) => ({ ...command, keyCombo: `__ssab${index}` }));
+  })();
+
+  commandsImpl = (() => {
+    return abTestCommands.reduce((commands, abCommand) => {
+      return {
+        ...commands,
+        [abCommand.keyCombo]: async () => {
+          try {
+            const spotAB = JSON.parse(
+              unsafeWindow.localStorage.getItem("SPOT_AB")
+            );
+            const currentVariant = spotAB[abCommand.id].variant;
+            const nextPossibleVariantChar = String.fromCharCode(
+              currentVariant.charCodeAt(0) + 1
+            );
+            const nextVariant =
+              abCommand.variants.find(
+                variant => variant.id === nextPossibleVariantChar
+              ) || abCommand.variants[0];
+
+            let statusText;
+
+            spotAB[abCommand.id].variant = nextVariant.id;
+            statusText = nextVariant.statusText;
+
+            message.set(statusText, {
+              emoji: "😃",
+              color: colors.success
+            });
+            unsafeWindow.localStorage.setItem(
+              "SPOT_AB",
+              JSON.stringify(spotAB)
+            );
+          } catch (err) {
+            message.set("Are you sure this spot has this test?", {
+              title: `Couldn't ${abCommand.description}`,
+              emoji: "😞",
+              color: colors.error
+            });
+          }
+        }
+      };
+    }, commandsImpl);
+  })();
 
   const commands = [
     { keyCombo: "sss", description: "Scroll to Conversation" },
@@ -1706,7 +1635,7 @@
     { keyCombo: "ssh", description: "Show Help" },
     {
       keyCombo: "__ssn",
-      description: "Show What's New",
+      description: "What's New?",
       unlisted: true
     },
     {
@@ -1730,8 +1659,8 @@
     function handleTableClick(e) {
       const line = e.target.closest(".sptmninja_tr");
       if (line && line.children.length) {
-        const command = line.children[0].dataset.keyCombo;
-        const commandImpl = commandsImpl[command];
+        const keyCombo = line.children[0].children[0].dataset.keyCombo;
+        const commandImpl = commandsImpl[keyCombo];
 
         if (commandImpl) {
           commandImpl();
@@ -1739,7 +1668,17 @@
       }
     }
 
-    function show() {
+    async function show() {
+      selectedItemIndex = 0;
+      let lastCommandThatRan = await (async () => {
+        const { lastCommandThatRanKeyCombo } = await prefs.get();
+        if (lastCommandThatRanKeyCombo) {
+          return commands.find(
+            command => command.keyCombo === lastCommandThatRanKeyCombo
+          );
+        }
+      })();
+
       scrolling.stop({ hideMessage: false });
       let relevantCommands;
 
@@ -1766,6 +1705,9 @@
 
       function runSelectedCommand() {
         const selectedCommand = relevantCommands[selectedItemIndex];
+        lastCommandThatRan = selectedCommand;
+        prefs.set({ lastCommandThatRanKeyCombo: lastCommandThatRan.keyCombo });
+
         if (selectedCommand) {
           message.hide(true);
           commandsImpl[selectedCommand.keyCombo]();
@@ -1786,6 +1728,16 @@
             command.keyCombo.match(regExp) ||
             (command.keywords && command.keywords.match(regExp))
         );
+
+        if (!value && lastCommandThatRan) {
+          const lastCommandIndex = relevantCommands.findIndex(
+            command => command === lastCommandThatRan
+          );
+
+          relevantCommands.splice(lastCommandIndex, 1);
+
+          relevantCommands.unshift(lastCommandThatRan);
+        }
         // .filter(command => value !== "" || !command.unlisted);
       }
 
@@ -1801,14 +1753,21 @@
                   command.unlisted ? "×" : command.keyCombo
                 }</span>`,
                 `<span
-                    class="${
+                    class="sptmninja_pallete_row_main_col ${
                       selectedItemIndex === index
                         ? "sptmninja_weight_bold"
                         : "sptmninja_muted_result"
                     }"
                     ${selectedItemIndex === index ? "data-selected" : ""}
                     >
-                    ${command.description}
+                    <div class="palette_row_description">${
+                      command.description
+                    }</div>
+                    ${
+                      lastCommandThatRan === command
+                        ? "<div class='palette_row_recently_used'>recently used</div>"
+                        : ""
+                    }
                   </span>`,
                 selectedItemIndex === index
                   ? utils.createElement("⏎", "muted_text")
@@ -1880,6 +1839,159 @@
     };
   })();
 
+  const whatsNew = (() => {
+    const changelog = [
+      {
+        version: "3.7",
+        list: [
+          {
+            title: "Added Recently Used commands",
+            description:
+              "The command you last used will now be offered first, next time you hit Ctrl+S"
+          }
+        ]
+      },
+      {
+        version: "3.5",
+        list: [{ title: "Bug fixes" }]
+      },
+      {
+        version: "3.4",
+        list: [
+          {
+            title: "The following commands were added:",
+            list: [
+              {
+                title: "Toggle Show Asset Versions on Load",
+                description:
+                  "If enabled, will show the asset versions popup once the page loads"
+              },
+              ...abTestCommands.map(command => ({ title: command.description }))
+            ]
+          }
+        ]
+      }
+    ];
+
+    function renderList(list) {
+      return list
+        .map(listItem => {
+          return /*html*/ `
+          <li>
+            ${listItem.title}
+            ${
+              listItem.description
+                ? /*html*/ `<div class="whatsNewDescription">${listItem.description}</div>`
+                : ""
+            }
+          </li>
+          ${listItem.list ? "<ul>" + renderList(listItem.list) + "</ul>" : ""}
+        `;
+        })
+        .join("");
+    }
+
+    function renderChangesInVersion(versionDetails, isLatest) {
+      const className = isLatest ? "latest" : "";
+
+      return /*html*/ `
+          <div class="whatsNewTitle ${className}">${
+        isLatest
+          ? `⭐️ What's New in v${versionDetails.version}:`
+          : "✨ v" + versionDetails.version + ":"
+      }</div>
+          <ul class="${className}">
+            ${renderList(versionDetails.list)}
+          </ul>
+        `;
+    }
+
+    function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
+      return /*html*/ `
+          <div class="whatsNewWrapper">
+            <div class="whatsNewContent">
+              ${renderChangesInVersion(changelog[0], true)}
+              ${changelog
+                .slice(1)
+                .map(change => renderChangesInVersion(change))
+                .join("")}
+            </div>
+            <div class="whatsNewFeatureRequest">
+              💡 Got a feature request? <a href="slack://channel?id=D9SQV11P1&team=T0460KVUF">Hit me up on Slack!</a>
+            </div>
+            <div class="whatsNewGutter">
+              <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
+                ${
+                  isShowingWhatsNewOnUpgrade
+                    ? "Don't Show Me What's New On Upgrade"
+                    : "Show Me What's New Next Upgrade"
+                }
+              </button>
+              <button class="whatsNewButton whatsNewCloseButton">
+                Close
+              </button>
+            </div>
+          </div>
+        `;
+    }
+
+    async function show(hasUpgraded) {
+      const currentVersion = GM_info.script.version;
+      const { dontShowWhatsNew } = await prefs.get();
+      await prefs.set({ lastWhatsNewVersion: currentVersion });
+
+      message.set(renderWhatsNew(!dontShowWhatsNew), {
+        title: hasUpgraded
+          ? `SpotIM Ninja Tools Upgraded! 🥳`
+          : "SpotIM Ninja Tools Changelog"
+      });
+
+      function handleClose() {
+        message.hide(true);
+      }
+
+      async function handleCloseAndToggleShowNextTime() {
+        const { dontShowWhatsNew } = await prefs.get();
+        await prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
+        message.hide(true);
+      }
+
+      shadow
+        .querySelector(".whatsNewCloseButton")
+        .addEventListener("click", handleClose);
+      shadow
+        .querySelector(".whatsNewCloseAndToggleShowButton")
+        .addEventListener("click", handleCloseAndToggleShowNextTime);
+    }
+
+    async function showIfUpgraded() {
+      const isNotFirstRun = await prefs.get().isNotFirstRun;
+      if (isNotFirstRun) {
+        const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
+        const currentVersion = GM_info.script.version;
+
+        if (dontShowWhatsNew) {
+          return;
+        }
+
+        if (
+          (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) &&
+          changelog.find(entry => entry.version === currentVersion)
+        ) {
+          show(true);
+        }
+
+        await prefs.set({ lastWhatsNewVersion: currentVersion });
+      }
+    }
+
+    showIfUpgraded();
+
+    return {
+      show
+    };
+  })();
+
   // handle keystrokes
   (() => {
     let lastKeyStrokesResetTimeout;
@@ -1914,7 +2026,7 @@
         return;
       }
 
-      if (e.key.toLowerCase() === "s" && e.ctrlKey) {
+      if ((e.key.toLowerCase() === "s" || e.key === "ד") && e.ctrlKey) {
         commandPalette.show();
         return;
       }
