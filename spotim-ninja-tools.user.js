@@ -11,6 +11,7 @@
 // @grant        GM_openInTab
 // @grant        GM_setClipboard
 // @grant        GM_deleteValue
+// @grant        GM_notification
 // @grant        unsafeWindow
 // ==/UserScript==
 
@@ -1200,7 +1201,7 @@
   const assetChangeListener = (() => {
     let assetChangeInterval;
 
-    function isConfigEqualOneWay(config1, config2) {
+    function isConfigContainsConfig(config1, config2) {
       return !config1.find(config1Module => {
         const config2Module = config2.find(
           config2Module =>
@@ -1220,45 +1221,52 @@
 
     function isConfigEqual(config1, config2) {
       return (
-        isConfigEqualOneWay(config1, config2) &&
-        isConfigEqualOneWay(config2, config1)
+        isConfigContainsConfig(config1, config2) &&
+        isConfigContainsConfig(config2, config1)
       );
     }
 
     async function notifyOnChange() {
-      if (location.protocol !== "https:") {
-        message.set(`Can't display notifications on non-https sites`, {
-          timeout: 4000,
-          color: colors.error,
-          emoji: "😞"
-        });
+      // if (location.protocol !== "https:") {
+      //   message.set(`Can't display notifications on non-https sites`, {
+      //     timeout: 4000,
+      //     color: colors.error,
+      //     emoji: "😞"
+      //   });
 
-        return;
-      }
+      //   return;
+      // }
 
-      message.set(`Please allow notifications on this site`, {
-        color: colors.default,
-        emoji: "🚦",
-        belowNotificationPopover: true
-      });
+      // message.set(`Please allow notifications on this site`, {
+      //   color: colors.default,
+      //   emoji: "🚦",
+      //   belowNotificationPopover: true
+      // });
 
-      const result = await Notification.requestPermission();
+      // const result = await Notification.requestPermission();
 
-      if (result !== "granted") {
-        message.set(`Notification permission denied`, {
-          timeout: 3000,
-          color: colors.error,
-          emoji: "😕"
-        });
+      // if (result !== "granted") {
+      //   message.set(`Notification permission denied`, {
+      //     timeout: 3000,
+      //     color: colors.error,
+      //     emoji: "😕"
+      //   });
 
-        return;
-      }
+      //   return;
+      // }
 
       let lastConfig;
 
       function showNotification() {
         stopListeningToChanges();
-        var notification = new Notification("An asset has been updated");
+        GM_notification({
+          title: "An asset has been updated!",
+          text: `${window.location.hostname} — Detected asset update`,
+          onclick: () => {
+            window.focus();
+          }
+        });
+        // var notification = new Notification("");
       }
 
       async function checkForUpdates() {
