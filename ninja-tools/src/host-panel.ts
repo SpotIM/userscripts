@@ -32,8 +32,7 @@ export const open = async ({ spotId }) => {
     message.set(
       "First you need to enter you're credentials for the Host Panel.<br/>" +
         'Do so by running the following command in the console:<br/>' +
-        '<span class="sptmninja_code">__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")</span><br/>' +
-        "Note that the credentials will be saved as clear text somewhere in TamperMonkey's storage!",
+        '<span class="sptmninja_code">__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")</span>',
       { color: colors.default }
     );
 
