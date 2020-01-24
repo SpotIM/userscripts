@@ -1,6 +1,9 @@
 import * as prefs from './prefs';
+import * as message from './message';
+import colors from './colors';
+import * as commandPalette from './command-palette';
 
-export default () => {
+export default async () => {
   const isNotFirstRun = await prefs.get().isNotFirstRun;
   if (!isNotFirstRun) {
     message.set("(you'll only see this message once)", {

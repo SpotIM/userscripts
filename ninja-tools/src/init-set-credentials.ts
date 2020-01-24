@@ -1,3 +1,5 @@
+import * as prefs from './prefs';
+
 export default () => {
   unsafeWindow.__spotim_ninja_tools_set_creds__ = async (email, password) => {
     await GM_setValue('email', email);

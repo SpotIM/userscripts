@@ -1,3 +1,12 @@
+import commands from './commands';
+import * as scrollToConversation from './scroll-to-conversation';
+import * as message from './message';
+import * as utils from './utils';
+import * as prefs from './prefs';
+import colors from './colors';
+import commandsImpl from './commands-impl';
+import * as shadowDOM from './shadow-dom';
+
 // let selectedItemIndex = prefs.get().selectedItemIndex || 0;
 let selectedItemIndex = 0;
 
@@ -24,7 +33,7 @@ async function show() {
     }
   })();
 
-  scrolling.stop({ hideMessage: false });
+  scrollToConversation.stop({ hideMessage: false });
   let relevantCommands;
 
   const missingLauncherWarning = `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
@@ -43,7 +52,7 @@ async function show() {
     .querySelector('.sptmninja_results')
     .addEventListener('click', handleTableClick);
 
-  const input = shadowDOM.querySelector('.sptmninja_input');
+  const input = shadowDOM.get().querySelector('.sptmninja_input');
   updateRelevantResults();
   renderResults();
   input.focus();
@@ -51,7 +60,7 @@ async function show() {
   function runSelectedCommand() {
     const selectedCommand = relevantCommands[selectedItemIndex];
     lastCommandThatRan = selectedCommand;
-    prefs.set({ lastCommandThatRanKeyCombo: lastCommandThatRan.keyCombo });
+    prefs.set({ lastCommandThatRanKeyCombo: lastCommandThatRan?.keyCombo });
 
     if (selectedCommand) {
       message.hide(true);
@@ -86,7 +95,7 @@ async function show() {
     // .filter(command => value !== "" || !command.unlisted);
   }
 
-  function renderResults(scrollAlignToTop) {
+  function renderResults(scrollAlignToTop?: boolean) {
     messageBodyEl.querySelector(
       '.sptmninja_results'
     ).innerHTML = relevantCommands.length
@@ -124,6 +133,7 @@ async function show() {
     function isResultLineVisible(lineEl) {
       const lineBounds = lineEl.getBoundingClientRect();
       const resultsBounds = shadowDOM
+        .get()
         .querySelector('.sptmninja_results')
         .getBoundingClientRect();
       return (
@@ -132,13 +142,13 @@ async function show() {
       );
     }
 
-    const selectedLineTr = shadowDOM.querySelector('[data-selected]');
+    const selectedLineTr = shadowDOM.get().querySelector('[data-selected]');
     if (selectedLineTr) {
       const selectedLine = selectedLineTr.parentNode.parentNode;
       if (!isResultLineVisible(selectedLine)) {
         selectedLine.scrollIntoView(scrollAlignToTop);
       }
-      // unsafeWindow.shadow = shadowDOM;
+      // unsafeWindow.shadow = shadowDOM.get();
     }
   }
 

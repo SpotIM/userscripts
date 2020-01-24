@@ -1,3 +1,8 @@
+import * as message from './message';
+import * as utils from './utils';
+import commonMessages from './common-messages';
+import colors from './colors';
+
 let isScrolling;
 let scrollingInterval;
 let hasScrolledDown;
@@ -24,7 +29,9 @@ function unhighlightConversation() {
     return;
   }
 
-  [...document.querySelectorAll('[data-sptmninja-highlighted]')].forEach(el => {
+  [
+    ...(document.querySelectorAll('[data-sptmninja-highlighted]') as any),
+  ].forEach(el => {
     // el.style.transition = "all 1s ease-out";
     el.style.boxShadow = null;
     el.style.borderRadius = null;

@@ -1,4 +1,14 @@
-export default [
+import abTestCommands from './ab-test-commands';
+
+export interface ICommand {
+  keyCombo: string;
+  description: string;
+  detailedDescription?: string;
+  keywords?: string;
+  unlisted?: boolean;
+}
+
+const commands: ICommand[] = [
   { keyCombo: 'sss', description: 'Scroll to Conversation' },
   { keyCombo: 'ssi', description: 'Show Info' },
   {
@@ -41,3 +51,5 @@ export default [
     unlisted: true,
   })),
 ];
+
+export default commands;

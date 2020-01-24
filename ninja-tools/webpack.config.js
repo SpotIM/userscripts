@@ -13,6 +13,9 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     port: 5732,
   },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
   module: {
     rules: [
       {

@@ -59,7 +59,7 @@ export const getSpotId = launcher => {
   }
 };
 
-getPostId: launcher => {
+export const getPostId = launcher => {
   return launcher.getAttribute('data-post-id');
 };
 

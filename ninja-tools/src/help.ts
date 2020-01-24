@@ -1,3 +1,8 @@
+import * as message from './message';
+import * as utils from './utils';
+import commands from './commands';
+import colors from './colors';
+
 export const show = () => {
   message.set(
     utils.renderTable(

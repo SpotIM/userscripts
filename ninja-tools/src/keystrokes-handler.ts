@@ -1,11 +1,16 @@
+import commandsImpl from './commands-impl';
+import * as scrollToConversation from './scroll-to-conversation';
+import * as message from './message';
+import * as commandPalette from './command-palette';
+
 export function init() {
   let lastKeyStrokesResetTimeout;
 
-  let lastKeyStrokes = [];
+  let lastKeyStrokes: string[] = [];
 
   function isFocusedOnInput() {
     const el = document.activeElement;
-    return el.getAttribute('contenteditable') || el.tagName === 'INPUT';
+    return el?.getAttribute('contenteditable') || el?.tagName === 'INPUT';
   }
 
   function executeCommand(keyCombo) {
@@ -21,12 +26,12 @@ export function init() {
 
   function handleKeyDown(e) {
     if (e.key && e.key.toLowerCase() === 'escape') {
-      scrolling.stop();
+      scrollToConversation.stop();
       message.hide(true);
     }
   }
 
-  function handleKeyPress(e) {
+  function handleKeyPress(e: KeyboardEvent) {
     if (isFocusedOnInput()) {
       return;
     }

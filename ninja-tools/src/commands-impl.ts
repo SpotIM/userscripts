@@ -1,12 +1,25 @@
+import commands from './commands';
+import * as scrollToConversation from './scroll-to-conversation';
+import * as message from './message';
+import * as utils from './utils';
+import * as prefs from './prefs';
+import * as hostPanel from './host-panel';
+import * as assetChangeListeners from './asset-change-listeners';
+import * as whatsNew from './whats-new';
+import * as help from './help';
+import colors from './colors';
+import pageLoadTime from './page-load-time';
+import abTestCommands from './ab-test-commands';
+
 let commandsImpl: any = {
   // scroll to conversation
   sss: () => {
-    scrolling.toggle();
+    scrollToConversation.toggle();
   },
 
   // copy spot id
   ssc: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
     if (launcher) {
@@ -31,7 +44,7 @@ let commandsImpl: any = {
 
   // show info
   ssi: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
     if (launcher) {
@@ -57,7 +70,7 @@ let commandsImpl: any = {
 
   // show versions
   ssv: async () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     if (unsafeWindow.__SPOTIM__) {
       const assetsConfig =
@@ -105,7 +118,7 @@ let commandsImpl: any = {
 
   // open admin panel
   ssa: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
     if (launcher) {
@@ -120,7 +133,7 @@ let commandsImpl: any = {
 
   // dumb open admin panel
   ssda: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
     if (launcher) {
@@ -133,7 +146,7 @@ let commandsImpl: any = {
   },
 
   sso: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
     if (utils.isProduction(launcher)) {
@@ -142,9 +155,9 @@ let commandsImpl: any = {
   },
 
   ssn: async () => {
-    scrolling.stop();
+    scrollToConversation.stop();
 
-    assetChangeListener.toggleNotifyOnChange();
+    assetChangeListeners.toggleNotifyOnChange();
   },
 
   __ssa: async () => {
@@ -172,43 +185,10 @@ let commandsImpl: any = {
 
   // show help
   ssh: () => {
-    scrolling.stop();
+    scrollToConversation.stop();
     help.show();
   },
 };
-
-const abTestCommands = (() => {
-  return [
-    {
-      name: 'Redesign',
-      description: 'Toggle Redesign',
-      id: 35,
-      variants: [
-        { id: 'A', statusText: 'Redesign Disabled' },
-        { id: 'B', statusText: 'Redesign Enabled' },
-      ],
-    },
-    {
-      name: 'Reactions',
-      description: 'Cycle Through Reaction Variants',
-      id: 34,
-      variants: [
-        { id: 'A', statusText: 'Reactions Disabled' },
-        { id: 'B', statusText: 'Reactions Enabled' },
-        { id: 'C', statusText: 'Reactions Enabled (With Ads)' },
-      ],
-    },
-    {
-      name: 'Show Scores',
-      description: 'Toggle Show Scores Before/After Click',
-      id: 37,
-      variants: [
-        { id: 'A', statusText: 'Showing Scores After Click' },
-        { id: 'B', statusText: 'Showing Scores Before Click' },
-      ],
-    },
-  ].map((command, index) => ({ ...command, keyCombo: `__ssab${index}` }));
-})();
 
 commandsImpl = (() => {
   return abTestCommands.reduce((commands, abCommand) => {
@@ -249,3 +229,5 @@ commandsImpl = (() => {
     };
   }, commandsImpl);
 })();
+
+export default commandsImpl;

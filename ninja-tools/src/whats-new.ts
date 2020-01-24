@@ -1,3 +1,8 @@
+import abTestCommands from './ab-test-commands';
+import * as prefs from './prefs';
+import * as message from './message';
+import * as shadowDOM from './shadow-dom';
+
 const changelog = [
   {
     version: '3.7',
@@ -45,7 +50,7 @@ function renderList(list) {
     .join('');
 }
 
-function renderChangesInVersion(versionDetails, isLatest) {
+function renderChangesInVersion(versionDetails, isLatest?: boolean) {
   const className = isLatest ? 'latest' : '';
 
   return /*html*/ `
@@ -89,7 +94,7 @@ function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
         `;
 }
 
-async function show(hasUpgraded) {
+async function show(hasUpgraded?: boolean) {
   const currentVersion = GM_info.script.version;
   const { dontShowWhatsNew } = await prefs.get();
   await prefs.set({ lastWhatsNewVersion: currentVersion });
@@ -111,9 +116,11 @@ async function show(hasUpgraded) {
   }
 
   shadowDOM
+    .get()
     .querySelector('.whatsNewCloseButton')
     .addEventListener('click', handleClose);
   shadowDOM
+    .get()
     .querySelector('.whatsNewCloseAndToggleShowButton')
     .addEventListener('click', handleCloseAndToggleShowNextTime);
 }
