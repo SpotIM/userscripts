@@ -1,3 +1,7 @@
+import * as message from './message';
+import commonMessages from './common-messages';
+import colors from './colors';
+
 export const isTopMostFrame = () => {
   return window.parent === window;
 };
@@ -16,7 +20,7 @@ export const getLauncherEl = (displayErrorIfNotFound?: boolean) => {
   );
 
   if (!launcher && displayErrorIfNotFound) {
-    if (utils.isTopMostFrame()) {
+    if (isTopMostFrame()) {
       message.set(`Could not find launcher script`, {
         timeout: 2000,
         color: colors.error,
@@ -66,7 +70,7 @@ export const getPostId = launcher => {
 export const getSpotimVersion = () => {
   if (
     unsafeWindow.__SPOTIM__ &&
-    (utils.findConversation() || {}).tagName !== 'IFRAME'
+    (findConversation() || {}).tagName !== 'IFRAME'
   ) {
     return 2;
   } else {
@@ -75,10 +79,10 @@ export const getSpotimVersion = () => {
 };
 
 export const getConfigUrl = () => {
-  const launcher = utils.getLauncherEl(true);
-  return `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
+  const launcher = getLauncherEl(true);
+  return `https://api-2-0.spot.im/v1.0.0/config/launcher/${getSpotId(
     launcher
-  )}/${utils.getPostId(launcher)}/vendor,init,conversation`;
+  )}/${getPostId(launcher)}/vendor,init,conversation`;
 };
 
 export const padTime = str => {
