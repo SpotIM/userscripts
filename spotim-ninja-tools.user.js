@@ -1864,7 +1864,7 @@
           {
             title: "Added Recently Used commands",
             description:
-              "The command you last used will now be offered first, next time you hit Ctrl+S"
+              "The command you last used will show up first, next time you hit Ctrl+S"
           }
         ]
       },
