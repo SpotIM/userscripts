@@ -20,4 +20,4 @@ Bump version in `package.json` and run:
 yarn build
 ```
 
-And just push the changes (Tampermonkey pulls updates from this repo on a daily basis)
+And just push the changes (Tampermonkey pulls updates from this repo on a daily basis).
