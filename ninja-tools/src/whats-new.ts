@@ -2,8 +2,17 @@ import abTestCommands from './ab-test-commands';
 import * as prefs from './prefs';
 import * as message from './message';
 import * as shadowDOM from './shadow-dom';
+import gutterActions from './gutter-actions';
 
 const changelog = [
+  {
+    version: '4.0.2',
+    list: [
+      {
+        title: 'Added Set Credentials Command and Credentials Form',
+      },
+    ],
+  },
   {
     version: '3.7',
     list: [
@@ -66,7 +75,14 @@ function renderChangesInVersion(versionDetails, isLatest?: boolean) {
 }
 
 function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
-  return /*html*/ `
+  const [renderButtons, addListeners] = gutterActions([
+    isShowingWhatsNewOnUpgrade
+      ? "Don't Show Me What's New On Upgrade"
+      : "Show Me What's New Next Upgrade",
+    'Close',
+  ]);
+
+  const html = /*html*/ `
           <div class="whatsNewWrapper">
             <div class="whatsNewContent">
               ${renderChangesInVersion(changelog[0], true)}
@@ -78,28 +94,20 @@ function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
             <div class="whatsNewFeatureRequest">
               💡 Got a feature request? <a href="slack://channel?id=D9SQV11P1&team=T0460KVUF">Hit me up on Slack!</a>
             </div>
-            <div class="whatsNewGutter">
-              <button class="whatsNewButton whatsNewCloseAndToggleShowButton">
-                ${
-                  isShowingWhatsNewOnUpgrade
-                    ? "Don't Show Me What's New On Upgrade"
-                    : "Show Me What's New Next Upgrade"
-                }
-              </button>
-              <button class="whatsNewButton whatsNewCloseButton">
-                Close
-              </button>
-            </div>
+            ${renderButtons()}
           </div>
         `;
+
+  return { html, addListeners };
 }
 
 async function show(hasUpgraded?: boolean) {
   const currentVersion = GM_info.script.version;
   const { dontShowWhatsNew } = await prefs.get();
   await prefs.set({ lastWhatsNewVersion: currentVersion });
+  const whatsNew = renderWhatsNew(!dontShowWhatsNew);
 
-  message.set(renderWhatsNew(!dontShowWhatsNew), {
+  message.set(whatsNew.html, {
     title: hasUpgraded
       ? `SpotIM Ninja Tools Upgraded! 🥳`
       : 'SpotIM Ninja Tools Changelog',
@@ -115,14 +123,13 @@ async function show(hasUpgraded?: boolean) {
     message.hide(true);
   }
 
-  shadowDOM
-    .get()
-    .querySelector('.whatsNewCloseButton')
-    .addEventListener('click', handleClose);
-  shadowDOM
-    .get()
-    .querySelector('.whatsNewCloseAndToggleShowButton')
-    .addEventListener('click', handleCloseAndToggleShowNextTime);
+  whatsNew.addListeners(index => {
+    if (index === 0) {
+      handleCloseAndToggleShowNextTime();
+    } else {
+      handleClose();
+    }
+  });
 }
 
 async function showIfUpgraded() {
@@ -146,6 +153,4 @@ async function showIfUpgraded() {
   }
 }
 
-showIfUpgraded();
-
-export { show };
+export { showIfUpgraded, show };

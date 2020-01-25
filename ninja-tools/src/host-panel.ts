@@ -1,11 +1,130 @@
 import * as message from './message';
 import * as utils from './utils';
+import * as shadowDOM from './shadow-dom';
 import colors from './colors';
+import gutterActions from './gutter-actions';
 
 let windowRef;
 let lastUrl;
 
-export const open = async ({ spotId }) => {
+export function openCredentialsForm(openHostPanelAfter?: boolean) {
+  const [renderButtons, addListeners] = gutterActions([
+    'Delete Credentials',
+    'Cancel',
+    'Submit',
+  ]);
+
+  const styles = {
+    wrapper: `
+      margin: 1em 2em 1.5em;
+    `,
+    title: `
+      font-weight: normal;
+      margin: 1em 0px;
+      text-align: left;
+    `,
+    formField: `
+      display: flex;
+      align-items: baseline;
+      margin: 1em 3em;
+    `,
+    label: `
+      margin-right: 1em;
+      width: 120px;
+      text-align: right;
+    `,
+    submit: `
+      position: absolute;
+      visibility: hidden
+    `,
+  };
+
+  message.set(
+    /*html*/ `
+      <form style="${styles.wrapper}">
+        <div style="${
+          styles.title
+        }">Your host panel credentials are required.</div>
+        <div style="${styles.formField}">
+          <label style="${styles.label}">Email</label>
+          <input id="emailInput" class="sptmninja_input" >
+        </div>
+        <div style="${styles.formField}">
+          <label style="${styles.label}">Password</label>
+          <input id="passwordInput" class="sptmninja_input" type="password">
+        </div>
+        <input style="${styles.submit}" type="submit"/>
+      </form>
+    ${renderButtons()}
+  `,
+    { title: 'Open Host Panel', color: colors.default }
+  );
+
+  async function submitForm() {
+    const email = shadowDOM
+      .get()
+      .querySelector('#emailInput')
+      .value.trim();
+    const password = shadowDOM
+      .get()
+      .querySelector('#passwordInput')
+      .value.trim();
+
+    if (email && password) {
+      await GM_setValue('email', email);
+      await GM_setValue('password', password);
+
+      message.set('Your credentials were set!', {
+        timeout: 2000,
+        color: colors.success,
+        emoji: '😃',
+      });
+
+      if (openHostPanelAfter) {
+        setTimeout(() => {
+          open({ spotId: utils.getSpotId(utils.getLauncherEl()) });
+        }, 2000);
+      }
+    }
+  }
+
+  async function handleButtonClick(index: number) {
+    if (index === 2) {
+      submitForm();
+    } else if (index === 1) {
+      message.hide(true);
+    } else {
+      await GM_setValue('email', '');
+      await GM_setValue('password', '');
+      message.set('Your credentials were deleted!', {
+        timeout: 3000,
+        color: colors.default,
+        emoji: '👍🏻',
+      });
+    }
+  }
+
+  // if i don't use setTimeout here the form gets submitted on mount...
+  //
+  setTimeout(() => {
+    shadowDOM
+      .get()
+      .querySelector('#emailInput')
+      .focus();
+  }, 10);
+
+  shadowDOM
+    .get()
+    .querySelector('form')
+    .addEventListener('submit', e => {
+      e.preventDefault();
+      submitForm();
+    });
+
+  addListeners(handleButtonClick);
+}
+
+export const open = async ({ spotId }: { spotId: string }) => {
   function showSuccessMessage() {
     message.set('Openning Host Panel...', {
       color: colors.success,
@@ -29,12 +148,7 @@ export const open = async ({ spotId }) => {
   const password = await GM_getValue('password');
 
   if (!email || !password) {
-    message.set(
-      "First you need to enter you're credentials for the Host Panel.<br/>" +
-        'Do so by running the following command in the console:<br/>' +
-        '<span class="sptmninja_code">__spotim_ninja_tools_set_creds__("john@example.com", "Password!123")</span>',
-      { color: colors.default }
-    );
+    openCredentialsForm(true);
 
     return;
   }

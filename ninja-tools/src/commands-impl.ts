@@ -183,6 +183,10 @@ let commandsImpl: any = {
     whatsNew.show();
   },
 
+  __ssc: () => {
+    hostPanel.openCredentialsForm();
+  },
+
   // show help
   ssh: () => {
     scrollToConversation.stop();

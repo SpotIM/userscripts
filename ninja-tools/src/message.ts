@@ -407,7 +407,7 @@ function addStyleTag() {
       opacity: 0.6;
     }
 
-    .whatsNewGutter {
+    .gutterActions {
       display: flex;
       margin: -10px;
       padding: 10px 0px;
@@ -418,7 +418,7 @@ function addStyleTag() {
       position: relative;
     }
 
-    .whatsNewGutter .whatsNewButton {
+    .gutterActions .gutterActionsButton {
       font-size: inherit;
       font-family: inherit;
       color: inherit;

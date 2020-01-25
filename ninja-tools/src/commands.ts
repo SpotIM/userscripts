@@ -20,7 +20,7 @@ const commands: ICommand[] = [
     description: 'Open Host Panel',
     detailedDescription:
       'Will require you to enter the username and password you use to log in to the host panel on first run ' +
-      'and not work if you use Google to sign in',
+      "and won't work if you use Google to sign in",
     keywords: 'admin',
   },
   { keyCombo: 'ssv', description: 'Show Asset Versions', keywords: 'assets' },
@@ -43,6 +43,11 @@ const commands: ICommand[] = [
     description: 'Toggle Show Asset Versions on Load',
     detailedDescription:
       'If enabled, will display the asset versions once the page loads',
+    unlisted: true,
+  },
+  {
+    keyCombo: '__ssc',
+    description: 'Set Host Panel Credentials',
     unlisted: true,
   },
   ...abTestCommands.map(abCommand => ({
