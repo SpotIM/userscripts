@@ -7,7 +7,7 @@ import gutterActions from './gutter-actions';
 let windowRef;
 let lastUrl;
 
-export function openCredentialsForm(openHostPanelAfter?: boolean) {
+export function openCredentialsForm(isOpeningHostPanel?: boolean) {
   const [renderButtons, addListeners] = gutterActions([
     'Delete Credentials',
     'Cancel',
@@ -39,12 +39,14 @@ export function openCredentialsForm(openHostPanelAfter?: boolean) {
     `,
   };
 
+  const title = isOpeningHostPanel
+    ? 'Your host panel credentials are required.'
+    : 'Enter your host panel credentials:';
+
   message.set(
     /*html*/ `
       <form style="${styles.wrapper}">
-        <div style="${
-          styles.title
-        }">Your host panel credentials are required.</div>
+        <div style="${styles.title}">${title}</div>
         <div style="${styles.formField}">
           <label style="${styles.label}">Email</label>
           <input id="emailInput" class="sptmninja_input" >
@@ -80,7 +82,7 @@ export function openCredentialsForm(openHostPanelAfter?: boolean) {
         emoji: '😃',
       });
 
-      if (openHostPanelAfter) {
+      if (isOpeningHostPanel) {
         setTimeout(() => {
           open({ spotId: utils.getSpotId(utils.getLauncherEl()) });
         }, 2000);
