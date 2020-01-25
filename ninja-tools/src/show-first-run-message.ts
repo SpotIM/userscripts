@@ -2,6 +2,7 @@ import * as prefs from './prefs';
 import * as message from './message';
 import colors from './colors';
 import * as commandPalette from './command-palette';
+import * as whatsNew from './whats-new';
 
 export default async () => {
   const isNotFirstRun = await prefs.get().isNotFirstRun;
@@ -17,5 +18,6 @@ export default async () => {
     }, 3500);
 
     await prefs.set({ isNotFirstRun: true });
+    await whatsNew.setCurrentVersionAsLastShown();
   }
 };

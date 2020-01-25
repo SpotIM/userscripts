@@ -153,4 +153,9 @@ async function showIfUpgraded() {
   }
 }
 
-export { showIfUpgraded, show };
+async function setCurrentVersionAsLastShown() {
+  const currentVersion = GM_info.script.version;
+  await prefs.set({ lastWhatsNewVersion: currentVersion });
+}
+
+export { setCurrentVersionAsLastShown, showIfUpgraded, show };
