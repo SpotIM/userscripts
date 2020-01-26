@@ -6,15 +6,22 @@ import * as whatsNew from './whats-new';
 function renderWelcomeMessage() {
   return /*html*/ `
     <style>
-      @keyframes shortcut {
+      @keyframes cta {
         0% {
-          background: #FF37FD;
+          color: #ffffff;
+          text-shadow: inherit;
         }
-        50% {
-          background: #00F8F8;
+        74.99% {
+          color: #ffffff;
+          text-shadow: inherit;
         }
-        99% {
-          background: #FF37FD;
+        75% {
+          color: transparent;
+          text-shadow: none;
+        }
+        100% {
+          color: transparent;
+          text-shadow: none;
         }
       }
       .wrapper {
@@ -42,12 +49,16 @@ function renderWelcomeMessage() {
         border-radius: 5px;
         box-shadow: 0px 0px 2px #000000a8;
       }
+
+      .cta {
+        animation: cta linear 1.4s infinite;
+      }
     </style>
     <div class="wrapper">
       <div class="message">
         <p>👋 Welcome,</p>
         <p>You can now hit <span class="shortcut">Ctrl+S</span> to open the command palette.</p>
-        <p>Try it now!</p>
+        <p class="cta">Press Ctrl+S</p>
       </div>
       <img src="https://github.com/SpotIM/userscripts/raw/master/ninja-tools/welcome-background.png">
     </div>
