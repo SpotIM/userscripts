@@ -70,7 +70,12 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
       </form>
     ${renderButtons()}
   `,
-    { title: 'Open Host Panel', color: colors.default }
+    {
+      title: isOpeningHostPanel
+        ? 'Open Host Panel'
+        : 'Set Host Panel Credentials',
+      color: colors.default,
+    }
   );
 
   async function submitForm() {

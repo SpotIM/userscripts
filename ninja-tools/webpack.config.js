@@ -36,7 +36,7 @@ module.exports = {
       headers: {
         name: 'SpotIM Ninja Tools',
         namespace: 'https://spot.im/',
-        version: dev ? `[version]-build.[buildNo]` : `[version]`,
+        version: dev ? `[version]-build.[buildTime]` : `[version]`,
         description: 'A bunch of shortcuts to make our lives easier',
         author: 'dutzi',
         match: 'http*://*/*',

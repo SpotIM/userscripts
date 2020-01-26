@@ -7,6 +7,7 @@ import * as hostPanel from './host-panel';
 import * as assetChangeListeners from './asset-change-listeners';
 import * as whatsNew from './whats-new';
 import * as help from './help';
+import showFirstRunMessage from './show-first-run-message';
 import colors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
@@ -25,26 +26,87 @@ let commandsImpl: any = {
     if (launcher) {
       const spotId = utils.getSpotId(launcher);
 
-      // if (navigator.clipboard) {
       GM_setClipboard(spotId);
       message.set(`Copied ${spotId} to clipboard!`, {
         timeout: 2000,
         color: colors.default,
         emoji: '😃',
       });
-      // } else {
-      //   message.set(`Can't copy ${spotId} to clipboard on non-https sites`, {
-      //     timeout: 4000,
-      //     color: colors.error,
-      //     emoji: "😞"
-      //   });
-      // }
     }
   },
 
   // show info
   ssi: () => {
     scrollToConversation.stop();
+
+    function renderCopyableText(text) {
+      unsafeWindow.__sptmninja_copy = e => {
+        const target = e.currentTarget;
+
+        GM_setClipboard(target.parentElement.children[0].innerText);
+
+        target.classList.add('showCheckmark');
+        setTimeout(() => {
+          target.classList.remove('showCheckmark');
+        }, 1000);
+      };
+
+      return /*html*/ `
+        <style>
+          .infoLine {
+            display: flex;
+            justify-content: space-between;
+            font-weight: normal;
+          }
+
+          .copyButton {
+            border: none;
+            text-shadow: none;
+            display: inline-block;
+            margin-top: 0px;
+            right: 9px;
+            font-size: 0.8em;
+            background: #00000030;
+            padding: 1px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 2px;
+            font-family: inherit;
+            color: inherit;
+            line-height: inherit;
+            visibility: hidden;
+            position: relative;
+            outline: none;
+          }
+
+          .copyButton .checkmark {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+          }
+
+          .copyButton.showCheckmark .checkmark {
+            opacity: 1;
+          }
+
+          .copyButton.showCheckmark > div:nth-child(2) {
+            visibility: hidden;
+          }
+
+          .infoLine:hover .copyButton {
+            visibility: visible;
+          }
+        </style>
+        <div class="infoLine">
+          <div>${text}</div>
+          <button onClick="__sptmninja_copy(event)" class="copyButton">
+            <div class="checkmark">✔</div>
+            <div>Copy</div>
+          </button>
+        </div>
+      `;
+    }
 
     const launcher = utils.getLauncherEl(true);
     if (launcher) {
@@ -55,9 +117,9 @@ let commandsImpl: any = {
 
       message.set(
         utils.renderTable([
-          ['Spot Id', utils.createElement(spotId, 'weight_normal')],
-          ['Post Id', utils.createElement(postId, 'weight_normal')],
-          ['Environment', utils.createElement(env, 'weight_normal')],
+          ['Spot Id', renderCopyableText(spotId)],
+          ['Post Id', renderCopyableText(postId)],
+          ['Environment', renderCopyableText(env)],
         ]),
         {
           // timeout: 8000,
@@ -187,6 +249,23 @@ let commandsImpl: any = {
     hostPanel.openCredentialsForm();
   },
 
+  // copy post id
+  __ssp: () => {
+    scrollToConversation.stop();
+
+    const launcher = utils.getLauncherEl(true);
+    if (launcher) {
+      const postId = utils.getPostId(launcher);
+
+      GM_setClipboard(postId);
+      message.set(`Copied ${postId} to clipboard!`, {
+        timeout: 2000,
+        color: colors.default,
+        emoji: '😃',
+      });
+    }
+  },
+
   // show help
   ssh: () => {
     scrollToConversation.stop();
@@ -233,5 +312,11 @@ commandsImpl = (() => {
     };
   }, commandsImpl);
 })();
+
+if (process.env.NODE_ENV === 'development') {
+  commandsImpl.ssw = () => {
+    showFirstRunMessage(true);
+  };
+}
 
 export default commandsImpl;

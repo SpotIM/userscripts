@@ -77,9 +77,9 @@ function renderWelcomeMessage() {
   `;
 }
 
-export default async () => {
+export default async (force?: boolean) => {
   const isNotFirstRun = await prefs.get().isNotFirstRun;
-  if (!isNotFirstRun) {
+  if (!isNotFirstRun || force) {
     message.set(renderWelcomeMessage(), {
       color: colors.default,
       title: 'Welcome to Spot.IM Ninja Tools!',

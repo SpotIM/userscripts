@@ -37,25 +37,67 @@ async function show() {
   scrollToConversation.stop({ hideMessage: false });
   let relevantCommands;
 
-  const missingLauncherWarning = `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
+  const missingLauncherWarning = /*html*/ `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
+
+  function renderDevBadge() {
+    const buildTime = GM_info.script.version.split('.').pop();
+    const secondsSinceBuild = Math.round(
+      (new Date().getTime() - buildTime) / 1000
+    );
+
+    const buildAge =
+      secondsSinceBuild <= 60
+        ? secondsSinceBuild + 's'
+        : Math.floor(secondsSinceBuild / 60) +
+          ':' +
+          String(secondsSinceBuild % 60).padStart(2, '0');
+
+    return /*html*/ `
+      <style>
+        .badgeWrapper {
+          left: 11px;
+          position: absolute;
+          top: 14px;
+          display: flex;
+          align-items: baseline;
+        }
+
+        .devBadge {
+          padding: 3px 7px 1px;
+          border-radius: 6px 0px 0px 6px;
+          background: #E91E63;
+          font-weight: normal;
+          text-transform: uppercase;
+          font-size: 0.7em;
+          margin-right: 0px;
+          display: block;
+          text-shadow: none;
+          box-shadow: 0px 0px 6px inset #000000a1, 0px -1px #00000080;
+        }
+
+        .buildAge {
+          font-size: 0.8em;
+          padding: 3px 7px 1px;
+          border-radius: 0px 6px 6px 0px;
+          background: #FF5722;
+          font-weight: normal;
+          font-size: 0.7em;
+          margin-right: 12px;
+          display: block;
+          color: white;
+          text-shadow: none;
+          box-shadow: 0px -1px #00000080;
+        }
+      </style>
+      <span class="badgeWrapper">
+        <span class="devBadge">dev</span>
+        <span class="buildAge" title="Time since built">${buildAge}</span>
+      </span>
+    `;
+  }
 
   const messageBodyEl = message.set(
     /*html*/ `<style>
-      .devBadge {
-        padding: 3px 5px 1px;
-        border-radius: 6px;
-        background: #E91E63;
-        font-weight: normal;
-        text-transform: uppercase;
-        font-size: 0.7em;
-        margin-right: 12px;
-        left: 11px;
-        position: absolute;
-        top: 14px;
-        text-shadow: none;
-        box-shadow: 0px 0px 6px inset #000000a1, 0px -1px #00000080;
-      }
-
       .fuzzyHighlight {
         color: #FFEB3B;
         font-weight: bold;
@@ -70,9 +112,7 @@ async function show() {
       title: `${
         !utils.getLauncherEl(false) ? missingLauncherWarning : ''
       }Start Typing A Command${
-        process.env.NODE_ENV === 'development'
-          ? ' <span class="devBadge">Development</span>'
-          : ''
+        process.env.NODE_ENV === 'development' ? renderDevBadge() : ''
       }`,
       color: colors.default,
     }
@@ -103,10 +143,10 @@ async function show() {
 
   function updateRelevantResults() {
     // const value = input.value.replace(/ /g, ".");
-    const value = input.value.split('').join('.*?');
-    const regExp = new RegExp(value, 'i');
+    const value = input.value;
+    // const regExp = new RegExp(value, 'i');
 
-    const fuzzyResults = fuzzy.filter(input.value, commands, {
+    const fuzzyResults = fuzzy.filter(value, commands, {
       pre: '<span class="fuzzyHighlight">',
       post: '</span>',
       extract: command => command.description,

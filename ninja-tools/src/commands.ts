@@ -50,6 +50,11 @@ const commands: ICommand[] = [
     description: 'Set Host Panel Credentials',
     unlisted: true,
   },
+  {
+    keyCombo: '__ssp',
+    description: 'Copy Post ID to Clipboard',
+    unlisted: true,
+  },
   ...abTestCommands.map(abCommand => ({
     keyCombo: abCommand.keyCombo,
     description: 'A/B Test: ' + abCommand.description,
