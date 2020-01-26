@@ -12,6 +12,8 @@ Then visit http://localhost:5732/spotim-ninja-tools.user.js and install the scri
 
 Whenever you make changes to the source, update the userscript through Tampermonkey.
 
+After you're done developing, re-install the script from [Github](https://github.com/SpotIM/userscripts/raw/master/spotim-ninja-tools.user.js).
+
 ## Publish
 
 Bump version in `package.json` and run:
