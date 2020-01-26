@@ -69,6 +69,11 @@ async function notifyOnChange() {
         window.focus();
       },
     });
+
+    message.set('An asset has been updated!', {
+      color: colors.default,
+      emoji: '⬆️',
+    });
     // var notification = new Notification("");
   }
 
