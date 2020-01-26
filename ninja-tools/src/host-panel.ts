@@ -33,6 +33,12 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
       width: 120px;
       text-align: right;
     `,
+    disclaimer: `
+      text-align: left;
+      font-size: 0.8em;
+      font-weight: normal;
+      opacity: 0.8;
+    `,
     submit: `
       position: absolute;
       visibility: hidden
@@ -54,6 +60,11 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
         <div style="${styles.formField}">
           <label style="${styles.label}">Password</label>
           <input id="passwordInput" class="sptmninja_input" type="password">
+        </div>
+        <div style="${styles.disclaimer}">
+          If you're using Google to sign to the Host Panel this won't work.
+          You'll have to create an account using your email address to use
+          this feature.
         </div>
         <input style="${styles.submit}" type="submit"/>
       </form>
