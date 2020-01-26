@@ -203,7 +203,14 @@ export const open = async ({ spotId }: { spotId: string }) => {
   if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
     message.set('Too many login attempts', {
       color: colors.error,
-      timeout: 2000,
+      timeout: 3500,
+      emoji: '😕',
+    });
+    return;
+  } else if (emailConnectJson.success === false) {
+    message.set("Couldn't log in to Host Panel", {
+      color: colors.error,
+      timeout: 3500,
       emoji: '😕',
     });
     return;
