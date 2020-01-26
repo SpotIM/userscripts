@@ -83,8 +83,8 @@ async function notifyOnChange() {
     if (launcher) {
       response = await fetch(
         `https://api-2-0.spot.im/v1.0.0/config/launcher/${utils.getSpotId(
-          utils.getLauncherEl(true)
-        )}/redesign-post/vendor,init,conversation`
+          launcher
+        )}/${utils.getPostId(launcher)}/vendor,init,conversation`
       );
     } else if (
       unsafeWindow.location.href.match(
