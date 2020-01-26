@@ -1,4 +1,4 @@
-# SpotIM Ninja Tools
+![Spot.IM Ninja Tools Logo](./src/header.png)
 
 ## Develop
 
