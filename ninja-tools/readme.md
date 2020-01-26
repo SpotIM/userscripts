@@ -1,4 +1,4 @@
-![Spot.IM Ninja Tools Logo](./src/header.png)
+![Spot.IM Ninja Tools Logo](./header.png)
 
 ## Develop
 
