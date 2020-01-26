@@ -6,6 +6,7 @@ import * as prefs from './prefs';
 import colors from './colors';
 import commandsImpl from './commands-impl';
 import * as shadowDOM from './shadow-dom';
+import fuzzy from 'fuzzy';
 
 // let selectedItemIndex = prefs.get().selectedItemIndex || 0;
 let selectedItemIndex = 0;
@@ -39,11 +40,40 @@ async function show() {
   const missingLauncherWarning = `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
 
   const messageBodyEl = message.set(
-    '<input class="sptmninja_input"><div class="sptmninja_results"></div>',
+    /*html*/ `<style>
+      .devBadge {
+        padding: 3px 5px 1px;
+        border-radius: 6px;
+        background: #E91E63;
+        font-weight: normal;
+        text-transform: uppercase;
+        font-size: 0.7em;
+        margin-right: 12px;
+        left: 11px;
+        position: absolute;
+        top: 14px;
+        text-shadow: none;
+        box-shadow: 0px 0px 6px inset #000000a1, 0px -1px #00000080;
+      }
+
+      .fuzzyHighlight {
+        color: #FFEB3B;
+        font-weight: bold;
+      }
+
+      .inputNotEmpty .sptmninja_pallete_row_main_col {
+        font-weight: normal;
+      }
+    </style>
+    <input class="sptmninja_input"><div class="sptmninja_results"></div>`,
     {
       title: `${
         !utils.getLauncherEl(false) ? missingLauncherWarning : ''
-      }Start Typing A Command`,
+      }Start Typing A Command${
+        process.env.NODE_ENV === 'development'
+          ? ' <span class="devBadge">Development</span>'
+          : ''
+      }`,
       color: colors.default,
     }
   );
@@ -76,16 +106,27 @@ async function show() {
     const value = input.value.split('').join('.*?');
     const regExp = new RegExp(value, 'i');
 
-    relevantCommands = commands.filter(
-      command =>
-        command.description.match(regExp) ||
-        command.keyCombo.match(regExp) ||
-        (command.keywords && command.keywords.match(regExp))
-    );
+    const fuzzyResults = fuzzy.filter(input.value, commands, {
+      pre: '<span class="fuzzyHighlight">',
+      post: '</span>',
+      extract: command => command.description,
+    });
+
+    relevantCommands = fuzzyResults.map(result => ({
+      ...commands[result.index],
+      description: result.string,
+    }));
+
+    // relevantCommands = commands.filter(
+    //   command =>
+    //     command.description.match(regExp) ||
+    //     command.keyCombo.match(regExp) ||
+    //     (command.keywords && command.keywords.match(regExp))
+    // );
 
     if (!value && lastCommandThatRan) {
       const lastCommandIndex = relevantCommands.findIndex(
-        command => command === lastCommandThatRan
+        command => command.keyCombo === lastCommandThatRan?.keyCombo
       );
 
       relevantCommands.splice(lastCommandIndex, 1);
@@ -96,6 +137,16 @@ async function show() {
   }
 
   function renderResults(scrollAlignToTop?: boolean) {
+    if (input.value.trim()) {
+      messageBodyEl
+        .querySelector('.sptmninja_results')
+        .classList.add('inputNotEmpty');
+    } else {
+      messageBodyEl
+        .querySelector('.sptmninja_results')
+        .classList.remove('inputNotEmpty');
+    }
+
     messageBodyEl.querySelector(
       '.sptmninja_results'
     ).innerHTML = relevantCommands.length

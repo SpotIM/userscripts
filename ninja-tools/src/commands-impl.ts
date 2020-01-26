@@ -171,7 +171,7 @@ let commandsImpl: any = {
         color: colors.success,
       });
     } else {
-      message.set('I will stop showing you asset versions on page load', {
+      message.set('Stopped showing you asset versions on page load', {
         timeout: 4000,
         emoji: '❌',
         color: colors.default,

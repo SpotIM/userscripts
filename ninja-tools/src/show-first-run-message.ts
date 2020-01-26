@@ -24,6 +24,12 @@ function renderWelcomeMessage() {
           text-shadow: none;
         }
       }
+
+      @font-face {
+        font-family: "BigBlue TerminalPlus";
+        src: url('https://rawcdn.githack.com/SpotIM/userscripts/53c2ab94cf3523830e17d299ed8abd533822d0c5/ninja-tools/src/assets/BigBlue_Terminal_437TT.TTF') format('truetype')
+      }
+
       .wrapper {
         margin: -7px -10px -18px;
       }
@@ -36,7 +42,7 @@ function renderWelcomeMessage() {
       .message {
         text-align: left;
         padding: 20px;
-        margin-bottom: -80px;
+        margin-bottom: -65px;
       }
 
       .message p:first-child {
@@ -51,16 +57,22 @@ function renderWelcomeMessage() {
       }
 
       .cta {
+        position: absolute;
+        bottom: 63px;
+        left: 21px;
         animation: cta linear 1.4s infinite;
+        font-family: "BigBlue TerminalPlus";
+        -webkit-font-smoothing: none;
+        font-weight: normal;
       }
     </style>
     <div class="wrapper">
       <div class="message">
         <p>👋 Welcome,</p>
         <p>You can now hit <span class="shortcut">Ctrl+S</span> to open the command palette.</p>
-        <p class="cta">Press Ctrl+S</p>
       </div>
       <img src="https://github.com/SpotIM/userscripts/raw/master/ninja-tools/welcome-background.png">
+      <p class="cta">Press Ctrl+S</p>
     </div>
   `;
 }

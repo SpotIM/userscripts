@@ -122,7 +122,7 @@ function stopListeningToChanges(showMessage?: boolean) {
     message.set(`Stopped listening to asset updates`, {
       timeout: 4000,
       color: colors.default,
-      emoji: '👍',
+      emoji: '❌',
     });
   }
 }
