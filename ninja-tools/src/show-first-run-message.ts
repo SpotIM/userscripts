@@ -4,6 +4,16 @@ import colors from './colors';
 import * as whatsNew from './whats-new';
 
 function renderWelcomeMessage() {
+  const fontFaceStyle = unsafeWindow.document.createElement('style');
+  fontFaceStyle.innerHTML = /*css*/ `
+    @font-face {
+      font-family: "BigBlue TerminalPlus";
+      src: url('${GM_getResourceURL('bigBlueFont')}') format('truetype')
+    }
+  `;
+
+  unsafeWindow.document.head.appendChild(fontFaceStyle);
+
   return /*html*/ `
     <style>
       @keyframes cta {
@@ -23,11 +33,6 @@ function renderWelcomeMessage() {
           color: transparent;
           text-shadow: none;
         }
-      }
-
-      @font-face {
-        font-family: "BigBlue TerminalPlus";
-        src: url('https://rawcdn.githack.com/SpotIM/userscripts/53c2ab94cf3523830e17d299ed8abd533822d0c5/ninja-tools/src/assets/BigBlue_Terminal_437TT.TTF') format('truetype')
       }
 
       .wrapper {
@@ -71,7 +76,7 @@ function renderWelcomeMessage() {
         <p>👋 Welcome,</p>
         <p>You can now hit <span class="shortcut">Ctrl+S</span> to open the command palette.</p>
       </div>
-      <img src="https://github.com/SpotIM/userscripts/raw/master/ninja-tools/welcome-background.png">
+      <img src="${GM_getResourceURL('welcomeImage')}">
       <p class="cta">Press Ctrl+S</p>
     </div>
   `;
