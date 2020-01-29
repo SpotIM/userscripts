@@ -11,6 +11,7 @@ import showFirstRunMessage from './show-first-run-message';
 import colors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
+import showInfoStyles from './commands-impl-show-info.css';
 
 let commandsImpl: any = {
   // scroll to conversation
@@ -53,50 +54,7 @@ let commandsImpl: any = {
 
       return /*html*/ `
         <style>
-          .infoLine {
-            display: flex;
-            justify-content: space-between;
-            font-weight: normal;
-          }
-
-          .copyButton {
-            border: none;
-            text-shadow: none;
-            display: inline-block;
-            margin-top: 0px;
-            right: 9px;
-            font-size: 0.8em;
-            background: #00000030;
-            padding: 1px 7px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 2px;
-            font-family: inherit;
-            color: inherit;
-            line-height: inherit;
-            visibility: hidden;
-            position: relative;
-            outline: none;
-          }
-
-          .copyButton .checkmark {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-          }
-
-          .copyButton.showCheckmark .checkmark {
-            opacity: 1;
-          }
-
-          .copyButton.showCheckmark > div:nth-child(2) {
-            visibility: hidden;
-          }
-
-          .infoLine:hover .copyButton {
-            visibility: visible;
-          }
+          ${showInfoStyles}
         </style>
         <div class="infoLine">
           <div>${text}</div>

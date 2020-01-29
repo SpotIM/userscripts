@@ -1,0 +1,43 @@
+.fuzzyHighlight {
+  color: #ffeb3b;
+  font-weight: bold;
+}
+
+.inputNotEmpty .sptmninja_pallete_row_main_col {
+  font-weight: normal;
+}
+
+.badgeWrapper {
+  left: 11px;
+  position: absolute;
+  top: 14px;
+  display: flex;
+  align-items: baseline;
+}
+
+.devBadge {
+  padding: 3px 7px 1px;
+  border-radius: 6px 0px 0px 6px;
+  background: #e91e63;
+  font-weight: normal;
+  text-transform: uppercase;
+  font-size: 0.7em;
+  margin-right: 0px;
+  display: block;
+  text-shadow: none;
+  box-shadow: 0px 0px 6px inset #000000a1, 0px -1px #00000080;
+}
+
+.buildAge {
+  font-size: 0.8em;
+  padding: 3px 7px 1px;
+  border-radius: 0px 6px 6px 0px;
+  background: #ff5722;
+  font-weight: normal;
+  font-size: 0.7em;
+  margin-right: 12px;
+  display: block;
+  color: white;
+  text-shadow: none;
+  box-shadow: 0px -1px #00000080;
+}

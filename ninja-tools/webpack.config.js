@@ -29,6 +29,10 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.css$/i,
+        use: 'raw-loader',
+      },
     ],
   },
   plugins: [

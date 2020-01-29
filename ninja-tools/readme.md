@@ -10,7 +10,7 @@ yarn start
 
 Then visit http://localhost:5732/spotim-ninja-tools.user.js and install the script.
 
-You'll see the following repeatedly spat out to the console:
+In most domains you'll see the following repeatedly spat out to the console:
 
 ```
 Invalid Host/Origin header

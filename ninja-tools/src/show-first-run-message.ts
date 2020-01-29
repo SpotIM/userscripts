@@ -2,6 +2,7 @@ import * as prefs from './prefs';
 import * as message from './message';
 import colors from './colors';
 import * as whatsNew from './whats-new';
+import styles from './show-first-run-message';
 
 function renderWelcomeMessage() {
   // injecting the font in the document because it turns out that injecting
@@ -19,60 +20,7 @@ function renderWelcomeMessage() {
 
   return /*html*/ `
     <style>
-      @keyframes cta {
-        0% {
-          color: #ffffff;
-          text-shadow: inherit;
-        }
-        74.99% {
-          color: #ffffff;
-          text-shadow: inherit;
-        }
-        75% {
-          color: transparent;
-          text-shadow: none;
-        }
-        100% {
-          color: transparent;
-          text-shadow: none;
-        }
-      }
-
-      .wrapper {
-        margin: -7px -10px -18px;
-      }
-
-      .wrapper img {
-        width: 100%;
-        height: 294px;
-      }
-
-      .message {
-        text-align: left;
-        padding: 20px;
-        margin-bottom: -65px;
-      }
-
-      .message p:first-child {
-        margin-top: 0px;
-      }
-
-      .shortcut {
-        background: #FF37FD;
-        padding: 6px 8px;
-        border-radius: 5px;
-        box-shadow: 0px 0px 2px #000000a8;
-      }
-
-      .cta {
-        position: absolute;
-        bottom: 63px;
-        left: 21px;
-        animation: cta linear 1.4s infinite;
-        font-family: "BigBlue TerminalPlus";
-        -webkit-font-smoothing: none;
-        font-weight: normal;
-      }
+      ${styles}
     </style>
     <div class="wrapper">
       <div class="message">
