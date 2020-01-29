@@ -43,7 +43,7 @@ module.exports = {
         noframes: true,
         resource: [
           'bigBlueFont https://rawcdn.githack.com/SpotIM/userscripts/53c2ab94cf3523830e17d299ed8abd533822d0c5/ninja-tools/src/assets/BigBlue_Terminal_437TT.TTF',
-          'welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/welcome-background.png',
+          'welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/assets/welcome-background.png',
         ],
         grant: [
           'GM_setValue',

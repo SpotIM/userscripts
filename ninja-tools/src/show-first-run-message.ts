@@ -4,6 +4,9 @@ import colors from './colors';
 import * as whatsNew from './whats-new';
 
 function renderWelcomeMessage() {
+  // injecting the font in the document because it turns out that injecting
+  // it in the shadow-dom doesn't work
+  //
   const fontFaceStyle = unsafeWindow.document.createElement('style');
   fontFaceStyle.innerHTML = /*css*/ `
     @font-face {

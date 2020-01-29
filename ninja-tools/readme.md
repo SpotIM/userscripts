@@ -14,6 +14,10 @@ Whenever you make changes to the source, update the userscript through Tampermon
 
 After you're done developing, re-install the script from [Github](https://github.com/SpotIM/userscripts/raw/master/spotim-ninja-tools.user.js).
 
+## Updating What's New
+
+When releasing a minor update, one that fixes some bugs or add patch version,
+
 ## Publish
 
 Bump version in `package.json` and run:
