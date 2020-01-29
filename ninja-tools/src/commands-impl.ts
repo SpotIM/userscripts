@@ -112,7 +112,6 @@ let commandsImpl: any = {
     if (launcher) {
       const spotId = utils.getSpotId(launcher);
       const postId = utils.getPostId(launcher);
-      const version = utils.getSpotimVersion() === 2 ? 'V.2.0' : 'V.1.0';
       const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
 
       message.set(
@@ -122,7 +121,6 @@ let commandsImpl: any = {
           ['Environment', renderCopyableText(env)],
         ]),
         {
-          // timeout: 8000,
           color: colors.default,
           title: 'Spot Info',
         }
