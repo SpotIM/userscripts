@@ -7,6 +7,7 @@ import getColors from './colors';
 import commandsImpl from './commands-impl';
 import * as shadowDOM from './shadow-dom';
 import fuzzy from 'fuzzy';
+import styles from './command-palette.css';
 
 // let selectedItemIndex = prefs.get().selectedItemIndex || 0;
 let selectedItemIndex = 0;
@@ -53,42 +54,6 @@ async function show() {
           String(secondsSinceBuild % 60).padStart(2, '0');
 
     return /*html*/ `
-      <style>
-        .badgeWrapper {
-          left: 11px;
-          position: absolute;
-          top: 14px;
-          display: flex;
-          align-items: baseline;
-        }
-
-        .devBadge {
-          padding: 3px 7px 1px;
-          border-radius: 6px 0px 0px 6px;
-          background: #E91E63;
-          font-weight: normal;
-          text-transform: uppercase;
-          font-size: 0.7em;
-          margin-right: 0px;
-          display: block;
-          text-shadow: none;
-          box-shadow: 0px 0px 6px inset #000000a1, 0px -1px #00000080;
-        }
-
-        .buildAge {
-          font-size: 0.8em;
-          padding: 3px 7px 1px;
-          border-radius: 0px 6px 6px 0px;
-          background: #FF5722;
-          font-weight: normal;
-          font-size: 0.7em;
-          margin-right: 12px;
-          display: block;
-          color: white;
-          text-shadow: none;
-          box-shadow: 0px -1px #00000080;
-        }
-      </style>
       <span class="badgeWrapper">
         <span class="devBadge">dev</span>
         <span class="buildAge" title="Time since built">${buildAge}</span>
@@ -98,14 +63,7 @@ async function show() {
 
   const messageBodyEl = message.set(
     /*html*/ `<style>
-      .fuzzyHighlight {
-        color: #FFEB3B;
-        font-weight: bold;
-      }
-
-      .inputNotEmpty .sptmninja_pallete_row_main_col {
-        font-weight: normal;
-      }
+      ${styles}
     </style>
     <input class="sptmninja_input"><div class="sptmninja_results"></div>`,
     {

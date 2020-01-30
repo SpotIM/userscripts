@@ -1,0 +1,5 @@
+{
+  "search.exclude": {
+    "spotim-ninja-tools.user.js": true
+  }
+}

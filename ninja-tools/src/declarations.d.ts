@@ -6,3 +6,8 @@ declare const GM_openInTab: (url: string, background: boolean) => void;
 declare const GM_getResourceURL: (name: string) => string;
 declare const GM_info: any;
 declare const unsafeWindow: any;
+
+declare module '*.css' {
+  const content: string;
+  export default content;
+}
