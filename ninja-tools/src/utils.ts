@@ -1,6 +1,6 @@
 import * as message from './message';
 import commonMessages from './common-messages';
-import colors from './colors';
+import getColors from './colors';
 
 export const isTopMostFrame = () => {
   return window.parent === window;
@@ -23,7 +23,7 @@ export const getLauncherEl = (displayErrorIfNotFound?: boolean) => {
     if (isTopMostFrame()) {
       message.set(`Could not find launcher script`, {
         timeout: 2000,
-        color: colors.error,
+        color: getColors().error,
         emoji: '😕',
       });
     } else {
@@ -32,7 +32,7 @@ export const getLauncherEl = (displayErrorIfNotFound?: boolean) => {
         `${commonMessages.focusWarning}<br/>Could not find launcher script`,
         {
           timeout: 3000,
-          color: colors.error,
+          color: getColors().error,
           emoji: '😕️',
         }
       );

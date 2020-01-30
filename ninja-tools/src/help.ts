@@ -1,7 +1,7 @@
 import * as message from './message';
 import * as utils from './utils';
 import commands from './commands';
-import colors from './colors';
+import getColors from './colors';
 
 export const show = () => {
   message.set(
@@ -30,7 +30,7 @@ export const show = () => {
       ])
     ),
     {
-      color: colors.default,
+      color: getColors().default,
       title: 'Available Shortcuts',
       overflow: 'scroll',
     }

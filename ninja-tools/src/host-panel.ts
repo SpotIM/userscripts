@@ -1,7 +1,7 @@
 import * as message from './message';
 import * as utils from './utils';
 import * as shadowDOM from './shadow-dom';
-import colors from './colors';
+import getColors from './colors';
 import gutterActions from './gutter-actions';
 
 let windowRef;
@@ -74,7 +74,7 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
       title: isOpeningHostPanel
         ? 'Open Host Panel'
         : 'Set Host Panel Credentials',
-      color: colors.default,
+      color: getColors().default,
     }
   );
 
@@ -94,7 +94,7 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
 
       message.set('Your credentials were set!', {
         timeout: 2000,
-        color: colors.success,
+        color: getColors().success,
         emoji: '😃',
       });
 
@@ -116,7 +116,7 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
       await GM_setValue('password', '');
       message.set('Your credentials were deleted!', {
         timeout: 3000,
-        color: colors.default,
+        color: getColors().default,
         emoji: '👍🏻',
       });
     }
@@ -145,7 +145,7 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
 export const open = async ({ spotId }: { spotId: string }) => {
   function showSuccessMessage() {
     message.set('Openning Host Panel...', {
-      color: colors.success,
+      color: getColors().success,
       timeout: 2000,
     });
   }
@@ -174,7 +174,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   var networkName = 'spotim';
 
   message.set('Fetching network id...', {
-    color: colors.default,
+    color: getColors().default,
     step: 0,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -185,7 +185,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   ).then(r => r.json());
 
   message.set('Fetching network token...', {
-    color: colors.default,
+    color: getColors().default,
     step: 1,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -197,7 +197,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   ).then(r => r.json());
 
   message.set('Logging in...', {
-    color: colors.default,
+    color: getColors().default,
     step: 2,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -218,14 +218,14 @@ export const open = async ({ spotId }: { spotId: string }) => {
 
   if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
     message.set('Too many login attempts', {
-      color: colors.error,
+      color: getColors().error,
       timeout: 3500,
       emoji: '😕',
     });
     return;
   } else if (emailConnectJson.success === false) {
     message.set("Couldn't log in to Host Panel", {
-      color: colors.error,
+      color: getColors().error,
       timeout: 3500,
       emoji: '😕',
     });
@@ -233,7 +233,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   }
 
   message.set('Fetching login json...', {
-    color: colors.default,
+    color: getColors().default,
     step: 3,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -251,7 +251,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   ).then(r => r.json());
 
   message.set('Calling me-make-admin...', {
-    color: colors.default,
+    color: getColors().default,
     step: 4,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -268,7 +268,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   ).then(r => r.json());
 
   message.set('Fetching token JSON...', {
-    color: colors.default,
+    color: getColors().default,
     step: 5,
     numSteps: 5,
     title: 'Open Admin Panel',
@@ -290,7 +290,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   ].join('');
 
   message.set('Opening Host Panel', {
-    color: colors.success,
+    color: getColors().success,
     timeout: 2000,
     emoji: '😃',
   });

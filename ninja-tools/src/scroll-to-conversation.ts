@@ -1,7 +1,7 @@
 import * as message from './message';
 import * as utils from './utils';
 import commonMessages from './common-messages';
-import colors from './colors';
+import getColors from './colors';
 
 let isScrolling;
 let scrollingInterval;
@@ -82,7 +82,7 @@ function startScrolling() {
       }
       message.set('Hit <span class="sptmninja_mono">escape</span> to stop', {
         title: 'Scroll To Conversation',
-        color: colors.success,
+        color: getColors().success,
         emoji: '😃',
       });
       highlightConversation(conversation);
@@ -91,7 +91,7 @@ function startScrolling() {
 
       if (utils.isTopMostFrame()) {
         message.set('Element not found. Try scrolling up and down a bit.', {
-          color: colors.error,
+          color: getColors().error,
           emoji: '😕',
           title: 'Scroll To Conversation',
         });
@@ -100,7 +100,7 @@ function startScrolling() {
         message.set(
           `${commonMessages.focusWarning}<br/>Scroll To Conversation... not found. Try scrolling up and down a bit.`,
 
-          { color: colors.error, timeout: 3000, emoji: '😕' }
+          { color: getColors().error, timeout: 3000, emoji: '😕' }
         );
         stopScrolling({ hideMessage: false });
       }
