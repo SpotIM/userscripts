@@ -104,7 +104,7 @@ function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
           .join('')}
       </div>
       <div class="whatsNewFeatureRequest">
-        💡 Got a feature request? <a href="slack://channel?id=D9SQV11P1&team=T0460KVUF">Hit me up on Slack!</a>
+        💡 Got a feature request? <a href="slack://channel?id=CSZGJD6R1&team=T0460KVUF">Hit us up on Slack!</a>
       </div>
       ${renderButtons()}
     </div>
