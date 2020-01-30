@@ -1,6 +1,6 @@
 import { IColor } from './colors';
 import * as scrollToConversation from './scroll-to-conversation';
-import colors from './colors';
+import getColors from './colors';
 import * as shadowDOM from './shadow-dom';
 import styles from './message.css';
 
@@ -65,7 +65,7 @@ function addMessage() {
     isMouseOver = false;
   });
 
-  setMessageColor(colors.default);
+  setMessageColor(getColors().default);
 
   shadowWrapper = document.createElement('div');
   document.body.appendChild(shadowWrapper);

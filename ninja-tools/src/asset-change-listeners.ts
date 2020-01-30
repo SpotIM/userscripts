@@ -1,6 +1,6 @@
 import * as utils from './utils';
 import * as message from './message';
-import colors from './colors';
+import getColors from './colors';
 
 let assetChangeInterval;
 
@@ -33,7 +33,7 @@ async function notifyOnChange() {
   // if (location.protocol !== "https:") {
   //   message.set(`Can't display notifications on non-https sites`, {
   //     timeout: 4000,
-  //     color: colors.error,
+  //     color: getColors().error,
   //     emoji: "😞"
   //   });
 
@@ -41,7 +41,7 @@ async function notifyOnChange() {
   // }
 
   // message.set(`Please allow notifications on this site`, {
-  //   color: colors.default,
+  //   color: getColors().default,
   //   emoji: "🚦",
   //   belowNotificationPopover: true
   // });
@@ -51,7 +51,7 @@ async function notifyOnChange() {
   // if (result !== "granted") {
   //   message.set(`Notification permission denied`, {
   //     timeout: 3000,
-  //     color: colors.error,
+  //     color: getColors().error,
   //     emoji: "😕"
   //   });
 
@@ -71,7 +71,7 @@ async function notifyOnChange() {
     });
 
     message.set('An asset has been updated!', {
-      color: colors.default,
+      color: getColors().default,
       emoji: '⬆️',
     });
     // var notification = new Notification("");
@@ -109,7 +109,7 @@ async function notifyOnChange() {
 
   message.set(`I will notify you on asset updates!`, {
     timeout: 4000,
-    color: colors.success,
+    color: getColors().success,
     emoji: '😃',
   });
 }
@@ -121,7 +121,7 @@ function stopListeningToChanges(showMessage?: boolean) {
   if (showMessage) {
     message.set(`Stopped listening to asset updates`, {
       timeout: 4000,
-      color: colors.default,
+      color: getColors().default,
       emoji: '❌',
     });
   }

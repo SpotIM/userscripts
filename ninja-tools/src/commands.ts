@@ -39,6 +39,16 @@ const commands: ICommand[] = [
     unlisted: true,
   },
   {
+    keyCombo: '__ssdt',
+    description: 'Use Dark Theme',
+    unlisted: true,
+  },
+  {
+    keyCombo: '__sslt',
+    description: 'Use Light Theme',
+    unlisted: true,
+  },
+  {
     keyCombo: '__ssa',
     description: 'Toggle Show Asset Versions on Load',
     detailedDescription:

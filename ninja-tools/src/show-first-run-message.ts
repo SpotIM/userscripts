@@ -1,6 +1,6 @@
 import * as prefs from './prefs';
 import * as message from './message';
-import colors from './colors';
+import getColors from './colors';
 import * as whatsNew from './whats-new';
 import styles from './show-first-run-message';
 
@@ -37,7 +37,7 @@ export default async (force?: boolean) => {
   const isNotFirstRun = await prefs.get().isNotFirstRun;
   if (!isNotFirstRun || force) {
     message.set(renderWelcomeMessage(), {
-      color: colors.default,
+      color: getColors().default,
       title: 'Welcome to Spot.IM Ninja Tools!',
     });
 

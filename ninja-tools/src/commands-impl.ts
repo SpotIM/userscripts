@@ -8,7 +8,7 @@ import * as assetChangeListeners from './asset-change-listeners';
 import * as whatsNew from './whats-new';
 import * as help from './help';
 import showFirstRunMessage from './show-first-run-message';
-import colors from './colors';
+import getColors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
 import showInfoStyles from './commands-impl-show-info.css';
@@ -30,7 +30,7 @@ let commandsImpl: any = {
       GM_setClipboard(spotId);
       message.set(`Copied ${spotId} to clipboard!`, {
         timeout: 2000,
-        color: colors.default,
+        color: getColors().default,
         emoji: '😃',
       });
     }
@@ -79,7 +79,7 @@ let commandsImpl: any = {
           ['Environment', renderCopyableText(env)],
         ]),
         {
-          color: colors.default,
+          color: getColors().default,
           title: 'Spot Info',
         }
       );
@@ -114,21 +114,21 @@ let commandsImpl: any = {
           `<div class="sptmninja_muted_text sptmninja_margin_top">Page loaded at ${pageLoadTime}</div>`;
 
         message.set(table, {
-          color: colors.default,
+          color: getColors().default,
           emoji: utils.getRandomOptimisticEmoji(),
           title: 'Assets',
         });
       } else {
         message.set(`No assets found. Are you running locally?`, {
           timeout: 2000,
-          color: colors.error,
+          color: getColors().error,
           emoji: '😕',
         });
       }
     } else {
       message.set(`Could not find __SPOTIM__ object`, {
         timeout: 2000,
-        color: colors.error,
+        color: getColors().error,
         emoji: '😕',
       });
     }
@@ -186,13 +186,13 @@ let commandsImpl: any = {
       message.set('I will now show you asset versions on page load!', {
         timeout: 4000,
         emoji: '🤠',
-        color: colors.success,
+        color: getColors().success,
       });
     } else {
       message.set('Stopped showing you asset versions on page load', {
         timeout: 4000,
         emoji: '❌',
-        color: colors.default,
+        color: getColors().default,
       });
     }
   },
@@ -216,10 +216,18 @@ let commandsImpl: any = {
       GM_setClipboard(postId);
       message.set(`Copied ${postId} to clipboard!`, {
         timeout: 2000,
-        color: colors.default,
+        color: getColors().default,
         emoji: '😃',
       });
     }
+  },
+
+  __ssdt: async () => {
+    await prefs.set({ useDarkTheme: true });
+  },
+
+  __sslt: async () => {
+    await prefs.set({ useDarkTheme: false });
   },
 
   // show help
@@ -254,14 +262,14 @@ commandsImpl = (() => {
 
           message.set(statusText, {
             emoji: '😃',
-            color: colors.success,
+            color: getColors().success,
           });
           unsafeWindow.localStorage.setItem('SPOT_AB', JSON.stringify(spotAB));
         } catch (err) {
           message.set('Are you sure this spot has this test?', {
             title: `Couldn't ${abCommand.description}`,
             emoji: '😞',
-            color: colors.error,
+            color: getColors().error,
           });
         }
       },

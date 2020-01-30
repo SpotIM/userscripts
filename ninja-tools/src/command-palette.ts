@@ -3,7 +3,7 @@ import * as scrollToConversation from './scroll-to-conversation';
 import * as message from './message';
 import * as utils from './utils';
 import * as prefs from './prefs';
-import colors from './colors';
+import getColors from './colors';
 import commandsImpl from './commands-impl';
 import * as shadowDOM from './shadow-dom';
 import fuzzy from 'fuzzy';
@@ -72,7 +72,7 @@ async function show() {
       }Start Typing A Command${
         process.env.NODE_ENV === 'development' ? renderDevBadge() : ''
       }`,
-      color: colors.default,
+      color: getColors().default,
     }
   );
 
