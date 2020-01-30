@@ -80,7 +80,7 @@ function startScrolling() {
         conversation.scrollIntoView();
         window.scrollBy(0, -200);
       }
-      message.set('Hit <span class="sptmninja_mono">escape</span> to stop', {
+      message.set('Hit <span class="mono">escape</span> to stop', {
         title: 'Scroll To Conversation',
         color: getColors().success,
         emoji: '😃',

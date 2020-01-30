@@ -18,14 +18,14 @@ export const show = () => {
                       : ''
                   }"
                   class="
-                    sptmninja_mono
-                    ${command.unlisted ? 'sptmninja_hidden' : ''}
+                    mono
+                    ${command.unlisted ? 'hidden' : ''}
                   ">
                   ${command.unlisted ? '×' : command.keyCombo}
                 </span>`,
         command.description +
           (command.detailedDescription
-            ? `<div class="sptmninja_detailed_description">${command.detailedDescription}</div>`
+            ? `<div class="detailed_description">${command.detailedDescription}</div>`
             : ''),
       ])
     ),

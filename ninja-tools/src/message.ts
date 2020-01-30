@@ -1,6 +1,6 @@
-import { IColor } from './colors';
+import colors, { IColor } from './colors';
 import * as scrollToConversation from './scroll-to-conversation';
-import getColors from './colors';
+import getColors, { getUseDarkTheme } from './colors';
 import * as shadowDOM from './shadow-dom';
 import styles from './message.css';
 
@@ -29,24 +29,34 @@ function addStyleTag() {
 
 function addMessage() {
   if (hasAddedMessage) {
+    if (getUseDarkTheme()) {
+      messageEl.classList.add('dark');
+    } else {
+      messageEl.classList.remove('dark');
+    }
+
     return;
   }
   hasAddedMessage = true;
 
   messageEl = document.createElement('div');
-  messageEl.className = 'sptmninja_message';
+  messageEl.className = 'message';
+
+  if (getUseDarkTheme()) {
+    messageEl.classList.add('dark');
+  }
 
   const insetShadow = document.createElement('div');
-  insetShadow.className = 'sptmninja_inset_shadow';
+  insetShadow.className = 'inset_shadow';
 
   messageBodyEl = document.createElement('div');
 
   messageProgressEl = document.createElement('div');
-  messageProgressEl.className = 'sptmninja_message_progress';
+  messageProgressEl.className = 'message_progress';
 
   const messageCloseEl = document.createElement('div');
   messageCloseEl.innerText = '×';
-  messageCloseEl.className = 'sptmninja_close_button';
+  messageCloseEl.className = 'close_button';
   messageCloseEl.addEventListener('click', () => {
     hideMessage(true);
     scrollToConversation.stop();
@@ -146,10 +156,10 @@ function setMessage(
 
   let prefix = '';
   if (title) {
-    prefix = `<div class="sptmninja_title">${title}</div>`;
+    prefix = `<div class="title">${title}</div>`;
   }
   if (emoji) {
-    prefix += `<div class="sptmninja_emoji">${emoji}</div>`;
+    prefix += `<div class="emoji">${emoji}</div>`;
   }
 
   fullMessageHTML = prefix + fullMessageHTML;
@@ -159,9 +169,9 @@ function setMessage(
   }
 
   if (belowNotificationPopover) {
-    messageEl.classList.add('sptmninja_below_notifications');
+    messageEl.classList.add('below_notifications');
   } else {
-    messageEl.classList.remove('sptmninja_below_notifications');
+    messageEl.classList.remove('below_notifications');
   }
 
   clearTimeout(hideMessageTimeout);
@@ -190,9 +200,8 @@ function setMessageProgress(progress) {
 
 function setMessageColor(color) {
   messageEl.style.backgroundColor = color.bg;
-  if (messageEl.querySelector('.sptmninja_title')) {
-    messageEl.querySelector('.sptmninja_title').style.backgroundColor =
-      color.bg;
+  if (messageEl.querySelector('.title')) {
+    messageEl.querySelector('.title').style.backgroundColor = color.bg;
   }
   messageEl.style.borderColor = color.border;
 }

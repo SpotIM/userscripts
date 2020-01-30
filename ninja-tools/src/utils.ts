@@ -95,12 +95,12 @@ export const padTime = str => {
 
 export const renderTable = data => {
   return (
-    "<div class='sptmninja_table'><tbody>" +
+    "<div class='table'><tbody>" +
     data
       .map(
         line =>
-          "<div class='sptmninja_tr'><div class='sptmninja_td'>" +
-          line.join("</div><div class='sptmninja_td'>") +
+          "<div class='tr'><div class='td'>" +
+          line.join("</div><div class='td'>") +
           '</div></div>'
       )
       .join('') +
@@ -109,7 +109,7 @@ export const renderTable = data => {
 };
 
 export const createElement = (html, className, tag = 'div') => {
-  return `<${tag} class="sptmninja_${className}">${html}</${tag}>`;
+  return `<${tag} class="${className}">${html}</${tag}>`;
 };
 
 export const getRandomOptimisticEmoji = () => {

@@ -1,7 +1,5 @@
-import abTestCommands from './ab-test-commands';
 import * as prefs from './prefs';
 import * as message from './message';
-import * as shadowDOM from './shadow-dom';
 import gutterActions from './gutter-actions';
 import styles from './whats-new.css';
 
@@ -35,7 +33,9 @@ const changelog = [
             description:
               'If enabled, will show the asset versions popup once the page loads',
           },
-          ...abTestCommands.map(command => ({ title: command.description })),
+          { title: 'A/B Test: Toggle Redesign' },
+          { title: 'A/B Test: Cycle Through Reaction Variants' },
+          { title: 'A/B Test: Toggle Show Scores Before/After Click' },
         ],
       },
     ],
@@ -107,7 +107,7 @@ function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
 
 async function show(hasUpgraded?: boolean) {
   const currentVersion = GM_info.script.version;
-  const { dontShowWhatsNew } = await prefs.get();
+  const { dontShowWhatsNew } = prefs.get();
   await prefs.set({ lastWhatsNewVersion: currentVersion });
   const whatsNew = renderWhatsNew(!dontShowWhatsNew);
 
@@ -122,7 +122,7 @@ async function show(hasUpgraded?: boolean) {
   }
 
   async function handleCloseAndToggleShowNextTime() {
-    const { dontShowWhatsNew } = await prefs.get();
+    const { dontShowWhatsNew } = prefs.get();
     await prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
     message.hide(true);
   }
@@ -137,9 +137,9 @@ async function show(hasUpgraded?: boolean) {
 }
 
 async function showIfUpgraded() {
-  const isNotFirstRun = await prefs.get().isNotFirstRun;
+  const isNotFirstRun = prefs.get().isNotFirstRun;
   if (isNotFirstRun) {
-    const { lastWhatsNewVersion, dontShowWhatsNew } = await prefs.get();
+    const { lastWhatsNewVersion, dontShowWhatsNew } = prefs.get();
     const currentVersion = GM_info.script.version;
 
     if (dontShowWhatsNew) {

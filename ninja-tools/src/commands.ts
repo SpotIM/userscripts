@@ -4,7 +4,6 @@ export interface ICommand {
   keyCombo: string;
   description: string;
   detailedDescription?: string;
-  keywords?: string;
   unlisted?: boolean;
 }
 
@@ -21,16 +20,14 @@ const commands: ICommand[] = [
     detailedDescription:
       'Will require you to enter the username and password you use to log in to the host panel on first run ' +
       "and won't work if you use Google to sign in",
-    keywords: 'admin',
   },
-  { keyCombo: 'ssv', description: 'Show Asset Versions', keywords: 'assets' },
+  { keyCombo: 'ssv', description: 'Show Asset Versions' },
   { keyCombo: 'sso', description: 'Open Config Data' },
   {
     keyCombo: 'ssn',
     description: 'Notify On Asset Updates',
     detailedDescription:
       'Will start constantly checking if an update to one of our products was released for this spot and pop a notification once that happens',
-    keywords: 'changes',
   },
   { keyCombo: 'ssh', description: 'Show Help' },
   {
@@ -40,12 +37,7 @@ const commands: ICommand[] = [
   },
   {
     keyCombo: '__ssdt',
-    description: 'Use Dark Theme',
-    unlisted: true,
-  },
-  {
-    keyCombo: '__sslt',
-    description: 'Use Light Theme',
+    description: 'Toggle Dark Theme',
     unlisted: true,
   },
   {

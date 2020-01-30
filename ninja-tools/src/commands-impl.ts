@@ -7,13 +7,18 @@ import * as hostPanel from './host-panel';
 import * as assetChangeListeners from './asset-change-listeners';
 import * as whatsNew from './whats-new';
 import * as help from './help';
+import * as commandPalette from './command-palette';
 import showFirstRunMessage from './show-first-run-message';
 import getColors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
 import showInfoStyles from './commands-impl-show-info.css';
 
-let commandsImpl: any = {
+interface ICommandImpls {
+  [key: string]: () => void;
+}
+
+let commandsImpl: ICommandImpls = {
   // scroll to conversation
   sss: () => {
     scrollToConversation.toggle();
@@ -41,7 +46,7 @@ let commandsImpl: any = {
     scrollToConversation.stop();
 
     function renderCopyableText(text) {
-      unsafeWindow.__sptmninja_copy = e => {
+      unsafeWindow.__spotImNinjaToolsCopy = e => {
         const target = e.currentTarget;
 
         GM_setClipboard(target.parentElement.children[0].innerText);
@@ -58,7 +63,7 @@ let commandsImpl: any = {
         </style>
         <div class="infoLine">
           <div>${text}</div>
-          <button onClick="__sptmninja_copy(event)" class="copyButton">
+          <button onClick="__spotImNinjaToolsCopy(event)" class="copyButton">
             <div class="checkmark">✔</div>
             <div>Copy</div>
           </button>
@@ -105,13 +110,13 @@ let commandsImpl: any = {
               .filter(item => item.url.indexOf('tags') > -1)
               .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
               .map(item => [
-                `<span class="sptmninja_mono"><a target="_blank" href="${
-                  item.url
-                }">${item.url.match(/tags\/(.*?)\//)[1]}</a></span>`,
+                `<span class="mono"><a target="_blank" href="${item.url}">${
+                  item.url.match(/tags\/(.*?)\//)[1]
+                }</a></span>`,
                 item.name,
               ])
           ) +
-          `<div class="sptmninja_muted_text sptmninja_margin_top">Page loaded at ${pageLoadTime}</div>`;
+          `<div class="muted_text margin_top">Page loaded at ${pageLoadTime}</div>`;
 
         message.set(table, {
           color: getColors().default,
@@ -179,7 +184,7 @@ let commandsImpl: any = {
   },
 
   __ssa: async () => {
-    const showVersionsOnLoad = await prefs.get().showVersionsOnLoad;
+    const showVersionsOnLoad = prefs.get().showVersionsOnLoad;
     await prefs.set({ showVersionsOnLoad: !showVersionsOnLoad });
 
     if (!showVersionsOnLoad) {
@@ -223,11 +228,12 @@ let commandsImpl: any = {
   },
 
   __ssdt: async () => {
-    await prefs.set({ useDarkTheme: true });
-  },
+    const { useDarkTheme = false } = prefs.get();
+    await prefs.set({ useDarkTheme: !useDarkTheme });
 
-  __sslt: async () => {
-    await prefs.set({ useDarkTheme: false });
+    setTimeout(() => {
+      commandPalette.show();
+    }, 0);
   },
 
   // show help

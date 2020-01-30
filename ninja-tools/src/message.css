@@ -13,7 +13,7 @@
   }
 }
 
-.sptmninja_message {
+.message {
   position: fixed;
   top: 0;
   left: 0;
@@ -39,11 +39,20 @@
   text-shadow: 0px 2px #00000033;
 }
 
-.sptmninja_below_notifications {
+.below_notifications {
   margin: 10em auto;
 }
 
-.sptmninja_message .sptmninja_table {
+/*
+ * Why not use normal "table" HTML tag you ask?
+ *
+ * Well, initially this extension would render dierctly to the document,
+ * I only started rendering to a shadow-dom long after I wrote this.
+ * This caused a lot of CSS override issues so I succombed and decided to
+ * use only divs everywere.
+ * Someday I'll clear this thing up.
+ */
+.message .table {
   display: table;
   border: none;
   width: 100%;
@@ -54,23 +63,27 @@
   font-weight: inherit;
 }
 
-.sptmninja_message .sptmninja_table .sptmninja_tr {
+.message .table .tr {
   display: table-row;
   background: initial !important;
 }
 
-.sptmninja_message .sptmninja_table .sptmninja_td {
+.message .table .td {
   display: table-cell;
   padding: initial;
   border: none;
   border-bottom: 1px solid #00000021;
 }
 
-.sptmninja_message .sptmninja_table .sptmninja_tr:last-child .sptmninja_td {
+.message.dark .table .td {
+  border-bottom: 1px solid #ffffff21;
+}
+
+.message .table .tr:last-child .td {
   border-bottom: none;
 }
 
-.sptmninja_message .sptmninja_table .sptmninja_td:first-child {
+.message .table .td:first-child {
   text-align: right;
   padding-right: 12px;
 }
@@ -80,7 +93,7 @@
   overflow-y: auto;
 }
 
-.sptmninja_close_button {
+.close_button {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -91,11 +104,11 @@
   z-index: 11;
 }
 
-.sptmninja_close_button:active {
+.close_button:active {
   text-shadow: 0px -2px #00000033;
 }
 
-.sptmninja_inset_shadow {
+.inset_shadow {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -107,38 +120,42 @@
   pointer-events: none;
 }
 
-.sptmninja_title {
+.title {
   padding: 12px 0px 10px;
-  box-shadow: 0px -20px 50px -24px #424242 inset, 0px 1px 1px #121212;
+  box-shadow: 0px -20px 50px -24px #00ffff36 inset, 0px 1px 1px #00000038;
   margin: -10px -10px 8px;
   position: relative;
   z-index: 10;
 }
 
-.sptmninja_titleIcon {
+.dark .title {
+  box-shadow: 0px -20px 50px -24px #c3c3c336 inset, 0px 1px 1px #cccccc38;
+}
+
+.titleIcon {
   margin-inline-end: 12px;
 }
 
-.sptmninja_muted_text {
+.muted_text {
   text-shadow: none;
   color: #ffffff73;
   font-weight: normal;
 }
 
-.sptmninja_weight_normal {
+.weight_normal {
   font-weight: normal;
 }
 
-.sptmninja_muted_result {
+.muted_result {
   font-weight: normal;
   opacity: 0.8;
 }
 
-.sptmninja_weight_bold {
+.weight_bold {
   font-weight: bold;
 }
 
-.sptmninja_pallete_row_main_col {
+.pallete_row_main_col {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -163,11 +180,11 @@
   transform: translateX(0px);
 }
 
-.sptmninja_margin_top {
+.margin_top {
   margin-top: 12px;
 }
 
-.sptmninja_emoji {
+.emoji {
   position: absolute;
   font-size: 6em;
   transform: translateY(-50%);
@@ -178,11 +195,11 @@
   height: 150px;
 }
 
-.sptmninja_title + .sptmninja_emoji {
+.title + .emoji {
   margin-top: 20px;
 }
 
-.sptmninja_message_progress {
+.message_progress {
   background: black;
   position: absolute;
   left: 0px;
@@ -194,7 +211,7 @@
   transition: width 0.2s ease-out;
 }
 
-.sptmninja_code {
+.code {
   font-family: monaco;
   font-size: 13px;
   color: #d3d5da;
@@ -205,7 +222,7 @@
   border-radius: 5px;
 }
 
-.sptmninja_mono {
+.mono {
   background: #0000003d;
   padding: 1px 7px;
   border-radius: 5px;
@@ -217,29 +234,33 @@
   display: inline-block;
 }
 
-.sptmninja_hidden {
+.dark .mono {
+  background: #ffffff3d;
+}
+
+.hidden {
   opacity: 0.5;
 }
 
-.sptmninja_detailed_description {
+.detailed_description {
   font-weight: normal;
   font-size: 0.8em;
   margin: 2px 0px 5px;
   color: #ffffffbf;
 }
 
-.sptmninja_mono a {
+.mono a {
   color: inherit;
   text-decoration: none;
   outline: none;
 }
 
-.sptmninja_mono a:focus,
-.sptmninja_mono a:hover {
+.mono a:focus,
+.mono a:hover {
   text-decoration: underline;
 }
 
-.sptmninja_input {
+.input {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
@@ -255,33 +276,25 @@
   font-weight: bold;
 }
 
-.sptmninja_results {
+.results {
   max-height: 270px;
   overflow-y: scroll;
   padding-right: 10px;
 }
 
-.sptmninja_input + .sptmninja_results:not(:empty) {
+.input + .results:not(:empty) {
   margin-top: 12px;
 }
 
-.sptmninja_results .sptmninja_tr {
+.results .tr {
   cursor: pointer;
 }
 
-.sptmninja_input
-  + .sptmninja_results
-  .sptmninja_table
-  .sptmninja_tr
-  .sptmninja_td:first-child {
+.input + .results .table .tr .td:first-child {
   padding-right: 20px;
 }
 
-.sptmninja_input
-  + .sptmninja_results
-  .sptmninja_table
-  .sptmninja_tr
-  .sptmninja_td:nth-child(2) {
+.input + .results .table .tr .td:nth-child(2) {
   width: 100%;
 }
 

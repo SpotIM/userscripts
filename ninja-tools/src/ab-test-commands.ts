@@ -1,4 +1,12 @@
-export default [
+interface IABTest {
+  keyCombo: string;
+  name: string;
+  description: string;
+  id: number;
+  variants: { id: string; statusText: string }[];
+}
+
+const abTests: IABTest[] = [
   {
     name: 'Redesign',
     description: 'Toggle Redesign',
@@ -28,3 +36,5 @@ export default [
     ],
   },
 ].map((command, index) => ({ ...command, keyCombo: `__ssab${index}` }));
+
+export default abTests;

@@ -8,7 +8,7 @@ export default () => {
   };
 
   unsafeWindow.__spotim_ninja_tools_set_prefs__ = async newPrefs => {
-    const currentPrefs = await prefs.get();
+    const currentPrefs = prefs.get();
 
     const mergedPrefs = {
       ...currentPrefs,

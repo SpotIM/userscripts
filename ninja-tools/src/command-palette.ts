@@ -13,7 +13,7 @@ import styles from './command-palette.css';
 let selectedItemIndex = 0;
 
 function handleTableClick(e) {
-  const line = e.target.closest('.sptmninja_tr');
+  const line = e.target.closest('.tr');
   if (line && line.children.length) {
     const keyCombo = line.children[0].children[0].dataset.keyCombo;
     const commandImpl = commandsImpl[keyCombo];
@@ -27,7 +27,7 @@ function handleTableClick(e) {
 async function show() {
   selectedItemIndex = 0;
   let lastCommandThatRan = await (async () => {
-    const { lastCommandThatRanKeyCombo } = await prefs.get();
+    const { lastCommandThatRanKeyCombo } = prefs.get();
     if (lastCommandThatRanKeyCombo) {
       return commands.find(
         command => command.keyCombo === lastCommandThatRanKeyCombo
@@ -38,7 +38,7 @@ async function show() {
   scrollToConversation.stop({ hideMessage: false });
   let relevantCommands;
 
-  const missingLauncherWarning = /*html*/ `<span class="sptmninja_titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
+  const missingLauncherWarning = /*html*/ `<span class="titleIcon" title="Can't find Launcher script tag">⚠️</span>`;
 
   function renderDevBadge() {
     const buildTime = GM_info.script.version.split('.').pop();
@@ -65,7 +65,7 @@ async function show() {
     /*html*/ `<style>
       ${styles}
     </style>
-    <input class="sptmninja_input"><div class="sptmninja_results"></div>`,
+    <input class="input"><div class="results"></div>`,
     {
       title: `${
         !utils.getLauncherEl(false) ? missingLauncherWarning : ''
@@ -77,10 +77,10 @@ async function show() {
   );
 
   messageBodyEl
-    .querySelector('.sptmninja_results')
+    .querySelector('.results')
     .addEventListener('click', handleTableClick);
 
-  const input = shadowDOM.get().querySelector('.sptmninja_input');
+  const input = shadowDOM.get().querySelector('.input');
   updateRelevantResults();
   renderResults();
   input.focus();
@@ -136,30 +136,22 @@ async function show() {
 
   function renderResults(scrollAlignToTop?: boolean) {
     if (input.value.trim()) {
-      messageBodyEl
-        .querySelector('.sptmninja_results')
-        .classList.add('inputNotEmpty');
+      messageBodyEl.querySelector('.results').classList.add('inputNotEmpty');
     } else {
-      messageBodyEl
-        .querySelector('.sptmninja_results')
-        .classList.remove('inputNotEmpty');
+      messageBodyEl.querySelector('.results').classList.remove('inputNotEmpty');
     }
 
-    messageBodyEl.querySelector(
-      '.sptmninja_results'
-    ).innerHTML = relevantCommands.length
+    messageBodyEl.querySelector('.results').innerHTML = relevantCommands.length
       ? utils.renderTable(
           relevantCommands.map((command, index) => [
-            `<span class="sptmninja_mono ${
-              command.unlisted ? 'sptmninja_hidden' : ''
+            `<span class="mono ${
+              command.unlisted ? 'hidden' : ''
             }" data-key-combo="${command.keyCombo}">${
               command.unlisted ? '×' : command.keyCombo
             }</span>`,
             `<span
-                  class="sptmninja_pallete_row_main_col ${
-                    selectedItemIndex === index
-                      ? 'sptmninja_weight_bold'
-                      : 'sptmninja_muted_result'
+                  class="pallete_row_main_col ${
+                    selectedItemIndex === index ? 'weight_bold' : 'muted_result'
                   }"
                   ${selectedItemIndex === index ? 'data-selected' : ''}
                   >
@@ -183,7 +175,7 @@ async function show() {
       const lineBounds = lineEl.getBoundingClientRect();
       const resultsBounds = shadowDOM
         .get()
-        .querySelector('.sptmninja_results')
+        .querySelector('.results')
         .getBoundingClientRect();
       return (
         lineBounds.y > resultsBounds.y &&

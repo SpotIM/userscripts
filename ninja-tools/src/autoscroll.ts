@@ -15,7 +15,7 @@ export default async () => {
 
   if (
     utils.isTopMostFrame() &&
-    (await prefs.get().autoScroll) &&
+    prefs.get().autoScroll &&
     shouldAutoScrollInDomain()
   ) {
     findConversationInterval = setInterval(() => {

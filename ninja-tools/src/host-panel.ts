@@ -55,11 +55,11 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
         <div style="${styles.title}">${title}</div>
         <div style="${styles.formField}">
           <label style="${styles.label}">Email</label>
-          <input id="emailInput" class="sptmninja_input" >
+          <input id="emailInput" class="input" >
         </div>
         <div style="${styles.formField}">
           <label style="${styles.label}">Password</label>
-          <input id="passwordInput" class="sptmninja_input" type="password">
+          <input id="passwordInput" class="input" type="password">
         </div>
         <div style="${styles.disclaimer}">
           If you're using Google to sign to the Host Panel this won't work.

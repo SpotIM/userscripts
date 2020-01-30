@@ -2,7 +2,7 @@ import * as prefs from './prefs';
 import * as message from './message';
 import getColors from './colors';
 import * as whatsNew from './whats-new';
-import styles from './show-first-run-message';
+import styles from './show-first-run-message.css';
 
 function renderWelcomeMessage() {
   // injecting the font in the document because it turns out that injecting
@@ -12,7 +12,7 @@ function renderWelcomeMessage() {
   fontFaceStyle.innerHTML = /*css*/ `
     @font-face {
       font-family: "BigBlue TerminalPlus";
-      src: url('${GM_getResourceURL('bigBlueFont')}') format('truetype')
+      src: url('${GM_getResourceURL('bigBlueFont')}') format('truetype');
     }
   `;
 
@@ -22,8 +22,8 @@ function renderWelcomeMessage() {
     <style>
       ${styles}
     </style>
-    <div class="wrapper">
-      <div class="message">
+    <div class="welcomeMessageWrapper">
+      <div class="welcomeMessageWrapperMessage">
         <p>👋 Welcome,</p>
         <p>You can now hit <span class="shortcut">Ctrl+S</span> to open the command palette.</p>
       </div>
@@ -34,7 +34,7 @@ function renderWelcomeMessage() {
 }
 
 export default async (force?: boolean) => {
-  const isNotFirstRun = await prefs.get().isNotFirstRun;
+  const isNotFirstRun = prefs.get().isNotFirstRun;
   if (!isNotFirstRun || force) {
     message.set(renderWelcomeMessage(), {
       color: getColors().default,
@@ -42,6 +42,11 @@ export default async (force?: boolean) => {
     });
 
     await prefs.set({ isNotFirstRun: true });
+
+    // prevents what's new message from showing up right after welcome message
+    // (what's new should only show up after the userscript has been upgraded,
+    // not right after it was installed)
+    //
     await whatsNew.setCurrentVersionAsLastShown();
   }
 };

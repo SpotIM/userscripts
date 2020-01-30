@@ -5,7 +5,7 @@ export interface IColor {
   border: string;
 }
 
-const getUseDarkTheme = () => {
+export const getUseDarkTheme = () => {
   const preferences = prefs.get();
   const { useDarkTheme } = preferences;
   return useDarkTheme;
