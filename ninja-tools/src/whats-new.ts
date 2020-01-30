@@ -5,6 +5,14 @@ import styles from './whats-new.css';
 
 const changelog = [
   {
+    version: '4.0.5',
+    list: [
+      {
+        title: 'Added Dark Mode (Toggle Dark Mode in the Command Palette)',
+      },
+    ],
+  },
+  {
     version: '4.0.2',
     list: [
       {
