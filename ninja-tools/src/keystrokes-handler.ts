@@ -29,9 +29,7 @@ export function init() {
       scrollToConversation.stop();
       message.hide(true);
     }
-  }
 
-  function handleKeyPress(e: KeyboardEvent) {
     if (isFocusedOnInput()) {
       return;
     }
@@ -55,7 +53,5 @@ export function init() {
     }
   }
 
-  // for some reason pressing on escape doesn't register as a keypress
   document.addEventListener('keydown', handleKeyDown);
-  document.addEventListener('keypress', handleKeyPress);
 }
