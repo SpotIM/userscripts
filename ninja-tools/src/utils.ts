@@ -128,3 +128,5 @@ export const onFoundSpotimObject = callback => {
 
   updateOnFoundSpotimObject();
 };
+
+export const isWindows = window.navigator.platform === 'Win32';

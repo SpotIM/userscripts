@@ -2,6 +2,7 @@ import commandsImpl from './commands-impl';
 import * as scrollToConversation from './scroll-to-conversation';
 import * as message from './message';
 import * as commandPalette from './command-palette';
+import { isWindows } from './utils';
 
 export function init() {
   let lastKeyStrokesResetTimeout;
@@ -34,7 +35,10 @@ export function init() {
       return;
     }
 
-    if ((e.key.toLowerCase() === 's' || e.key === 'ד') && e.ctrlKey) {
+    if (
+      (e.key.toLowerCase() === 's' || e.key === 'ד') &&
+      ((isWindows && e.altKey) || e.ctrlKey)
+    ) {
       commandPalette.show();
       return;
     }

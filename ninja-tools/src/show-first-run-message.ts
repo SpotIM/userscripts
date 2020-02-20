@@ -3,6 +3,7 @@ import * as message from './message';
 import getColors from './colors';
 import * as whatsNew from './whats-new';
 import styles from './show-first-run-message.css';
+import { isWindows } from './utils';
 
 function renderWelcomeMessage() {
   // injecting the font in the document because it turns out that injecting
@@ -18,6 +19,8 @@ function renderWelcomeMessage() {
 
   unsafeWindow.document.head.appendChild(fontFaceStyle);
 
+  const paletteKeyBinding = isWindows ? 'Alt+S' : 'Ctrl+S';
+
   return /*html*/ `
     <style>
       ${styles}
@@ -25,10 +28,10 @@ function renderWelcomeMessage() {
     <div class="welcomeMessageWrapper">
       <div class="welcomeMessageWrapperMessage">
         <p>👋 Welcome,</p>
-        <p>You can now hit <span class="shortcut">Ctrl+S</span> to open the command palette.</p>
+        <p>You can now hit <span class="shortcut">${paletteKeyBinding}</span> to open the command palette.</p>
       </div>
       <img src="${GM_getResourceURL('welcomeImage')}">
-      <p class="cta">Press Ctrl+S</p>
+      <p class="cta">Press ${paletteKeyBinding}</p>
     </div>
   `;
 }
