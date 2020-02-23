@@ -267,7 +267,7 @@ commandsImpl = (() => {
           statusText = nextVariant.statusText;
 
           message.set(statusText, {
-            emoji: '😃',
+            emoji: '👍🏻',
             color: getColors().success,
           });
           unsafeWindow.localStorage.setItem('SPOT_AB', JSON.stringify(spotAB));
