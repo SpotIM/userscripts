@@ -35,6 +35,24 @@ const abTests: IABTest[] = [
       { id: 'B', statusText: 'Showing Scores Before Click' },
     ],
   },
+  {
+    name: 'Show Feed',
+    description: 'Toggle Show Feed',
+    id: 39,
+    variants: [
+      { id: 'A', statusText: 'Showing Feed' },
+      { id: 'B', statusText: 'Not Showing Feed' },
+    ],
+  },
+  {
+    name: 'Change Feed Placement',
+    description: 'Toggle Feed Above/Below Conversation',
+    id: 40,
+    variants: [
+      { id: 'A', statusText: 'Feed Above Conversation' },
+      { id: 'B', statusText: 'Feed Below Conversation' },
+    ],
+  },
 ].map((command, index) => ({ ...command, keyCombo: `__ssab${index}` }));
 
 export default abTests;
