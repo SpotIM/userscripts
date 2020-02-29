@@ -21,8 +21,6 @@ function addStyleTag() {
 
   const style = document.createElement('style');
 
-  // For syntax highlighting, install this extension: https://bit.ly/36X6EOY
-  //
   style.innerHTML = styles;
   shadowDOM.get().appendChild(style);
 }
@@ -40,7 +38,7 @@ function addMessage() {
   hasAddedMessage = true;
 
   messageEl = document.createElement('div');
-  messageEl.className = 'message';
+  messageEl.className = 'message reset-css';
 
   if (getUseDarkTheme()) {
     messageEl.classList.add('dark');

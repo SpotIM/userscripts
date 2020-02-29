@@ -13,6 +13,51 @@
   }
 }
 
+.reset-css {
+  azimuth: initial;
+  border-collapse: initial;
+  border-spacing: initial;
+  caption-side: initial;
+  color: initial;
+  cursor: initial;
+  direction: initial;
+  elevation: initial;
+  empty-cells: initial;
+  font-family: initial;
+  font-size: initial;
+  font-style: initial;
+  font-variant: initial;
+  font-weight: initial;
+  font: initial;
+  letter-spacing: initial;
+  line-height: initial;
+  list-style-image: initial;
+  list-style-position: initial;
+  list-style-type: initial;
+  list-style: initial;
+  orphans: initial;
+  pitch-range: initial;
+  pitch: initial;
+  quotes: initial;
+  richness: initial;
+  speak-header: initial;
+  speak-numeral: initial;
+  speak-punctuation: initial;
+  speak: initial;
+  speech-rate: initial;
+  stress: initial;
+  text-align: initial;
+  text-indent: initial;
+  text-transform: initial;
+  visibility: initial;
+  voice-family: initial;
+  volume: initial;
+  white-space: initial;
+  widows: initial;
+  word-spacing: initial;
+  -webkit-font-smoothing: unset;
+}
+
 .message {
   position: fixed;
   top: 0;
