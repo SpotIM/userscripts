@@ -1,6 +1,6 @@
 {
   "name": "ninja-tools",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,7 @@
     "webpack-userscript": "^2.5.1"
   },
   "dependencies": {
-    "fuzzy": "^0.1.3"
+    "fuzzy": "^0.1.3",
+    "lodash.isequal": "^4.5.0"
   }
 }

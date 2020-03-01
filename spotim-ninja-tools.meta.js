@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        SpotIM Ninja Tools
-// @version     4.0.9
+// @version     4.0.10
 // @author      dutzi
 // @description A bunch of shortcuts to make our lives easier
 // @match       http*://*/*

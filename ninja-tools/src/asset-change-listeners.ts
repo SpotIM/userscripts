@@ -1,63 +1,11 @@
 import * as utils from './utils';
 import * as message from './message';
 import getColors from './colors';
+import isEqual from 'lodash.isequal';
 
 let assetChangeInterval;
 
-function isConfigContainsConfig(config1, config2) {
-  return !config1.find(config1Module => {
-    const config2Module = config2.find(
-      config2Module =>
-        config1Module.module === config2Module.module &&
-        config1Module.name === config2Module.name
-    );
-
-    if (!config2Module) {
-      return true;
-    }
-
-    if (config1Module.url !== config2Module.url) {
-      return true;
-    }
-  });
-}
-
-function isConfigEqual(config1, config2) {
-  return (
-    isConfigContainsConfig(config1, config2) &&
-    isConfigContainsConfig(config2, config1)
-  );
-}
-
 async function notifyOnChange() {
-  // if (location.protocol !== "https:") {
-  //   message.set(`Can't display notifications on non-https sites`, {
-  //     timeout: 4000,
-  //     color: getColors().error,
-  //     emoji: "😞"
-  //   });
-
-  //   return;
-  // }
-
-  // message.set(`Please allow notifications on this site`, {
-  //   color: getColors().default,
-  //   emoji: "🚦",
-  //   belowNotificationPopover: true
-  // });
-
-  // const result = await Notification.requestPermission();
-
-  // if (result !== "granted") {
-  //   message.set(`Notification permission denied`, {
-  //     timeout: 3000,
-  //     color: getColors().error,
-  //     emoji: "😕"
-  //   });
-
-  //   return;
-  // }
-
   let lastConfig;
 
   function showNotification() {
@@ -74,7 +22,6 @@ async function notifyOnChange() {
       color: getColors().default,
       emoji: '⬆️',
     });
-    // var notification = new Notification("");
   }
 
   async function checkForUpdates() {
@@ -96,7 +43,7 @@ async function notifyOnChange() {
 
     const config = (await response.json()).assets_config;
 
-    if (lastConfig && !isConfigEqual(config, lastConfig)) {
+    if (lastConfig && !isEqual(config, lastConfig)) {
       showNotification();
     }
 
