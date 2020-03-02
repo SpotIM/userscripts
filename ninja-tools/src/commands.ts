@@ -29,6 +29,7 @@ const commands: ICommand[] = [
     detailedDescription:
       'Will start constantly checking if an update to one of our products was released for this spot and pop a notification once that happens',
   },
+  { keyCombo: 'sse', description: 'Toggle Events Viewer' },
   { keyCombo: 'ssh', description: 'Show Help' },
   {
     keyCombo: '__ssn',

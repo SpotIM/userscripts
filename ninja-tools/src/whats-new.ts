@@ -5,6 +5,16 @@ import styles from './whats-new.css';
 
 const changelog = [
   {
+    version: '4.1.0',
+    list: [
+      {
+        title: 'Added Events Viewer',
+        description:
+          'Shows BI events on the page, exposing only the diffs between similarly typed events',
+      },
+    ],
+  },
+  {
     version: '4.0.5',
     list: [
       {

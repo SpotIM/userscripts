@@ -8,6 +8,7 @@ import * as assetChangeListeners from './asset-change-listeners';
 import * as whatsNew from './whats-new';
 import * as help from './help';
 import * as commandPalette from './command-palette';
+import * as eventsViewer from './events-viewer';
 import showFirstRunMessage from './show-first-run-message';
 import getColors from './colors';
 import pageLoadTime from './page-load-time';
@@ -181,6 +182,24 @@ let commandsImpl: ICommandImpls = {
     scrollToConversation.stop();
 
     assetChangeListeners.toggleNotifyOnChange();
+  },
+
+  sse: () => {
+    const isShowingEventsViewer = eventsViewer.toggle();
+
+    if (isShowingEventsViewer) {
+      message.set('I will show you events!', {
+        timeout: 3000,
+        emoji: '👍🏻',
+        color: getColors().default,
+      });
+    } else {
+      message.set('Stopped showing events!', {
+        timeout: 3000,
+        emoji: '❌',
+        color: getColors().default,
+      });
+    }
   },
 
   __ssa: async () => {

@@ -1,0 +1,62 @@
+.events-list {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  font-family: Helvetica;
+  overflow: scroll;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 340px;
+  z-index: 2147483647;
+}
+
+.instructions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #bbb;
+  line-height: 1.5em;
+  font-size: 0.9em;
+  padding: 16px;
+  text-align: right;
+}
+
+.event {
+  margin: 0px 10px 10px;
+  text-align: right;
+  position: relative;
+}
+
+.event:not(.expanded) {
+  cursor: pointer;
+}
+
+.event .container {
+  background: #467fdb;
+  color: white;
+  padding: 7px 10px;
+  border-radius: 10px;
+  display: inline-flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 10px -4px black, 0px 2px 10px -4px #00a1ff inset;
+  border: 2px solid transparent;
+  text-align: left;
+}
+
+.event .prop-name:first-child {
+  margin-top: 0px;
+}
+
+.event .prop-name {
+  text-transform: uppercase;
+  font-size: 0.7em;
+  align-self: start;
+  margin: 6px 0px 3px;
+  opacity: 0.6;
+}
+
+.event .prop-value {
+  align-self: flex-start;
+}
