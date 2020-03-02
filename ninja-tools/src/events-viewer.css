@@ -59,4 +59,5 @@
 
 .event .prop-value {
   align-self: flex-start;
+  word-break: break-word;
 }

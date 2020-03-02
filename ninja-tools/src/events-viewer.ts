@@ -163,7 +163,7 @@ unsafeWindow.addEventListener('keypress', e => {
     createUniquePropsMap();
     renderEvents();
   }
-  // if (e.code === 'KeyP' && e.ctrlKey) {
-  //   unsafeWindow.console.log = existingConsoleLog;
-  // }
+  if (e.code === 'KeyP' && e.ctrlKey) {
+    unsafeWindow.console.log = existingConsoleLog;
+  }
 });
