@@ -69,7 +69,7 @@ function createUniquePropsMap() {
   });
 }
 
-function renderEvents() {
+function renderEvents(scrollToBottom = true) {
   addEventsList();
 
   const shouldScroll =
@@ -118,12 +118,12 @@ function renderEvents() {
         events[
           Number(e.currentTarget.dataset.index)
         ].__sptmninja_expanded = true;
-        renderEvents();
+        renderEvents(false);
       });
     }
   );
 
-  if (shouldScroll) {
+  if (shouldScroll && scrollToBottom) {
     eventsListEl.scrollTop = eventsListEl.scrollHeight;
   }
 }
