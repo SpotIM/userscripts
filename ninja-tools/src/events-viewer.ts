@@ -361,7 +361,10 @@ function renderEvents(scrollToBottom = true) {
 }
 
 function consoleLogProxy(...args) {
-  if (args[0].startsWith('%cSpot.IM Analytics')) {
+  if (
+    typeof args[0] === 'string' &&
+    (args[0].startsWith('%cSpot.IM Analytics') || args[0] === 'Analytics Track')
+  ) {
     existingConsoleLog.call(unsafeWindow.console, 'analytics');
     addEvent(...args);
     createUniquePropsMap();

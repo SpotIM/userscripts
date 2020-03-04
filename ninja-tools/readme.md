@@ -27,7 +27,7 @@ Ignore it.
 
 Whenever you make changes to the source, update the userscript through Tampermonkey.
 
-After you're done developing, re-install the script from [Github](https://github.com/SpotIM/userscripts/raw/master/spotim-ninja-tools.user.js).
+After you're done developing, re-install [the script from Github](https://github.com/SpotIM/userscripts/raw/master/spotim-ninja-tools.user.js).
 
 ## Adding a Command
 
