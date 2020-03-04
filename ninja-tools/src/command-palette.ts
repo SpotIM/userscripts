@@ -17,6 +17,7 @@ function handleTableClick(e) {
   if (line && line.children.length) {
     const keyCombo = line.children[0].children[0].dataset.keyCombo;
     const commandImpl = commandsImpl[keyCombo];
+    prefs.set({ lastCommandThatRanKeyCombo: keyCombo });
 
     if (commandImpl) {
       commandImpl();

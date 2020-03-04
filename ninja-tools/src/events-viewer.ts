@@ -161,7 +161,7 @@ function createUniquePropsMap() {
   uniqueProps = {};
 
   events.forEach(eventA => {
-    uniqueProps[eventA.type] = [];
+    uniqueProps[eventA.type] = uniqueProps[eventA.type] || [];
 
     events.forEach(eventB => {
       if (eventA !== eventB && eventA.type === eventB.type) {
