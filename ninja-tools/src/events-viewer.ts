@@ -1,8 +1,9 @@
 // import * as shadowDOM from './shadow-dom';
 import rawCSS from './events-viewer.css';
-import * as prefs from './prefs';
 import { parse } from 'shell-quote';
 import matcher from 'matcher';
+import * as prefs from './prefs';
+import { onFoundSpotimObject } from './utils';
 
 const EVENTS_VIEWER_WIDTH = 340;
 const EVENTS_VIEWER_MARGIN_END = 20;
@@ -369,15 +370,25 @@ function consoleLogProxy(...args) {
   existingConsoleLog.call(unsafeWindow.console, ...args);
 }
 
-export function toggle() {
+function show() {
+  unsafeWindow.console.log = consoleLogProxy;
+
+  renderEvents();
+}
+
+export function toggle({
+  waitForSpotimObject,
+}: { waitForSpotimObject?: boolean } = {}) {
   isShowing = !isShowing;
 
   if (isShowing) {
     unsafeWindow.localStorage.setItem('SPOTIM_DEBUG_API', '*');
 
-    unsafeWindow.console.log = consoleLogProxy;
-
-    renderEvents();
+    if (waitForSpotimObject) {
+      onFoundSpotimObject(show);
+    } else {
+      show();
+    }
   } else {
     unsafeWindow.console.log = existingConsoleLog;
     removeEventsList();
@@ -389,7 +400,7 @@ export function toggle() {
 }
 
 if (prefs.get().showEventsViewer) {
-  toggle();
+  toggle({ waitForSpotimObject: true });
 }
 
 unsafeWindow.addEventListener('keypress', e => {
