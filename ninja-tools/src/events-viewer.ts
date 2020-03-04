@@ -365,7 +365,6 @@ function consoleLogProxy(...args) {
     typeof args[0] === 'string' &&
     (args[0].startsWith('%cSpot.IM Analytics') || args[0] === 'Analytics Track')
   ) {
-    existingConsoleLog.call(unsafeWindow.console, 'analytics');
     addEvent(...args);
     createUniquePropsMap();
     renderEvents();
