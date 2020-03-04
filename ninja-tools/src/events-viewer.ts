@@ -153,8 +153,8 @@ function removeEventsList() {
   shadowWrapper.parentElement!.removeChild(shadowWrapper);
 }
 
-function addEvent(...params) {
-  events.push(params[3]);
+function addEvent(event) {
+  events.push(event);
 }
 
 function createUniquePropsMap() {
@@ -363,9 +363,14 @@ function renderEvents(scrollToBottom = true) {
 function consoleLogProxy(...args) {
   if (
     typeof args[0] === 'string' &&
+    (typeof args[1] === 'object' || typeof args[3] === 'object') &&
     (args[0].startsWith('%cSpot.IM Analytics') || args[0] === 'Analytics Track')
   ) {
-    addEvent(...args);
+    if (typeof args[3] === 'object') {
+      addEvent(args[3]);
+    } else {
+      addEvent(args[1]);
+    }
     createUniquePropsMap();
     renderEvents();
   }
