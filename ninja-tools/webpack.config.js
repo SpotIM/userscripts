@@ -33,6 +33,10 @@ module.exports = {
         test: /\.css$/i,
         use: 'raw-loader',
       },
+      {
+        test: /\.svg$/i,
+        use: 'raw-loader',
+      },
     ],
   },
   plugins: [

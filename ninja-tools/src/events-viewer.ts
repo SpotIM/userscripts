@@ -4,6 +4,7 @@ import { parse } from 'shell-quote';
 import matcher from 'matcher';
 import * as prefs from './prefs';
 import { onFoundSpotimObject } from './utils';
+import bookmarkSvg from './icons/bookmark.svg';
 
 const EVENTS_VIEWER_WIDTH = 340;
 const EVENTS_VIEWER_MARGIN_END = 20;
@@ -22,6 +23,28 @@ let isPaused: boolean;
 let queryInputEl: HTMLInputElement;
 let query = '';
 let events: any[] = [];
+let historyQueryIndex: number = (prefs.get().eventsQueryHistory || []).length;
+
+function saveLastQuery() {
+  prefs.set({ eventsQuery: queryInputEl.value });
+}
+
+function loadLastQuery() {
+  query = queryInputEl.value = prefs.get().eventsQuery || '';
+}
+
+function addQueryToHistory() {
+  const currentQuery = queryInputEl.value.trim();
+  const eventsQueryHistory = prefs.get().eventsQueryHistory || [];
+
+  if (
+    currentQuery &&
+    eventsQueryHistory[eventsQueryHistory.length - 1] !== currentQuery
+  ) {
+    eventsQueryHistory.push(currentQuery);
+    prefs.set({ eventsQueryHistory });
+  }
+}
 
 function addEventsList() {
   if (addedEventsList) {
@@ -39,7 +62,7 @@ function addEventsList() {
     <style>${rawCSS}</style>
     <div class="resizer"></div>
     <div class="query-input-wrapper">
-      <input type="text" class="query-input" placeholder='Type a query, e.g., "-type:loaded\"'>
+      <input type="text" class="query-input" placeholder='Type a query, e.g., "-type:loaded"'>
     </div>
     <div class="events-list"></div>
   `;
@@ -60,7 +83,9 @@ function addEventsList() {
     eventsListEl.style.height = `calc(100vh - ${position.y * 100}%)`;
   }
 
-  queryInputEl.addEventListener('keyup', handleQueryChange);
+  queryInputEl.addEventListener('keydown', handleQueryKeyDown);
+  queryInputEl.addEventListener('keyup', handleQueryKeyUp);
+  queryInputEl.addEventListener('change', handleQueryChange);
 
   (eventsViewerEl.querySelector('.resizer') as HTMLDivElement).addEventListener(
     'mousedown',
@@ -71,15 +96,24 @@ function addEventsList() {
   document.body.parentElement!.appendChild(shadowWrapper);
 
   shadowDOM = shadowWrapper.attachShadow({ mode: 'open' });
-  shadowDOM.appendChild(eventsViewerEl);
 
-  if (
-    eventsViewerEl.getBoundingClientRect().left >
-    window.innerWidth - EVENTS_VIEWER_FULL_WIDTH
-  ) {
-    eventsViewerEl.style.left =
-      window.innerWidth - EVENTS_VIEWER_FULL_WIDTH + 'px';
-  }
+  const eventsViewerWrapper = document.createElement('div');
+  eventsViewerWrapper.className = 'events-viewer-wrapper';
+  eventsViewerWrapper.appendChild(eventsViewerEl);
+
+  shadowDOM.appendChild(eventsViewerWrapper);
+
+  // if (
+  //   eventsViewerEl.getBoundingClientRect().left >
+  //   window.innerWidth - EVENTS_VIEWER_FULL_WIDTH
+  // ) {
+  //   eventsViewerEl.style.left =
+  //     window.innerWidth - EVENTS_VIEWER_FULL_WIDTH + 'px';
+  // }
+
+  loadLastQuery();
+
+  unsafeWindow.addEventListener('keypress', handleWindowKeyPress);
 }
 
 function handleResizeMouseDown(downEvent: MouseEvent) {
@@ -107,15 +141,23 @@ function handleResizeMouseDown(downEvent: MouseEvent) {
 
     const bounds = eventsViewerEl.getBoundingClientRect();
 
+    const x =
+      bounds.left / (unsafeWindow.innerWidth - EVENTS_VIEWER_FULL_WIDTH);
+    const y = bounds.top / unsafeWindow.innerHeight;
+
     prefs.set({
       eventsViewerPosition: {
         ...prefs.get().eventsViewerPosition,
         [unsafeWindow.location.host]: {
-          x: bounds.left / unsafeWindow.innerWidth,
-          y: bounds.top / unsafeWindow.innerHeight,
+          x,
+          y,
         },
       },
     });
+
+    eventsViewerEl.style.left = x * 100 + '%';
+    eventsViewerEl.style.top = y * 100 + '%';
+    eventsListEl.style.height = `calc(100vh - ${y * 100}%)`;
 
     unsafeWindow.document.body.style.userSelect = previousUserSelect;
   }
@@ -124,9 +166,40 @@ function handleResizeMouseDown(downEvent: MouseEvent) {
   document.addEventListener('mouseup', handleMouseUp);
 }
 
-function handleQueryChange(e) {
+function handleQueryKeyDown(e: KeyboardEvent) {
+  const eventsQueryHistory = prefs.get().eventsQueryHistory || [];
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+
+    historyQueryIndex = Math.max(0, historyQueryIndex - 1);
+
+    if (eventsQueryHistory[historyQueryIndex] === queryInputEl.value) {
+      historyQueryIndex = Math.max(0, historyQueryIndex - 1);
+    }
+
+    queryInputEl.value = eventsQueryHistory[historyQueryIndex] || '';
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+
+    historyQueryIndex = historyQueryIndex + 1;
+
+    if (historyQueryIndex >= eventsQueryHistory.length) {
+      historyQueryIndex = eventsQueryHistory.length;
+      queryInputEl.value = '';
+    } else {
+      queryInputEl.value = eventsQueryHistory[historyQueryIndex];
+    }
+  }
+}
+
+function handleQueryKeyUp(e: KeyboardEvent) {
   query = queryInputEl.value;
+  saveLastQuery();
   renderEvents();
+}
+
+function handleQueryChange(e: Event) {
+  addQueryToHistory();
 }
 
 function handleViewerMouseOver(e: MouseEvent) {
@@ -151,6 +224,7 @@ function removeEventsList() {
   addedEventsList = false;
 
   shadowWrapper.parentElement!.removeChild(shadowWrapper);
+  unsafeWindow.removeEventListener('keypress', handleWindowKeyPress);
 }
 
 function addEvent(event) {
@@ -161,10 +235,19 @@ function createUniquePropsMap() {
   uniqueProps = {};
 
   events.forEach(eventA => {
+    if (eventA.type === '__sptmninja_bookmark') {
+      return;
+    }
+
     uniqueProps[eventA.type] = uniqueProps[eventA.type] || [];
 
     events.forEach(eventB => {
+      if (eventB.type === '__sptmninja_bookmark') {
+        return;
+      }
+
       if (eventA !== eventB && eventA.type === eventB.type) {
+        // todo foreach instead of map?
         Object.keys(eventA).map(key => {
           if (
             key !== 'time_delta' &&
@@ -237,6 +320,10 @@ function renderEvents(scrollToBottom = true) {
       return true;
     }
 
+    if (event.type === '__sptmninja_bookmark') {
+      return true;
+    }
+
     for (let i = 0; i < splitQueryParts.length; i++) {
       const queryPart =
         typeof splitQueryParts[i] === 'object'
@@ -275,65 +362,61 @@ function renderEvents(scrollToBottom = true) {
     /*html*/ `<div class="instructions">
       <div>Ctrl+K to clear</div>
       <div>Ctrl+P to pause</div>
+      <div>Ctrl+B to bookmark</div>
     </div>` +
     filteredEvents
-      .map(
-        (event, index) => /*html*/ `
-      <div class="event ${
-        event.__sptmninja_expanded ? 'expanded' : ''
-      }" data-index="${event.__sptmninja_index}">
-        <div class="container">
-          <div class="toolbar">
-            <button class="button expand-button"></button>
-            <button class="button remove-button"></button>
-          </div>
-          ${(event.__sptmninja_expanded
-            ? [
-                'type',
-                ...Object.keys(event)
-                  .filter(
-                    key =>
-                      key !== '__sptmninja_expanded' &&
-                      key !== '__sptmninja_index' &&
-                      key !== 'type'
+      .map((event, index) => {
+        if (event.type === '__sptmninja_bookmark') {
+          return /*html*/ `<div class="bookmark">${bookmarkSvg}</div>`;
+        } else {
+          return /*html*/ `
+              <div class="event ${
+                event.__sptmninja_expanded ? 'expanded' : ''
+              }" data-index="${event.__sptmninja_index}">
+                <div class="container">
+                  <div class="toolbar">
+                    <button class="button expand-button"></button>
+                    <button class="button remove-button"></button>
+                  </div>
+                  ${(event.__sptmninja_expanded
+                    ? [
+                        'type',
+                        ...Object.keys(event)
+                          .filter(
+                            key =>
+                              key !== '__sptmninja_expanded' &&
+                              key !== '__sptmninja_index' &&
+                              key !== 'type'
+                          )
+                          .sort(),
+                      ]
+                    : [
+                        'type',
+                        ...uniqueProps[event.type]
+                          .sort()
+                          .filter(
+                            key =>
+                              key !== '__sptmninja_expanded' &&
+                              key !== '__sptmninja_index' &&
+                              key !== 'type'
+                          ),
+                      ]
                   )
-                  .sort(),
-              ]
-            : [
-                'type',
-                ...uniqueProps[event.type]
-                  .sort()
-                  .filter(
-                    key =>
-                      key !== '__sptmninja_expanded' &&
-                      key !== '__sptmninja_index' &&
-                      key !== 'type'
-                  ),
-              ]
-          )
-            .map(
-              propName => `
-              <span class="prop-name">${propName.replace(/_/g, ' ')}</span>
-              <span class="prop-value">${event[propName]}</span>
-            `
-            )
-            .join('')}
-        </div>
-      </div>
-    `
-      )
+                    .map(
+                      propName => `
+                      <span class="prop-name">${propName.replace(
+                        /_/g,
+                        ' '
+                      )}</span>
+                      <span class="prop-value">${event[propName]}</span>
+                    `
+                    )
+                    .join('')}
+                </div>
+              </div>`;
+        }
+      })
       .join('');
-
-  // [
-  //   ...eventsListEl.querySelectorAll('.event:not(.expanded) .container'),
-  // ].forEach(eventEl => {
-  //   eventEl.addEventListener('click', e => {
-  //     events[
-  //       Number(e.currentTarget.closest('.event').dataset.index)
-  //     ].__sptmninja_expanded = true;
-  //     renderEvents(false);
-  //   });
-  // });
 
   function getWrappingEventIndex(target: EventTarget) {
     return Number(
@@ -420,9 +503,14 @@ if (prefs.get().showEventsViewer) {
   toggle({ waitForSpotimObject: true });
 }
 
-unsafeWindow.addEventListener('keypress', e => {
+function handleWindowKeyPress(e) {
   if (!isShowing) {
     return;
+  }
+
+  if (e.key === ';' && e.ctrlKey) {
+    prefs.set({ eventsQuery: undefined });
+    prefs.set({ eventsQueryHistory: undefined });
   }
 
   if (e.code === 'KeyK' && e.ctrlKey) {
@@ -442,4 +530,9 @@ unsafeWindow.addEventListener('keypress', e => {
 
     renderEvents();
   }
-});
+
+  if (e.code === 'KeyB' && e.ctrlKey) {
+    events.push({ type: '__sptmninja_bookmark' });
+    renderEvents();
+  }
+}

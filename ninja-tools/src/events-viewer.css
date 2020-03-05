@@ -1,13 +1,24 @@
+.events-viewer-wrapper {
+  transform: translate(0px);
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 2147483647;
+  height: 100vh;
+  width: calc(100vw - 360px);
+  pointer-events: none;
+}
+
 .events-viewer {
   position: fixed;
-  right: 20px;
+  left: 100%;
   bottom: 0px;
   top: 20px;
   font-family: Helvetica;
   height: calc(100vh - 20px);
   display: flex;
   flex-direction: column;
-  max-width: 340px;
+  width: 340px;
   font-size: 16px;
   z-index: 2147483647;
   border-radius: 10px 10px 0px 0px;
@@ -15,6 +26,7 @@
   background: #ffffff26;
   backdrop-filter: blur(10px);
   border: 1px solid #00000021;
+  pointer-events: all;
   /* box-shadow: 0px 0px 12px -6px black; */
 }
 
@@ -161,4 +173,37 @@
   height: 7px;
   cursor: move;
   z-index: 11;
+}
+
+.bookmark {
+  position: relative;
+  text-align: center;
+  margin: 3px 0px 8px;
+}
+
+.bookmark svg {
+  color: #ffc107;
+  width: 13px;
+}
+
+.bookmark:before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  border-top: 1px solid #f9c10b;
+  right: calc(50% + 12px);
+}
+
+.bookmark:after {
+  content: '';
+  position: absolute;
+  left: calc(50% + 12px);
+  top: 8px;
+  border-top: 1px solid #f9c10b;
+  right: 12px;
+}
+
+.bookmark + .bookmark {
+  display: none;
 }

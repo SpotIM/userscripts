@@ -1,7 +1,18 @@
-export const get = () => {
+interface IPreferences {
+  autoScroll: boolean;
+  selectedItemIndex: number;
+  showVersionsOnLoad: boolean;
+  eventsQueryHistory: string[];
+  eventsQuery: string;
+  eventsViewerPosition: { [key: string]: { x: number; y: number } };
+  showEventsViewer: boolean;
+  isNotFirstRun: boolean;
+}
+
+export const get = (): IPreferences => {
   return GM_getValue('prefs', {});
 };
 
-export const set = newPrefs => {
+export const set = (newPrefs: IPreferences) => {
   return GM_setValue('prefs', { ...get(), ...newPrefs });
 };
