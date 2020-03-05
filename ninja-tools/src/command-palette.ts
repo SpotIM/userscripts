@@ -81,7 +81,7 @@ async function show() {
     .querySelector('.results')
     .addEventListener('click', handleTableClick);
 
-  const input = shadowDOM.get().querySelector('.input');
+  const input = shadowDOM.get().querySelector('.input') as HTMLInputElement;
   updateRelevantResults();
   renderResults();
   input.focus();
@@ -176,7 +176,7 @@ async function show() {
       const lineBounds = lineEl.getBoundingClientRect();
       const resultsBounds = shadowDOM
         .get()
-        .querySelector('.results')
+        .querySelector('.results')!
         .getBoundingClientRect();
       return (
         lineBounds.y > resultsBounds.y &&
@@ -186,7 +186,7 @@ async function show() {
 
     const selectedLineTr = shadowDOM.get().querySelector('[data-selected]');
     if (selectedLineTr) {
-      const selectedLine = selectedLineTr.parentNode.parentNode;
+      const selectedLine = selectedLineTr.parentNode.parentNode as HTMLTableRowElement;
       if (!isResultLineVisible(selectedLine)) {
         selectedLine.scrollIntoView(scrollAlignToTop);
       }
@@ -220,7 +220,7 @@ async function show() {
     }
   });
 
-  input.addEventListener('keyup', e => {
+  input.addEventListener('keyup', (e) => {
     updateRelevantResults();
     if (selectedItemIndex >= relevantCommands.length) {
       selectedItemIndex = Math.max(relevantCommands.length - 1, 0);
