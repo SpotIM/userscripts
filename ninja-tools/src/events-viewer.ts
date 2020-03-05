@@ -43,6 +43,8 @@ function addQueryToHistory() {
   ) {
     eventsQueryHistory.push(currentQuery);
     prefs.set({ eventsQueryHistory });
+
+    historyQueryIndex = prefs.get().eventsQueryHistory.length;
   }
 }
 
@@ -55,8 +57,8 @@ function addEventsList() {
 
   eventsViewerEl = document.createElement('div');
   eventsViewerEl.className = 'events-viewer';
-  eventsViewerEl.addEventListener('mouseover', handleViewerMouseOver);
-  document.addEventListener('mousemove', handleDocumentMouseMove);
+  // eventsViewerEl.addEventListener('mouseover', handleViewerMouseOver);
+  // document.addEventListener('mousemove', handleDocumentMouseMove);
 
   eventsViewerEl.innerHTML = /* html */ `
     <style>${rawCSS}</style>
@@ -113,7 +115,7 @@ function addEventsList() {
 
   loadLastQuery();
 
-  unsafeWindow.addEventListener('keypress', handleWindowKeyPress);
+  unsafeWindow.addEventListener('keydown', handleGlobalKeyDown);
 }
 
 function handleResizeMouseDown(downEvent: MouseEvent) {
@@ -189,6 +191,8 @@ function handleQueryKeyDown(e: KeyboardEvent) {
     } else {
       queryInputEl.value = eventsQueryHistory[historyQueryIndex];
     }
+  } else if (e.key === 'Enter') {
+    addQueryToHistory();
   }
 }
 
@@ -202,19 +206,19 @@ function handleQueryChange(e: Event) {
   addQueryToHistory();
 }
 
-function handleViewerMouseOver(e: MouseEvent) {
-  if (e.shiftKey) {
-    isClickThrough = true;
-    renderEvents();
-  }
-}
+// function handleViewerMouseOver(e: MouseEvent) {
+//   if (e.shiftKey) {
+//     isClickThrough = true;
+//     renderEvents();
+//   }
+// }
 
-function handleDocumentMouseMove(e: MouseEvent) {
-  if (isClickThrough && !e.shiftKey) {
-    isClickThrough = false;
-    renderEvents();
-  }
-}
+// function handleDocumentMouseMove(e: MouseEvent) {
+//   if (isClickThrough && !e.shiftKey) {
+//     isClickThrough = false;
+//     renderEvents();
+//   }
+// }
 
 function removeEventsList() {
   if (!addedEventsList) {
@@ -224,7 +228,7 @@ function removeEventsList() {
   addedEventsList = false;
 
   shadowWrapper.parentElement!.removeChild(shadowWrapper);
-  unsafeWindow.removeEventListener('keypress', handleWindowKeyPress);
+  unsafeWindow.removeEventListener('keydown', handleGlobalKeyDown);
 }
 
 function addEvent(event) {
@@ -313,6 +317,14 @@ function renderEvents(scrollToBottom = true) {
     __sptmninja_index: index,
   }));
 
+  function filterRelevantProps(key) {
+    return (
+      key !== '__sptmninja_expanded' &&
+      key !== '__sptmninja_index' &&
+      key !== 'type'
+    );
+  }
+
   const filteredEvents = events.filter(event => {
     const splitQueryParts: any[] = parse(query);
 
@@ -382,24 +394,14 @@ function renderEvents(scrollToBottom = true) {
                     ? [
                         'type',
                         ...Object.keys(event)
-                          .filter(
-                            key =>
-                              key !== '__sptmninja_expanded' &&
-                              key !== '__sptmninja_index' &&
-                              key !== 'type'
-                          )
+                          .filter(filterRelevantProps)
                           .sort(),
                       ]
                     : [
                         'type',
                         ...uniqueProps[event.type]
                           .sort()
-                          .filter(
-                            key =>
-                              key !== '__sptmninja_expanded' &&
-                              key !== '__sptmninja_index' &&
-                              key !== 'type'
-                          ),
+                          .filter(filterRelevantProps),
                       ]
                   )
                     .map(
@@ -503,7 +505,7 @@ if (prefs.get().showEventsViewer) {
   toggle({ waitForSpotimObject: true });
 }
 
-function handleWindowKeyPress(e) {
+function handleGlobalKeyDown(e) {
   if (!isShowing) {
     return;
   }
