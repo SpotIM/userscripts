@@ -225,7 +225,10 @@ function renderEvents(scrollToBottom = true) {
     eventsListEl.scrollHeight ===
     eventsListEl.scrollTop + eventsListEl.offsetHeight;
 
-  events = events.map((event, index) => ({ ...event, __sptmninja_id: index }));
+  events = events.map((event, index) => ({
+    ...event,
+    __sptmninja_index: index,
+  }));
 
   const filteredEvents = events.filter(event => {
     const splitQueryParts: any[] = parse(query);
@@ -269,16 +272,16 @@ function renderEvents(scrollToBottom = true) {
   });
 
   eventsListEl.innerHTML =
-    `<div class="instructions">
+    /*html*/ `<div class="instructions">
       <div>Ctrl+K to clear</div>
       <div>Ctrl+P to pause</div>
     </div>` +
     filteredEvents
       .map(
-        (event, index) => `
+        (event, index) => /*html*/ `
       <div class="event ${
         event.__sptmninja_expanded ? 'expanded' : ''
-      }" data-id="${event.__sptmninja_id}">
+      }" data-index="${event.__sptmninja_index}">
         <div class="container">
           <div class="toolbar">
             <button class="button expand-button"></button>
@@ -291,7 +294,7 @@ function renderEvents(scrollToBottom = true) {
                   .filter(
                     key =>
                       key !== '__sptmninja_expanded' &&
-                      key !== '__sptmninja_id' &&
+                      key !== '__sptmninja_index' &&
                       key !== 'type'
                   )
                   .sort(),
@@ -303,7 +306,7 @@ function renderEvents(scrollToBottom = true) {
                   .filter(
                     key =>
                       key !== '__sptmninja_expanded' &&
-                      key !== '__sptmninja_id' &&
+                      key !== '__sptmninja_index' &&
                       key !== 'type'
                   ),
               ]
@@ -326,27 +329,34 @@ function renderEvents(scrollToBottom = true) {
   // ].forEach(eventEl => {
   //   eventEl.addEventListener('click', e => {
   //     events[
-  //       Number(e.currentTarget.closest('.event').dataset.id)
+  //       Number(e.currentTarget.closest('.event').dataset.index)
   //     ].__sptmninja_expanded = true;
   //     renderEvents(false);
   //   });
   // });
 
-  [...eventsListEl.querySelectorAll('.event .remove-button')].forEach(
+  function getWrappingEventIndex(target: EventTarget) {
+    return Number(
+      ((target as HTMLElement).closest('.event') as HTMLElement).dataset.index
+    );
+  }
+
+  Array.from(eventsListEl.querySelectorAll('.event .remove-button')).forEach(
     eventEl => {
       eventEl.addEventListener('click', e => {
         e.stopPropagation();
-        events.splice(Number(e.currentTarget.closest('.event').dataset.id), 1);
+
+        events.splice(getWrappingEventIndex(e.currentTarget!), 1);
         renderEvents(false);
       });
     }
   );
 
-  [...eventsListEl.querySelectorAll('.event .expand-button')].forEach(
+  Array.from(eventsListEl.querySelectorAll('.event .expand-button')).forEach(
     eventEl => {
       eventEl.addEventListener('click', e => {
         e.stopPropagation();
-        const eventIndex = Number(e.currentTarget.closest('.event').dataset.id);
+        const eventIndex = getWrappingEventIndex(e.currentTarget!);
 
         events[eventIndex].__sptmninja_expanded = !events[eventIndex]
           .__sptmninja_expanded;

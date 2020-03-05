@@ -18,6 +18,11 @@
   /* box-shadow: 0px 0px 12px -6px black; */
 }
 
+.events-viewer,
+.events-viewer * {
+  box-sizing: initial;
+}
+
 .events-viewer.paused {
   /* opacity: 0.6; */
 }
