@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node print-start-message.js && webpack-dev-server",
-    "poststart": "node print-exit-message.js",
+    "prestart": "node print-prestart-message.js",
+    "start": "webpack-dev-server",
+    "poststart": "node print-poststart-message.js",
     "build": "NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
