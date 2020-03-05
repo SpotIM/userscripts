@@ -2,26 +2,40 @@ import * as utils from './utils';
 import * as message from './message';
 import getColors from './colors';
 import isEqual from 'lodash.isequal';
+import { diff } from 'deep-object-diff';
+import formatHighlight from 'json-format-highlight';
 
 let assetChangeInterval;
 
 async function notifyOnChange() {
   let lastConfig;
 
-  function showNotification() {
+  function showNotification(change: any) {
     stopListeningToChanges();
     GM_notification({
-      title: 'An asset has been updated!',
-      text: `${window.location.hostname} — Detected asset update`,
+      title: 'A configuration has changed!',
+      text: `${window.location.hostname} — Detected configuration change`,
       onclick: () => {
         window.focus();
       },
     });
 
-    message.set('An asset has been updated!', {
-      color: getColors().default,
-      emoji: '⬆️',
-    });
+    message.set(
+      `<pre>${formatHighlight(change, {
+        keyColor: 'white; font-weight: bold;',
+        numberColor: '#FFEB3B',
+        nullColor: '#FFEB3B',
+        falseColor: '#FFEB3B',
+        trueColor: '#FFEB3B',
+        stringColor: '#FFEB3B',
+      })}</pre>`,
+      {
+        title: 'A configuration has changed!',
+        color: getColors().default,
+        // emoji: '⬆️',
+        overflow: 'scroll',
+      }
+    );
   }
 
   async function checkForUpdates() {
@@ -41,10 +55,15 @@ async function notifyOnChange() {
       response = await fetch(unsafeWindow.location.href);
     }
 
-    const config = (await response.json()).assets_config;
+    const configResponse = await response.json();
+
+    const config = {
+      config: configResponse.init_data.config,
+      assetsConfig: configResponse.assets_config,
+    };
 
     if (lastConfig && !isEqual(config, lastConfig)) {
-      showNotification();
+      showNotification(diff(config, lastConfig));
     }
 
     lastConfig = config;
@@ -54,9 +73,9 @@ async function notifyOnChange() {
 
   assetChangeInterval = setInterval(checkForUpdates, 1000);
 
-  message.set(`I will notify you on asset updates!`, {
+  message.set(`I will notify you on configuration changes!`, {
     timeout: 4000,
-    color: getColors().success,
+    color: getColors().default,
     emoji: '😃',
   });
 }
@@ -66,7 +85,7 @@ function stopListeningToChanges(showMessage?: boolean) {
   assetChangeInterval = false;
 
   if (showMessage) {
-    message.set(`Stopped listening to asset updates`, {
+    message.set(`Stopped listening to configuration changes`, {
       timeout: 4000,
       color: getColors().default,
       emoji: '❌',

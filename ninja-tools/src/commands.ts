@@ -25,9 +25,9 @@ const commands: ICommand[] = [
   { keyCombo: 'sso', description: 'Open Config Data' },
   {
     keyCombo: 'ssn',
-    description: 'Notify On Asset Updates',
+    description: 'Notify On Config Updates',
     detailedDescription:
-      'Will start constantly checking if an update to one of our products was released for this spot and pop a notification once that happens',
+      'Will start persistently checking if an update to one of our products was released, or if a configuration changed for this spot and pop a notification once that happens',
   },
   { keyCombo: 'sse', description: 'Toggle Events Viewer' },
   { keyCombo: 'ssh', description: 'Show Help' },
