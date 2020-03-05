@@ -13,6 +13,6 @@ export const get = (): IPreferences => {
   return GM_getValue('prefs', {});
 };
 
-export const set = (newPrefs: IPreferences) => {
+export const set = (newPrefs: Partial<IPreferences>) => {
   return GM_setValue('prefs', { ...get(), ...newPrefs });
 };
