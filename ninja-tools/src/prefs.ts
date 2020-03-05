@@ -7,6 +7,10 @@ interface IPreferences {
   eventsViewerPosition: { [key: string]: { x: number; y: number } };
   showEventsViewer: boolean;
   isNotFirstRun: boolean;
+  lastWhatsNewVersion: string;
+  dontShowWhatsNew: boolean;
+  useDarkTheme: boolean;
+  lastCommandThatRanKeyCombo: string;
 }
 
 export const get = (): IPreferences => {
