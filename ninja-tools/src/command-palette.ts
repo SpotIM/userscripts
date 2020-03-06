@@ -186,7 +186,8 @@ async function show() {
 
     const selectedLineTr = shadowDOM.get().querySelector('[data-selected]');
     if (selectedLineTr) {
-      const selectedLine = selectedLineTr.parentNode.parentNode as HTMLTableRowElement;
+      const selectedLine = selectedLineTr.parentNode
+        .parentNode as HTMLTableRowElement;
       if (!isResultLineVisible(selectedLine)) {
         selectedLine.scrollIntoView(scrollAlignToTop);
       }
@@ -215,17 +216,21 @@ async function show() {
       if (runSelectedCommand()) {
         return;
       }
-    } else {
+    } else if (['Meta', 'Alt', 'Shift', 'Control'].indexOf(e.key) === -1) {
       renderResults();
     }
   });
 
-  input.addEventListener('keyup', (e) => {
+  input.addEventListener('keyup', e => {
     updateRelevantResults();
     if (selectedItemIndex >= relevantCommands.length) {
       selectedItemIndex = Math.max(relevantCommands.length - 1, 0);
     }
-    if (e.keyCode !== 38 && e.keyCode !== 40) {
+    if (
+      e.keyCode !== 38 &&
+      e.keyCode !== 40 &&
+      ['Meta', 'Alt', 'Shift', 'Control'].indexOf(e.key) === -1
+    ) {
       renderResults();
     }
   });

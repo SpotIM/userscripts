@@ -235,34 +235,40 @@ function addEvent(event) {
   events.push(event);
 }
 
+function isBookmark(event) {
+  return event.type === '__sptmninja_bookmark';
+}
+
 function createUniquePropsMap() {
   uniqueProps = {};
 
+  const pushUniqueEventProps = (eventA, eventB) => key => {
+    if (
+      key !== 'time_delta' &&
+      key !== 'uid' &&
+      key !== 'duration' &&
+      eventA[key] !== eventB[key] &&
+      uniqueProps[eventA.type].indexOf(key) === -1
+    ) {
+      uniqueProps[eventA.type].push(key);
+    }
+  };
+
   events.forEach(eventA => {
-    if (eventA.type === '__sptmninja_bookmark') {
+    if (isBookmark(eventA)) {
       return;
     }
 
     uniqueProps[eventA.type] = uniqueProps[eventA.type] || [];
 
     events.forEach(eventB => {
-      if (eventB.type === '__sptmninja_bookmark') {
+      if (isBookmark(eventB)) {
         return;
       }
 
       if (eventA !== eventB && eventA.type === eventB.type) {
-        // todo foreach instead of map?
-        Object.keys(eventA).map(key => {
-          if (
-            key !== 'time_delta' &&
-            key !== 'uid' &&
-            key !== 'duration' &&
-            eventA[key] !== eventB[key] &&
-            uniqueProps[eventA.type].indexOf(key) === -1
-          ) {
-            uniqueProps[eventA.type].push(key);
-          }
-        });
+        Object.keys(eventA).forEach(pushUniqueEventProps(eventA, eventB));
+        Object.keys(eventB).forEach(pushUniqueEventProps(eventA, eventB));
       }
     });
   });
@@ -271,10 +277,6 @@ function createUniquePropsMap() {
 function isNegative(queryPart: string) {
   return queryPart.startsWith('-');
 }
-
-// function getNegativePart(queryPart: string) {
-//   return queryPart.substr(1);
-// }
 
 function hasNameAndValue(queryPart: string) {
   return queryPart.indexOf(':') !== -1;
@@ -287,6 +289,14 @@ function getName(queryPart: string) {
   } else {
     return name;
   }
+}
+
+function isMandatoryProp(queryPart: string) {
+  return queryPart.endsWith('!');
+}
+
+function getMandatoryPropName(queryPart: string) {
+  return queryPart.substr(0, queryPart.length - 1);
 }
 
 function getValue(queryPart: string) {
@@ -325,6 +335,8 @@ function renderEvents(scrollToBottom = true) {
     );
   }
 
+  const mandatoryProps: string[] = [];
+
   const filteredEvents = events.filter(event => {
     const splitQueryParts: any[] = parse(query);
 
@@ -337,10 +349,18 @@ function renderEvents(scrollToBottom = true) {
     }
 
     for (let i = 0; i < splitQueryParts.length; i++) {
-      const queryPart =
+      const queryPart: string =
         typeof splitQueryParts[i] === 'object'
           ? splitQueryParts[i].pattern
           : splitQueryParts[i];
+
+      if (isMandatoryProp(queryPart)) {
+        const propName = getMandatoryPropName(queryPart);
+        if (mandatoryProps.indexOf(propName) === -1) {
+          mandatoryProps.push(propName);
+        }
+        continue;
+      }
 
       if (isNegative(queryPart)) {
         if (hasNameAndValue(queryPart)) {
@@ -402,6 +422,10 @@ function renderEvents(scrollToBottom = true) {
                         ...uniqueProps[event.type]
                           .sort()
                           .filter(filterRelevantProps),
+                        ...mandatoryProps.filter(
+                          propName =>
+                            uniqueProps[event.type].indexOf(propName) === -1
+                        ),
                       ]
                   )
                     .map(
@@ -505,7 +529,7 @@ if (prefs.get().showEventsViewer) {
   toggle({ waitForSpotimObject: true });
 }
 
-function handleGlobalKeyDown(e) {
+function handleGlobalKeyDown(e: KeyboardEvent) {
   if (!isShowing) {
     return;
   }
@@ -531,6 +555,14 @@ function handleGlobalKeyDown(e) {
     }
 
     renderEvents();
+  }
+
+  if (e.code === 'KeyC' && e.ctrlKey) {
+    GM_setClipboard(JSON.stringify(events, undefined, 2));
+  }
+
+  if (e.key === '/' && e.ctrlKey) {
+    queryInputEl.focus();
   }
 
   if (e.code === 'KeyB' && e.ctrlKey) {

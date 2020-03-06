@@ -31,15 +31,15 @@ export function init() {
       message.hide(true);
     }
 
-    if (isFocusedOnInput()) {
-      return;
-    }
-
     if (
       (e.key.toLowerCase() === 's' || e.key === 'ד') &&
       ((isWindows && e.altKey) || e.ctrlKey)
     ) {
       commandPalette.show();
+      return;
+    }
+
+    if (isFocusedOnInput()) {
       return;
     }
 

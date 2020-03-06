@@ -110,6 +110,7 @@
   padding: 0px;
   cursor: pointer;
   margin-right: 2px;
+  box-shadow: 0px -1px #00000038;
 }
 
 .event .toolbar .button:last-child {
