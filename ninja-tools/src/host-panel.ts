@@ -171,7 +171,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     return;
   }
 
-  var networkName = 'spotim';
+  const networkName = 'spotim';
 
   message.set('Fetching network id...', {
     color: getColors().default,
@@ -180,7 +180,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var networkIdJson = await fetch(
+  const networkIdJson = await fetch(
     `https://www.spot.im/api/me/network-id-by-name/${networkName}`
   ).then(r => r.json());
 
@@ -191,7 +191,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var networkTokenJson = await fetch(
+  const networkTokenJson = await fetch(
     `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
     { method: 'post' }
   ).then(r => r.json());
@@ -203,7 +203,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var emailConnectJson = await fetch(
+  const emailConnectJson = await fetch(
     `https://www.spot.im/api/email-connect/login`,
     {
       method: 'post',
@@ -239,7 +239,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var loginRegisteredJson = await fetch(
+  const loginRegisteredJson = await fetch(
     `https://www.spot.im/api/me/login-registered`,
     {
       method: 'post',
@@ -257,7 +257,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var makeMeAdminJson = await fetch(
+  const makeMeAdminJson = await fetch(
     `https://www.spot.im/api/moderation/internal/make-me-admin?spot_id=${spotId}`,
     {
       headers: new Headers({
@@ -274,13 +274,13 @@ export const open = async ({ spotId }: { spotId: string }) => {
     title: 'Open Admin Panel',
   });
 
-  var tokenByTicketJson = await fetch(
+  const tokenByTicketJson = await fetch(
     `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
     { method: 'post' }
   ).then(r => r.json());
 
   const isStaging = !utils.isProduction(utils.getLauncherEl());
-  var hostPrefix = isStaging ? 'staging-' : '';
+  const hostPrefix = isStaging ? 'staging-' : '';
 
   const url = [
     `https://admin.${hostPrefix}spot.im/spot/${spotId}/moderation?`,
