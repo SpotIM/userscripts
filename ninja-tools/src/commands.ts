@@ -27,7 +27,7 @@ const commands: ICommand[] = [
     keyCombo: 'ssn',
     description: 'Notify On Config Updates',
     detailedDescription:
-      'Will start persistently checking if an update to one of our products was released, or if a configuration changed for this spot and pop a notification once that happens',
+      'Will notify you once an asset updates or a configuration changes for the current spot',
   },
   { keyCombo: 'sse', description: 'Toggle Events Viewer' },
   { keyCombo: 'ssh', description: 'Show Help' },
