@@ -85,7 +85,7 @@ function stopListeningToChanges(showMessage?: boolean) {
   assetChangeInterval = false;
 
   if (showMessage) {
-    message.set(`Stopped listening to configuration changes`, {
+    message.set(`I won't notify you on changes!`, {
       timeout: 4000,
       color: getColors().default,
       emoji: '❌',

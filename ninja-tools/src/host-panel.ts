@@ -4,9 +4,6 @@ import * as shadowDOM from './shadow-dom';
 import getColors from './colors';
 import gutterActions from './gutter-actions';
 
-let windowRef;
-let lastUrl;
-
 export function openCredentialsForm(isOpeningHostPanel?: boolean) {
   const [renderButtons, addListeners] = gutterActions([
     'Delete Credentials',
@@ -81,11 +78,11 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
   async function submitForm() {
     const email = shadowDOM
       .get()
-      .querySelector('#emailInput')
+      .querySelector<HTMLInputElement>('#emailInput')!
       .value.trim();
     const password = shadowDOM
       .get()
-      .querySelector('#passwordInput')
+      .querySelector<HTMLInputElement>('#passwordInput')!
       .value.trim();
 
     if (email && password) {
@@ -127,13 +124,13 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
   setTimeout(() => {
     shadowDOM
       .get()
-      .querySelector('#emailInput')
+      .querySelector<HTMLInputElement>('#emailInput')!
       .focus();
   }, 10);
 
   shadowDOM
     .get()
-    .querySelector('form')
+    .querySelector('form')!
     .addEventListener('submit', e => {
       e.preventDefault();
       submitForm();
@@ -148,18 +145,6 @@ export const open = async ({ spotId }: { spotId: string }) => {
       color: getColors().success,
       timeout: 2000,
     });
-  }
-
-  if (lastUrl) {
-    windowRef = window.open(lastUrl);
-    lastUrl = null;
-
-    showSuccessMessage();
-  }
-
-  if (windowRef && !windowRef.closed) {
-    windowRef.focus();
-    return;
   }
 
   const email = await GM_getValue('email');
@@ -295,14 +280,5 @@ export const open = async ({ spotId }: { spotId: string }) => {
     emoji: '😃',
   });
 
-  // windowRef = window.open(url);
   GM_openInTab(url, false);
-
-  // if (windowRef === null) {
-  //   message.set(
-  //     "Popup blocker probably blocked us<br/>But run the command again and it will work immediately!",
-  //     { timeout: 8000, color: colors.error, emoji: "😞" }
-  //   );
-  //   lastUrl = url;
-  // }
 };
