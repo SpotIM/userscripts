@@ -1,5 +1,4 @@
 interface IABTest {
-  keyCombo: string;
   name: string;
   description: string;
   id: number;
@@ -53,6 +52,6 @@ const abTests: IABTest[] = [
       { id: 'B', statusText: 'Feed Below Conversation' },
     ],
   },
-].map((command, index) => ({ ...command, keyCombo: `__ssab${index}` }));
+];
 
 export default abTests;

@@ -1,37 +1,34 @@
-import commands from './commands';
 import * as scrollToConversation from './scroll-to-conversation';
 import * as message from './message';
 import * as utils from './utils';
 import * as prefs from './prefs';
 import getColors from './colors';
-import commandsImpl from './commands-impl';
 import * as shadowDOM from './shadow-dom';
 import fuzzy from 'fuzzy';
 import styles from './command-palette.css';
+import { ICommand } from './commands';
 
 // let selectedItemIndex = prefs.get().selectedItemIndex || 0;
 let selectedItemIndex = 0;
 
-function handleTableClick(e) {
-  const line = e.target.closest('.tr');
-  if (line && line.children.length) {
-    const keyCombo = line.children[0].children[0].dataset.keyCombo;
-    const commandImpl = commandsImpl[keyCombo];
-    prefs.set({ lastCommandThatRanKeyCombo: keyCombo });
-
-    if (commandImpl) {
-      commandImpl();
-    }
-  }
-}
-
-async function show() {
+async function show({
+  commands,
+  getCommandImpl,
+  commandPaletteId,
+  title = 'Start Typing A Command',
+}: {
+  commands: ICommand[];
+  getCommandImpl: ({ id }: { id: string }) => () => void;
+  commandPaletteId: string;
+  title?: string;
+}) {
   selectedItemIndex = 0;
-  let lastCommandThatRan = await (async () => {
-    const { lastCommandThatRanKeyCombo } = prefs.get();
-    if (lastCommandThatRanKeyCombo) {
+  let lastCommandThatRan;
+  lastCommandThatRan = (() => {
+    const { recentlyUsedCommands } = prefs.get();
+    if (recentlyUsedCommands) {
       return commands.find(
-        command => command.keyCombo === lastCommandThatRanKeyCombo
+        command => command.id === recentlyUsedCommands[commandPaletteId]
       );
     }
   })();
@@ -62,6 +59,33 @@ async function show() {
     `;
   }
 
+  function renderBetaBadge() {
+    return /*html*/ `
+      <span class="badgeWrapper">
+        <span class="devBadge">beta</span>
+      </span>
+    `;
+  }
+
+  function handleTableClick(e) {
+    const line = e.target.closest('.tr');
+    if (line && line.children.length) {
+      const commandId = line.children[0].children[0].dataset.commandId;
+      const commandImpl = getCommandImpl({ id: commandId });
+      const { recentlyUsedCommands } = prefs.get();
+      prefs.set({
+        recentlyUsedCommands: {
+          ...recentlyUsedCommands,
+          [commandPaletteId]: commandId,
+        },
+      });
+
+      if (commandImpl) {
+        commandImpl();
+      }
+    }
+  }
+
   const messageBodyEl = message.set(
     /*html*/ `<style>
       ${styles}
@@ -70,15 +94,15 @@ async function show() {
     {
       title: `${
         !utils.getLauncherEl(false) ? missingLauncherWarning : ''
-      }Start Typing A Command${
+      }${title}${
         process.env.NODE_ENV === 'development' ? renderDevBadge() : ''
-      }`,
+      }${process.env.BETA ? renderBetaBadge() : ''}`,
       color: getColors().default,
     }
   );
 
-  messageBodyEl
-    .querySelector('.results')
+  messageBodyEl!
+    .querySelector('.results')!
     .addEventListener('click', handleTableClick);
 
   const input = shadowDOM.get().querySelector('.input') as HTMLInputElement;
@@ -88,12 +112,19 @@ async function show() {
 
   function runSelectedCommand() {
     const selectedCommand = relevantCommands[selectedItemIndex];
+
     lastCommandThatRan = selectedCommand;
-    prefs.set({ lastCommandThatRanKeyCombo: lastCommandThatRan?.keyCombo });
+    const { recentlyUsedCommands } = prefs.get();
+    prefs.set({
+      recentlyUsedCommands: {
+        ...recentlyUsedCommands,
+        [commandPaletteId]: lastCommandThatRan?.id,
+      },
+    });
 
     if (selectedCommand) {
       message.hide(true);
-      commandsImpl[selectedCommand.keyCombo]();
+      getCommandImpl({ id: selectedCommand.id })!();
       return true;
     }
 
@@ -125,30 +156,33 @@ async function show() {
 
     if (!value && lastCommandThatRan) {
       const lastCommandIndex = relevantCommands.findIndex(
-        command => command.keyCombo === lastCommandThatRan?.keyCombo
+        command => command.id === lastCommandThatRan?.id
       );
 
       relevantCommands.splice(lastCommandIndex, 1);
 
       relevantCommands.unshift(lastCommandThatRan);
     }
-    // .filter(command => value !== "" || !command.unlisted);
   }
 
   function renderResults(scrollAlignToTop?: boolean) {
     if (input.value.trim()) {
-      messageBodyEl.querySelector('.results').classList.add('inputNotEmpty');
+      messageBodyEl!.querySelector('.results')!.classList.add('inputNotEmpty');
     } else {
-      messageBodyEl.querySelector('.results').classList.remove('inputNotEmpty');
+      messageBodyEl!
+        .querySelector('.results')!
+        .classList.remove('inputNotEmpty');
     }
 
-    messageBodyEl.querySelector('.results').innerHTML = relevantCommands.length
+    messageBodyEl!.querySelector(
+      '.results'
+    )!.innerHTML = relevantCommands.length
       ? utils.renderTable(
           relevantCommands.map((command, index) => [
             `<span class="mono ${
-              command.unlisted ? 'hidden' : ''
-            }" data-key-combo="${command.keyCombo}">${
-              command.unlisted ? '×' : command.keyCombo
+              !command.keyCombo ? 'hidden' : ''
+            }" data-command-id="${command.id}">${
+              !command.keyCombo ? '×' : command.keyCombo
             }</span>`,
             `<span
                   class="pallete_row_main_col ${
@@ -186,7 +220,7 @@ async function show() {
 
     const selectedLineTr = shadowDOM.get().querySelector('[data-selected]');
     if (selectedLineTr) {
-      const selectedLine = selectedLineTr.parentNode
+      const selectedLine = selectedLineTr.parentNode!
         .parentNode as HTMLTableRowElement;
       if (!isResultLineVisible(selectedLine)) {
         selectedLine.scrollIntoView(scrollAlignToTop);

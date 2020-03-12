@@ -8,6 +8,7 @@
     "start": "webpack-dev-server",
     "poststart": "node print-poststart-message.js",
     "build": "NODE_ENV=production webpack",
+    "build:beta": "NODE_ENV=production BETA=true webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

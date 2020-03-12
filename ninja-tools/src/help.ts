@@ -8,23 +8,29 @@ export const show = () => {
     utils.renderTable(
       [
         {
-          keyCombo: utils.isWindows ? 'alt+s' : 'ctrl+s',
+          keyCombo: utils.isWindows
+            ? 'alt+s'
+            : '<span class="modifier-key">⌃</span>s',
           description: 'Open Command Palette',
+        },
+        {
+          keyCombo: utils.isWindows
+            ? 'alt+<span class="modifier-key">⇧</span>+s'
+            : '<span class="modifier-key">⌃⇧</span>s',
+          description: 'Open Spots List',
         },
         ...commands,
         { keyCombo: 'escape', description: 'Hide Floating Message' },
       ].map(command => [
         `<span
           title="${
-            command.unlisted
-              ? 'This command is unlisted, no key combo assigned to it'
-              : ''
+            !command.keyCombo ? 'This has no key combo assigned to it' : ''
           }"
           class="
             mono
-            ${command.unlisted ? 'hidden' : ''}
+            ${!command.keyCombo ? 'hidden' : ''}
           ">
-          ${command.unlisted ? '×' : command.keyCombo}
+          ${!command.keyCombo ? '×' : command.keyCombo}
         </span>`,
         command.description +
           (command.detailedDescription
@@ -34,7 +40,7 @@ export const show = () => {
     ),
     {
       color: getColors().default,
-      title: 'Available Shortcuts',
+      title: 'Available Commands',
       overflow: 'scroll',
     }
   );

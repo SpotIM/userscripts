@@ -68,6 +68,7 @@ function startScrolling() {
 
   message.set('Looking for conversation element', {
     title: 'Scroll To Conversation',
+    styleAsMessageBox: true,
   });
   isScrolling = true;
   scrollingInterval = setInterval(() => {
@@ -80,9 +81,10 @@ function startScrolling() {
         conversation.scrollIntoView();
         window.scrollBy(0, -200);
       }
-      message.set('Hit <span class="mono">escape</span> to stop', {
+      message.set('Hit <span class="mono">esc</span> to stop', {
         title: 'Scroll To Conversation',
         color: getColors().success,
+        styleAsMessageBox: true,
         emoji: '😃',
       });
       highlightConversation(conversation);
@@ -94,6 +96,7 @@ function startScrolling() {
           color: getColors().error,
           emoji: '😕',
           title: 'Scroll To Conversation',
+          styleAsMessageBox: true,
         });
       } else {
         window.parent.focus();

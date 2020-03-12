@@ -21,12 +21,12 @@ interface ICommandImpls {
 
 let commandsImpl: ICommandImpls = {
   // scroll to conversation
-  sss: () => {
+  scrollToConversation: () => {
     scrollToConversation.toggle();
   },
 
   // copy spot id
-  ssc: () => {
+  copySpotId: () => {
     scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
@@ -43,7 +43,7 @@ let commandsImpl: ICommandImpls = {
   },
 
   // show info
-  ssi: () => {
+  showInfo: () => {
     scrollToConversation.stop();
 
     function renderCopyableText(text) {
@@ -93,7 +93,7 @@ let commandsImpl: ICommandImpls = {
   },
 
   // show versions
-  ssv: async () => {
+  showAssetVersions: async () => {
     scrollToConversation.stop();
 
     if (unsafeWindow.__SPOTIM__) {
@@ -141,7 +141,7 @@ let commandsImpl: ICommandImpls = {
   },
 
   // open admin panel
-  ssa: () => {
+  openHostPanel: () => {
     scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
@@ -169,7 +169,7 @@ let commandsImpl: ICommandImpls = {
     }
   },
 
-  sso: () => {
+  openConfigData: () => {
     scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
@@ -178,13 +178,13 @@ let commandsImpl: ICommandImpls = {
     }
   },
 
-  ssn: async () => {
+  notifyOnChanges: async () => {
     scrollToConversation.stop();
 
     assetChangeListeners.toggleNotifyOnChange();
   },
 
-  sse: () => {
+  toggleEventsViewer: () => {
     const isShowingEventsViewer = eventsViewer.toggle();
 
     if (isShowingEventsViewer) {
@@ -202,7 +202,7 @@ let commandsImpl: ICommandImpls = {
     }
   },
 
-  __ssa: async () => {
+  toggleShowAssetsVersions: async () => {
     const showVersionsOnLoad = prefs.get().showVersionsOnLoad;
     await prefs.set({ showVersionsOnLoad: !showVersionsOnLoad });
 
@@ -221,16 +221,16 @@ let commandsImpl: ICommandImpls = {
     }
   },
 
-  __ssn: () => {
+  whatsNew: () => {
     whatsNew.show();
   },
 
-  __ssc: () => {
+  setHostPanelCreds: () => {
     hostPanel.openCredentialsForm();
   },
 
   // copy post id
-  __ssp: () => {
+  copyPostId: () => {
     scrollToConversation.stop();
 
     const launcher = utils.getLauncherEl(true);
@@ -246,17 +246,21 @@ let commandsImpl: ICommandImpls = {
     }
   },
 
-  __ssdt: async () => {
+  toggleDarkTheme: async () => {
     const { useDarkTheme = false } = prefs.get();
     await prefs.set({ useDarkTheme: !useDarkTheme });
 
     setTimeout(() => {
-      commandPalette.show();
+      commandPalette.show({
+        commands,
+        getCommandImpl,
+        commandPaletteId: 'main',
+      });
     }, 0);
   },
 
   // show help
-  ssh: () => {
+  showHelp: () => {
     scrollToConversation.stop();
     help.show();
   },
@@ -266,7 +270,7 @@ commandsImpl = (() => {
   return abTestCommands.reduce((commands, abCommand) => {
     return {
       ...commands,
-      [abCommand.keyCombo]: async () => {
+      [`__ab${abCommand.id}`]: async () => {
         try {
           const spotAB = JSON.parse(
             unsafeWindow.localStorage.getItem('SPOT_AB')
@@ -309,3 +313,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default commandsImpl;
+
+export function getCommandImpl({ id }: { id: string }) {
+  return commandsImpl[id]!;
+}
+
+export function getCommandImplByKeyCombo(keyCombo: string) {
+  return commandsImpl[
+    commands.find(command => command.keyCombo === keyCombo)?.id ?? ''
+  ];
+}

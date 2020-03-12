@@ -5,6 +5,7 @@ import matcher from 'matcher';
 import * as prefs from './prefs';
 import { onFoundSpotimObject } from './utils';
 import bookmarkSvg from './icons/bookmark.svg';
+import { getUseDarkTheme } from './colors';
 
 const EVENTS_VIEWER_WIDTH = 340;
 const EVENTS_VIEWER_MARGIN_END = 20;
@@ -48,8 +49,17 @@ function addQueryToHistory() {
   }
 }
 
+function applyDarkClass() {
+  if (getUseDarkTheme()) {
+    eventsViewerEl.classList.add('dark');
+  } else {
+    eventsViewerEl.classList.remove('dark');
+  }
+}
+
 function addEventsList() {
   if (addedEventsList) {
+    applyDarkClass();
     return;
   }
 
@@ -57,6 +67,9 @@ function addEventsList() {
 
   eventsViewerEl = document.createElement('div');
   eventsViewerEl.className = 'events-viewer';
+
+  applyDarkClass();
+
   // eventsViewerEl.addEventListener('mouseover', handleViewerMouseOver);
   // document.addEventListener('mousemove', handleDocumentMouseMove);
 
@@ -525,10 +538,6 @@ export function toggle({
   return isShowing;
 }
 
-if (prefs.get().showEventsViewer) {
-  toggle({ waitForSpotimObject: true });
-}
-
 function handleGlobalKeyDown(e: KeyboardEvent) {
   if (!isShowing) {
     return;
@@ -569,4 +578,8 @@ function handleGlobalKeyDown(e: KeyboardEvent) {
     events.push({ type: '__sptmninja_bookmark' });
     renderEvents();
   }
+}
+
+if (prefs.get().showEventsViewer) {
+  toggle({ waitForSpotimObject: true });
 }

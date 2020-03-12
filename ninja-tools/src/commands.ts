@@ -1,67 +1,76 @@
 import abTestCommands from './ab-test-commands';
 
 export interface ICommand {
-  keyCombo: string;
+  id: string;
+  keyCombo?: string;
   description: string;
   detailedDescription?: string;
-  unlisted?: boolean;
 }
 
 const commands: ICommand[] = [
-  { keyCombo: 'sss', description: 'Scroll to Conversation' },
-  { keyCombo: 'ssi', description: 'Show Info' },
   {
+    id: 'scrollToConversation',
+    keyCombo: 'sss',
+    description: 'Scroll to Conversation',
+  },
+  { id: 'showInfo', keyCombo: 'ssi', description: 'Show Info' },
+  {
+    id: 'copySpotId',
     keyCombo: 'ssc',
     description: 'Copy Spot ID to Clipboard',
   },
   {
+    id: 'openHostPanel',
     keyCombo: 'ssa',
     description: 'Open Host Panel',
     detailedDescription:
       'Will require you to enter the username and password you use to log in to the host panel on first run ' +
       "and won't work if you use Google to sign in",
   },
-  { keyCombo: 'ssv', description: 'Show Asset Versions' },
-  { keyCombo: 'sso', description: 'Open Config Data' },
   {
+    id: 'showAssetVersions',
+    keyCombo: 'ssv',
+    description: 'Show Asset Versions',
+  },
+  { id: 'openConfigData', keyCombo: 'sso', description: 'Open Config Data' },
+  {
+    id: 'notifyOnChanges',
     keyCombo: 'ssn',
     description: 'Notify On Config Updates',
     detailedDescription:
       'Will notify you once an asset updates or a configuration changes for the current spot',
   },
-  { keyCombo: 'sse', description: 'Toggle Events Viewer' },
-  { keyCombo: 'ssh', description: 'Show Help' },
   {
-    keyCombo: '__ssn',
+    id: 'toggleEventsViewer',
+    keyCombo: 'sse',
+    description: 'Toggle Events Viewer',
+  },
+  { id: 'showHelp', keyCombo: 'ssh', description: 'Show Help' },
+  {
+    id: 'whatsNew',
     description: "What's New?",
-    unlisted: true,
   },
   {
-    keyCombo: '__ssdt',
+    id: 'toggleDarkTheme',
     description: 'Toggle Dark Theme',
-    unlisted: true,
   },
   {
-    keyCombo: '__ssa',
+    id: 'toggleShowAssetsVersions',
     description: 'Toggle Show Asset Versions on Load',
     detailedDescription:
       'If enabled, will display the asset versions once the page loads',
-    unlisted: true,
   },
   {
-    keyCombo: '__ssc',
+    id: 'setHostPanelCreds',
     description: 'Set Host Panel Credentials',
-    unlisted: true,
   },
   {
-    keyCombo: '__ssp',
+    id: 'copyPostId',
     description: 'Copy Post ID to Clipboard',
-    unlisted: true,
   },
   ...abTestCommands.map(abCommand => ({
-    keyCombo: abCommand.keyCombo,
+    id: `__ab${abCommand.id}`,
     description: 'A/B Test: ' + abCommand.description,
-    unlisted: true,
   })),
 ];
 

@@ -1,8 +1,11 @@
-import commandsImpl from './commands-impl';
+import { getCommandImpl, getCommandImplByKeyCombo } from './commands-impl';
 import * as scrollToConversation from './scroll-to-conversation';
 import * as message from './message';
 import * as commandPalette from './command-palette';
+import commands from './commands';
 import { isWindows } from './utils';
+import spotsData from './spot-data.json';
+import { showSpotCommands } from './spot-commands';
 
 export function init() {
   let lastKeyStrokesResetTimeout;
@@ -15,7 +18,7 @@ export function init() {
   }
 
   function executeCommand(keyCombo) {
-    const commandImpl = commandsImpl[keyCombo];
+    const commandImpl = getCommandImplByKeyCombo(keyCombo);
 
     if (commandImpl) {
       commandImpl();
@@ -35,7 +38,20 @@ export function init() {
       (e.key.toLowerCase() === 's' || e.key === 'ד') &&
       ((isWindows && e.altKey) || e.ctrlKey)
     ) {
-      commandPalette.show();
+      if (e.shiftKey) {
+        commandPalette.show({
+          commands: spotsData,
+          getCommandImpl: showSpotCommands,
+          commandPaletteId: 'spotSelector',
+          title: "Start Typing a Spot's Name",
+        });
+      } else {
+        commandPalette.show({
+          commands,
+          getCommandImpl,
+          commandPaletteId: 'main',
+        });
+      }
       return;
     }
 

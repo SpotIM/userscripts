@@ -7,7 +7,9 @@ module.exports = {
   entry: path.resolve(__dirname, 'src', 'index.ts'),
   output: {
     path: path.resolve(__dirname, '../'),
-    filename: 'spotim-ninja-tools.user.js',
+    filename: process.env.BETA
+      ? 'spotim-ninja-tools-beta.user.js'
+      : 'spotim-ninja-tools.user.js',
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
@@ -53,6 +55,9 @@ module.exports = {
           'bigBlueFont https://rawcdn.githack.com/SpotIM/userscripts/53c2ab94cf3523830e17d299ed8abd533822d0c5/ninja-tools/src/assets/BigBlue_Terminal_437TT.TTF',
           'welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/assets/welcome-background.png',
         ],
+        supportURL: 'slack://channel?id=CSZGJD6R1&team=T0460KVUF',
+        connect: ['extract-article-text.dutzi.now.sh'],
+        'run-at': 'document-start',
         grant: [
           'GM_setValue',
           'GM_getValue',
@@ -61,6 +66,7 @@ module.exports = {
           'GM_deleteValue',
           'GM_notification',
           'GM_getResourceURL',
+          'GM_xmlhttpRequest',
           'unsafeWindow',
         ],
       },

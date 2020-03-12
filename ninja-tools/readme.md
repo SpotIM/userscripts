@@ -34,11 +34,11 @@ After you're done developing, re-install [the script from Github](https://github
 To add a new command, you need to edit two files.
 
 - [commands.ts](./src/commands.ts) - This is where you'll provide the metadata for the command:
-  - `keyCombo` (string) - The key combination that activates this command (you can hit a key combo without the need to open the command palette), use this one for _super_ useful commands. If you don't want a key combo for that command, you'll still have to define one **(a unique one)** since it's also used as the command's identifier. If that's the case please the following as a template for one: `__ssXX` where XX are some group of chars that describe it.
+  - `id` (string) - A unique identifier.
+  - `keyCombo` (string, optional) - The key combination that activates this command (you can hit a key combo without the need to open the command palette), use this one for _super_ useful commands.
   - `description` (string) - The command's description, shows up in the command palette and help screen.
-  - `detailedDescription` (string) - A detailed description that will only show up in the help screen (optional).
-  - `unlisted` (boolean) - Set to false if the key combo starts with `__` (TODO - remove this, have it derived automatically from key combo).
-- [commands-impl.ts](./src/commands-impl.ts) - This file exports an object where the keys are key combo (remember they are used as identifiers?) and the values are that command's implementation. Nearing the end of that file you'll see a block that automatically creates command entries for A/B test commands.
+  - `detailedDescription` (string, optional) - A detailed description that will only show up in the help screen (optional).
+- [commands-impl.ts](./src/commands-impl.ts) - This file exports an object where the keys are command ids and the values are that command's implementation. Nearing the end of that file you'll see a block that automatically creates command entries for A/B test commands.
 
 ## Adding an A/B Test
 

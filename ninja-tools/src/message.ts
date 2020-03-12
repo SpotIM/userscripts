@@ -3,15 +3,19 @@ import * as scrollToConversation from './scroll-to-conversation';
 import getColors, { getUseDarkTheme } from './colors';
 import * as shadowDOM from './shadow-dom';
 import styles from './message.css';
+import isEqual from 'lodash.isequal';
 
-let messageEl;
-let messageBodyEl;
-let messageProgressEl;
-let hasAddedMessage;
-let hasAddedStyleTag;
-let hideMessageTimeout;
-let isMouseOver;
-let shadowWrapper;
+let messageEl: HTMLElement;
+let messageBodyEl: HTMLElement;
+let messageProgressEl: HTMLElement;
+let hasAddedMessage: boolean;
+let hasAddedStyleTag: boolean;
+let hideMessageTimeout: NodeJS.Timeout;
+let isMouseOver: boolean;
+let shadowWrapper: HTMLElement;
+let isShowingMessage: boolean;
+let lastMessageProps: any;
+let progressAnimationTimeout: NodeJS.Timeout;
 
 function addStyleTag() {
   if (hasAddedStyleTag) {
@@ -110,6 +114,7 @@ function hideMessage(force?: boolean) {
     if (shadowWrapper && shadowWrapper.parentNode) {
       shadowWrapper.parentNode.removeChild(shadowWrapper);
       setMessageProgress(0);
+      isShowingMessage = false;
     }
   }
 
@@ -131,6 +136,8 @@ function setMessage(
     emoji,
     belowNotificationPopover,
     overflow,
+    progressBarDuration,
+    styleAsMessageBox,
   }: {
     timeout?: number;
     color?: IColor;
@@ -140,8 +147,17 @@ function setMessage(
     emoji?: string;
     belowNotificationPopover?: string;
     overflow?: 'scroll';
+    progressBarDuration?: number;
+    styleAsMessageBox?: boolean;
   } = {}
 ) {
+  const currentMessageProps = arguments;
+  if (isShowingMessage && isEqual(lastMessageProps, currentMessageProps)) {
+    return;
+  }
+
+  lastMessageProps = currentMessageProps;
+
   addMessage();
   addStyleTag();
   showMessage();
@@ -159,12 +175,13 @@ function setMessage(
   if (emoji) {
     prefix += `<div class="emoji">${emoji}</div>`;
   }
+  if (styleAsMessageBox) {
+    fullMessageHTML = `<span class="message-box-content">${fullMessageHTML}</span>`;
+  }
 
   fullMessageHTML = prefix + fullMessageHTML;
 
-  if (messageBodyEl.innerHTML !== fullMessageHTML) {
-    messageBodyEl.innerHTML = fullMessageHTML;
-  }
+  messageBodyEl.innerHTML = fullMessageHTML;
 
   if (belowNotificationPopover) {
     messageEl.classList.add('below_notifications');
@@ -189,6 +206,27 @@ function setMessage(
     setMessageProgress(0);
   }
 
+  clearTimeout(progressAnimationTimeout);
+
+  if (progressBarDuration) {
+    messageProgressEl.style.width = '0%';
+    messageProgressEl.style.transition = `width ${progressBarDuration /
+      1000}s linear`;
+    progressAnimationTimeout = setTimeout(() => {
+      messageProgressEl.style.width = '100%';
+      progressAnimationTimeout = setTimeout(() => {
+        messageProgressEl.style.transition = '';
+      }, 100);
+    }, 100);
+  }
+
+  if (isNaN((step ?? 0) / (numSteps ?? 0)) && !progressBarDuration) {
+    messageProgressEl.style.transition = '';
+    messageProgressEl.style.width = '';
+  }
+
+  isShowingMessage = true;
+
   return messageBodyEl;
 }
 
@@ -199,7 +237,8 @@ function setMessageProgress(progress) {
 function setMessageColor(color) {
   messageEl.style.backgroundColor = color.bg;
   if (messageEl.querySelector('.title')) {
-    messageEl.querySelector('.title').style.backgroundColor = color.bg;
+    messageEl.querySelector<HTMLElement>('.title')!.style.backgroundColor =
+      color.bg;
   }
   messageEl.style.borderColor = color.border;
 }

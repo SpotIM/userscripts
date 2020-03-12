@@ -5,6 +5,30 @@ import styles from './whats-new.css';
 
 const changelog = [
   {
+    version: '4.2.0',
+    list: [
+      {
+        title: 'Added Spot Commands',
+        description:
+          "Access other spots from whichever website you are currently on. Hit Ctrl+Shift+S, start typing a spot's name, hit Enter and you will have access to the following commands",
+        list: [
+          {
+            title: "Open spot's website",
+          },
+          {
+            title: 'Open post page (EXPERIMENTAL)',
+          },
+          {
+            title: 'Copy spot id',
+          },
+          {
+            title: "Open spot's host panel",
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '4.1.0',
     list: [
       {

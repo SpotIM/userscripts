@@ -240,6 +240,12 @@
   height: 150px;
 }
 
+.message-box-content {
+  font-size: 0.9em;
+  text-shadow: none;
+  font-weight: normal;
+}
+
 .title + .emoji {
   margin-top: 20px;
 }
@@ -277,6 +283,10 @@
   font-size: 15px;
   margin: 4px 0px;
   display: inline-block;
+}
+
+.modifier-key {
+  font-family: Helvetica, Arial, sans-serif;
 }
 
 .dark .mono {

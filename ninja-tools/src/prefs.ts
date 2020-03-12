@@ -10,7 +10,7 @@ interface IPreferences {
   lastWhatsNewVersion: string;
   dontShowWhatsNew: boolean;
   useDarkTheme: boolean;
-  lastCommandThatRanKeyCombo: string;
+  recentlyUsedCommands: { [commandPaletteId: string]: string };
 }
 
 export const get = (): IPreferences => {
