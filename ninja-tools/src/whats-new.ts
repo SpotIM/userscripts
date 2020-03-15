@@ -2,11 +2,17 @@ import * as prefs from './prefs';
 import * as message from './message';
 import gutterActions from './gutter-actions';
 import styles from './whats-new.css';
+import getColors from './colors';
 
 const changelog = [
   {
     version: '4.2.0',
     list: [
+      {
+        title: 'Performance Improvements',
+        description:
+          'Previously Ninja Tools would run as soon the page was idle, it will now run as soon as the page starts loading',
+      },
       {
         title: 'Added Spot Commands',
         description:
@@ -163,15 +169,35 @@ async function show(hasUpgraded?: boolean) {
     message.hide(true);
   }
 
-  async function handleCloseAndToggleShowNextTime() {
+  function handleToggleShowNextTime() {
     const { dontShowWhatsNew } = prefs.get();
-    await prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
-    message.hide(true);
+    prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
   }
 
   whatsNew.addListeners(index => {
     if (index === 0) {
-      handleCloseAndToggleShowNextTime();
+      handleToggleShowNextTime();
+      handleClose();
+      const { dontShowWhatsNew } = prefs.get();
+
+      if (dontShowWhatsNew) {
+        message.set(
+          "You can change this later on through the What's New screen",
+          {
+            title: 'I will not show you updates anymore',
+            color: getColors().default,
+            emoji: '👌',
+            timeout: 6000,
+            styleAsMessageBox: true,
+          }
+        );
+      } else {
+        message.set('I will show you what has changed next time!', {
+          color: getColors().default,
+          emoji: '👍🏻',
+          timeout: 4000,
+        });
+      }
     } else {
       handleClose();
     }

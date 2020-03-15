@@ -150,6 +150,10 @@
   word-break: break-word;
 }
 
+.event .prop-value.value-undefined {
+  /* opacity: 0.75; */
+}
+
 .query-input-wrapper {
   position: fixed;
   right: 0px;

@@ -66,7 +66,7 @@ export function showSpotCommands({ id }) {
 
       try {
         const posts = await gmFetchJson(
-          'https://extract-article-text.dutzi.now.sh/?url=' + url
+          'https://extract-article-links.dutzi.now.sh/?url=' + url
         );
 
         if (!posts.length) {

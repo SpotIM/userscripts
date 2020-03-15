@@ -37,14 +37,14 @@ To add a new command, you need to edit two files.
   - `id` (string) - A unique identifier.
   - `keyCombo` (string, optional) - The key combination that activates this command (you can hit a key combo without the need to open the command palette), use this one for _super_ useful commands.
   - `description` (string) - The command's description, shows up in the command palette and help screen.
-  - `detailedDescription` (string, optional) - A detailed description that will only show up in the help screen (optional).
+  - `detailedDescription` (string, optional) - A detailed description that will only show up in the help screen.
 - [commands-impl.ts](./src/commands-impl.ts) - This file exports an object where the keys are command ids and the values are that command's implementation. Nearing the end of that file you'll see a block that automatically creates command entries for A/B test commands.
 
 ## Adding an A/B Test
 
 To add a command that toggles A/B tests (or cycles between their variants) there's no need to edit [commands.ts](./src/commands.ts) or [commands-impl.ts](./src/commands-impl.ts), instead you use a simple abstraction above it. You describe what your A/B test tests for and those descriptions are automatically converted to commands.
 
-Open [ab-test-commands.ts](./src/ab-test-commands.ts) and add an A/B test. It's pretty straightforward, just Look at existing ones for reference.
+Open [ab-test-commands.ts](./src/ab-test-commands.ts) and add an A/B test. It's pretty straightforward, just look at existing ones for reference.
 
 ## Updating the Release Notes (or What's New)
 

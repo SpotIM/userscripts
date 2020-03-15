@@ -86,7 +86,7 @@ async function show({
     }
   }
 
-  const messageBodyEl = message.set(
+  const { messageBodyEl } = message.set(
     /*html*/ `<style>
       ${styles}
     </style>

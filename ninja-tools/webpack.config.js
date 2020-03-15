@@ -49,6 +49,8 @@ module.exports = {
         version: dev ? `[version]-build.[buildTime]` : `[version]`,
         description: 'A bunch of shortcuts to make our lives easier',
         author: 'dutzi',
+        homepageURL:
+          'https://github.com/SpotIM/userscripts/tree/master/ninja-tools',
         match: 'http*://*/*',
         noframes: true,
         resource: [
@@ -56,7 +58,7 @@ module.exports = {
           'welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/assets/welcome-background.png',
         ],
         supportURL: 'slack://channel?id=CSZGJD6R1&team=T0460KVUF',
-        connect: ['extract-article-text.dutzi.now.sh'],
+        connect: ['extract-article-links.dutzi.now.sh'],
         'run-at': 'document-start',
         iconURL:
           'https://rawcdn.githack.com/SpotIM/userscripts/b327b3d46d1c3bf681a56e05b9b88e6bbcc3153e/ninja-tools/icon64.png',
@@ -72,6 +74,8 @@ module.exports = {
           'GM_getResourceURL',
           'GM_xmlhttpRequest',
           'unsafeWindow',
+          'GM_addValueChangeListener',
+          'GM_removeValueChangeListener',
         ],
       },
     }),

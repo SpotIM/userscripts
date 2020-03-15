@@ -23,4 +23,6 @@ const darkTheme = {
   success: { bg: '#121212', border: '#424242' },
 };
 
-export default () => (getUseDarkTheme() ? darkTheme : lightTheme);
+const getColors = () => (getUseDarkTheme() ? darkTheme : lightTheme);
+
+export default getColors;

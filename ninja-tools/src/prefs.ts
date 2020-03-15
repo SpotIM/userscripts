@@ -1,4 +1,4 @@
-interface IPreferences {
+export interface IPreferences {
   autoScroll: boolean;
   selectedItemIndex: number;
   showVersionsOnLoad: boolean;

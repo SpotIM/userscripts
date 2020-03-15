@@ -39,9 +39,26 @@ function renderWelcomeMessage() {
 export default async (force?: boolean) => {
   const isNotFirstRun = prefs.get().isNotFirstRun;
   if (!isNotFirstRun || force) {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.code === 'KeyS' && e.metaKey) {
+        message.set('You are hitting Cmd+S, hit Ctrl+S instead.', {
+          color: getColors().error,
+          emoji: '🤦🏻‍♂️',
+        });
+        e.preventDefault();
+      }
+    }
+
+    function handleMessageUnload() {
+      document.removeEventListener('keydown', handleKeyDown);
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+
     message.set(renderWelcomeMessage(), {
       color: getColors().default,
       title: 'Welcome to Spot.IM Ninja Tools!',
+      onMessageUnload: handleMessageUnload,
     });
 
     await prefs.set({ isNotFirstRun: true });

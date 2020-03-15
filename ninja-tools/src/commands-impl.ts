@@ -264,6 +264,10 @@ let commandsImpl: ICommandImpls = {
     scrollToConversation.stop();
     help.show();
   },
+
+  showWelcomeMessage: () => {
+    showFirstRunMessage(true);
+  },
 };
 
 commandsImpl = (() => {
@@ -305,12 +309,6 @@ commandsImpl = (() => {
     };
   }, commandsImpl);
 })();
-
-if (process.env.NODE_ENV === 'development') {
-  commandsImpl.ssw = () => {
-    showFirstRunMessage(true);
-  };
-}
 
 export default commandsImpl;
 

@@ -1,3 +1,4 @@
+import { IPreferences } from './prefs';
 // import * as shadowDOM from './shadow-dom';
 import rawCSS from './events-viewer.css';
 import { parse } from 'shell-quote';
@@ -8,8 +9,8 @@ import bookmarkSvg from './icons/bookmark.svg';
 import { getUseDarkTheme } from './colors';
 
 const EVENTS_VIEWER_WIDTH = 340;
-const EVENTS_VIEWER_MARGIN_END = 20;
-const EVENTS_VIEWER_FULL_WIDTH = EVENTS_VIEWER_WIDTH + EVENTS_VIEWER_MARGIN_END;
+const EVENTS_VIEWER_MARGIN = 20;
+const EVENTS_VIEWER_FULL_WIDTH = EVENTS_VIEWER_WIDTH + EVENTS_VIEWER_MARGIN;
 
 const existingConsoleLog = (unsafeWindow as Window).console.log;
 let isShowing: boolean;
@@ -25,6 +26,8 @@ let queryInputEl: HTMLInputElement;
 let query = '';
 let events: any[] = [];
 let historyQueryIndex: number = (prefs.get().eventsQueryHistory || []).length;
+let lastResizerMouseDownTime: number;
+let addValueChangeListenerId: number;
 
 function saveLastQuery() {
   prefs.set({ eventsQuery: queryInputEl.value });
@@ -57,6 +60,16 @@ function applyDarkClass() {
   }
 }
 
+function handlePrefsChange(
+  name: string,
+  oldValue: IPreferences,
+  newValue: IPreferences
+) {
+  if (oldValue.useDarkTheme !== newValue.useDarkTheme) {
+    applyDarkClass();
+  }
+}
+
 function addEventsList() {
   if (addedEventsList) {
     applyDarkClass();
@@ -67,6 +80,11 @@ function addEventsList() {
 
   eventsViewerEl = document.createElement('div');
   eventsViewerEl.className = 'events-viewer';
+
+  addValueChangeListenerId = GM_addValueChangeListener(
+    'prefs',
+    handlePrefsChange
+  );
 
   applyDarkClass();
 
@@ -132,6 +150,23 @@ function addEventsList() {
 }
 
 function handleResizeMouseDown(downEvent: MouseEvent) {
+  const now = new Date().getTime();
+  if (now - lastResizerMouseDownTime < 200) {
+    if (eventsViewerEl.style.left === '100%') {
+      eventsViewerEl.style.left =
+        (EVENTS_VIEWER_MARGIN /
+          (window.innerWidth - EVENTS_VIEWER_FULL_WIDTH)) *
+          100 +
+        '%';
+    } else {
+      eventsViewerEl.style.left = '100%';
+    }
+
+    return;
+  }
+
+  lastResizerMouseDownTime = now;
+
   const target = downEvent.currentTarget as Element;
   const initY = downEvent.clientY - target.getBoundingClientRect().top;
   const initX = downEvent.clientX - target.getBoundingClientRect().left;
@@ -242,6 +277,8 @@ function removeEventsList() {
 
   shadowWrapper.parentElement!.removeChild(shadowWrapper);
   unsafeWindow.removeEventListener('keydown', handleGlobalKeyDown);
+
+  GM_removeValueChangeListener(addValueChangeListenerId);
 }
 
 function addEvent(event) {
@@ -314,6 +351,16 @@ function getMandatoryPropName(queryPart: string) {
 
 function getValue(queryPart: string) {
   return queryPart.substr(queryPart.indexOf(':') + 1);
+}
+
+function renderPropValue(value?: string) {
+  if (value === undefined) {
+    return /*html*/ `<span class="prop-value value-undefined">undefined</span>`;
+  } else if (value === '') {
+    return /*html*/ `<span class="prop-value">(empty string)</span>`;
+  } else {
+    return /*html*/ `<span class="prop-value">${value}</span>`;
+  }
 }
 
 function renderEvents(scrollToBottom = true) {
@@ -408,6 +455,7 @@ function renderEvents(scrollToBottom = true) {
       <div>Ctrl+K to clear</div>
       <div>Ctrl+P to pause</div>
       <div>Ctrl+B to bookmark</div>
+      <div>Ctrl+C to copy all</div>
     </div>` +
     filteredEvents
       .map((event, index) => {
@@ -442,12 +490,12 @@ function renderEvents(scrollToBottom = true) {
                       ]
                   )
                     .map(
-                      propName => `
+                      propName => /*html*/ `
                       <span class="prop-name">${propName.replace(
                         /_/g,
                         ' '
                       )}</span>
-                      <span class="prop-value">${event[propName]}</span>
+                      ${renderPropValue(event[propName])}
                     `
                     )
                     .join('')}
@@ -521,8 +569,6 @@ export function toggle({
   isShowing = !isShowing;
 
   if (isShowing) {
-    unsafeWindow.localStorage.setItem('SPOTIM_DEBUG_API', '*');
-
     if (waitForSpotimObject) {
       onFoundSpotimObject(show);
     } else {
@@ -583,3 +629,5 @@ function handleGlobalKeyDown(e: KeyboardEvent) {
 if (prefs.get().showEventsViewer) {
   toggle({ waitForSpotimObject: true });
 }
+
+unsafeWindow.localStorage.setItem('SPOTIM_DEBUG_API', '*');

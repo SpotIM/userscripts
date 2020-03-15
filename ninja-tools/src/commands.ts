@@ -74,4 +74,11 @@ const commands: ICommand[] = [
   })),
 ];
 
+if (process.env.NODE_ENV === 'development') {
+  commands.push({
+    id: 'showWelcomeMessage',
+    description: 'Show Welcome Message',
+  });
+}
+
 export default commands;

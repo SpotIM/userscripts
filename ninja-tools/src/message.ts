@@ -16,6 +16,7 @@ let shadowWrapper: HTMLElement;
 let isShowingMessage: boolean;
 let lastMessageProps: any;
 let progressAnimationTimeout: NodeJS.Timeout;
+let _onMessageUnload: (() => void) | undefined;
 
 function addStyleTag() {
   if (hasAddedStyleTag) {
@@ -109,12 +110,20 @@ function mouseOut() {
   });
 }
 
+function callOnMessageUnload() {
+  if (_onMessageUnload) {
+    _onMessageUnload();
+    _onMessageUnload = undefined;
+  }
+}
+
 function hideMessage(force?: boolean) {
   function hideMessageImpl() {
     if (shadowWrapper && shadowWrapper.parentNode) {
       shadowWrapper.parentNode.removeChild(shadowWrapper);
       setMessageProgress(0);
       isShowingMessage = false;
+      callOnMessageUnload();
     }
   }
 
@@ -138,6 +147,7 @@ function setMessage(
     overflow,
     progressBarDuration,
     styleAsMessageBox,
+    onMessageUnload,
   }: {
     timeout?: number;
     color?: IColor;
@@ -149,12 +159,15 @@ function setMessage(
     overflow?: 'scroll';
     progressBarDuration?: number;
     styleAsMessageBox?: boolean;
+    onMessageUnload?: () => void;
   } = {}
 ) {
   const currentMessageProps = arguments;
   if (isShowingMessage && isEqual(lastMessageProps, currentMessageProps)) {
-    return;
+    return {};
   }
+
+  callOnMessageUnload();
 
   lastMessageProps = currentMessageProps;
 
@@ -227,7 +240,9 @@ function setMessage(
 
   isShowingMessage = true;
 
-  return messageBodyEl;
+  _onMessageUnload = onMessageUnload;
+
+  return { messageBodyEl };
 }
 
 function setMessageProgress(progress) {
