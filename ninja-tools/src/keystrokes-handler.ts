@@ -43,7 +43,7 @@ export function init() {
           commands: spotsData,
           getCommandImpl: showSpotCommands,
           commandPaletteId: 'spotSelector',
-          title: "Start Typing a Spot's Name",
+          placeholder: "Type a Spot's Name...",
         });
       } else {
         commandPalette.show({

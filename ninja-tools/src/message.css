@@ -153,6 +153,10 @@
   text-shadow: 0px -2px #00000033;
 }
 
+.message.hideCloseButton .close_button {
+  display: none;
+}
+
 .inset_shadow {
   position: absolute;
   top: 0px;
@@ -337,7 +341,7 @@
   padding-right: 10px;
 }
 
-.input + .results:not(:empty) {
+.inputWrapper + .results:not(:empty) {
   margin-top: 12px;
 }
 
@@ -345,11 +349,11 @@
   cursor: pointer;
 }
 
-.input + .results .table .tr .td:first-child {
+.inputWrapper + .results .table .tr .td:first-child {
   padding-right: 20px;
 }
 
-.input + .results .table .tr .td:nth-child(2) {
+.inputWrapper + .results .table .tr .td:nth-child(2) {
   width: 100%;
 }
 

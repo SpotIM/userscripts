@@ -148,6 +148,7 @@ function setMessage(
     progressBarDuration,
     styleAsMessageBox,
     onMessageUnload,
+    hideCloseButton,
   }: {
     timeout?: number;
     color?: IColor;
@@ -160,6 +161,7 @@ function setMessage(
     progressBarDuration?: number;
     styleAsMessageBox?: boolean;
     onMessageUnload?: () => void;
+    hideCloseButton?: boolean;
   } = {}
 ) {
   const currentMessageProps = arguments;
@@ -200,6 +202,12 @@ function setMessage(
     messageEl.classList.add('below_notifications');
   } else {
     messageEl.classList.remove('below_notifications');
+  }
+
+  if (hideCloseButton) {
+    messageEl.classList.add('hideCloseButton');
+  } else {
+    messageEl.classList.remove('hideCloseButton');
   }
 
   clearTimeout(hideMessageTimeout);

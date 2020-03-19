@@ -7,10 +7,31 @@
   font-weight: normal;
 }
 
-.badgeWrapper {
-  left: 11px;
+.inputWrapper {
+  position: relative;
+}
+
+.indicators {
+  display: flex;
   position: absolute;
-  top: 14px;
+  right: 0px;
+  top: 0px;
+  height: 100%;
+  align-items: center;
+}
+
+.titleIcon {
+  margin-inline-end: 9px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input::placeholder {
+  color: #ffffff80;
+}
+
+.badgeWrapper {
   display: flex;
   align-items: baseline;
 }

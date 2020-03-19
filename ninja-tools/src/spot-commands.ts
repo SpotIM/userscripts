@@ -116,7 +116,7 @@ export function showSpotCommands({ id }) {
         { id: 'copySpotId', description: 'Copy Spot Id' },
         { id: 'openHostPanel', description: 'Open Host Panel' },
       ],
-      title: spotName,
+      placeholder: `Type a Command for ${spotName}...`,
       getCommandImpl: getCommandImpl,
       commandPaletteId: 'spotCommands',
     });
