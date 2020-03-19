@@ -250,6 +250,15 @@ function setMessage(
 
   _onMessageUnload = onMessageUnload;
 
+  // function handleClick(e: MouseEvent) {
+  //   if (!(e.target as HTMLElement).closest('.message')) {
+  //     hideMessage();
+  //     window.removeEventListener('click', handleClick);
+  //   }
+  // }
+
+  // window.addEventListener('click', handleClick);
+
   return { messageBodyEl };
 }
 

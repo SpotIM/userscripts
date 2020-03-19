@@ -67,9 +67,10 @@ async function show({
   }
 
   function handleTableClick(e) {
-    const line = e.target.closest('.tr');
+    const line = e.target.closest('.pallete_row_main_col');
     if (line && line.children.length) {
-      const commandId = line.children[0].children[0].dataset.commandId;
+      const commandId = line.querySelector('[data-command-id]').dataset
+        .commandId;
       const commandImpl = getCommandImpl({ id: commandId });
       const { recentlyUsedCommands } = prefs.get();
       prefs.set({
@@ -80,7 +81,9 @@ async function show({
       });
 
       if (commandImpl) {
-        commandImpl();
+        setTimeout(() => {
+          commandImpl();
+        }, 0);
       }
     }
   }

@@ -15,6 +15,7 @@ import getColors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
 import showInfoStyles from './commands-impl-show-info.css';
+import * as prompt from './prompt';
 
 interface ICommandImpls {
   [key: string]: () => void;
@@ -260,9 +261,40 @@ let commandsImpl: ICommandImpls = {
     }, 0);
   },
 
-  // modifyABTest: () => {
-  //   abTest.openModifyForm();
-  // },
+  modifyABTest: async () => {
+    const abTestNumber = await prompt.show({ prompt: 'Enter A/B Test Number' });
+    if (abTestNumber === '') {
+      return;
+    }
+
+    const spotAB =
+      JSON.parse(unsafeWindow.localStorage.getItem('SPOT_AB')) ?? {};
+    const currentVariant = spotAB?.[abTestNumber]?.variant;
+
+    const abTestVariant = (
+      await prompt.show({
+        prompt:
+          'Enter a Variant' + (currentVariant ? ` (${currentVariant})` : ''),
+      })
+    ).toUpperCase();
+
+    spotAB[abTestNumber] = {
+      version: 'v2',
+      ...spotAB[abTestNumber],
+      short_name: abTestNumber,
+      variant: abTestVariant,
+    };
+
+    unsafeWindow.localStorage.setItem('SPOT_AB', JSON.stringify(spotAB));
+
+    message.set(
+      `Successfully set test "${abTestNumber}" to "${abTestVariant}"!`,
+      {
+        color: getColors().success,
+        emoji: '👍🏾',
+      }
+    );
+  },
 
   // show help
   showHelp: () => {

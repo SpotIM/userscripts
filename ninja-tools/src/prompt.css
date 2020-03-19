@@ -1,0 +1,41 @@
+.prompt.input {
+  display: flex;
+  padding: 0px;
+}
+
+.promptInput {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 20px;
+  background: none;
+  border: none;
+  outline: none;
+  color: white;
+  font-weight: bold;
+}
+
+.promptInput::placeholder {
+  color: #ffffff80;
+}
+
+.promptMessage {
+  flex-shrink: 0;
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  border-right: 1px solid #00000000;
+  padding: 0px 10px;
+  margin-top: 1px;
+  text-shadow: none;
+  opacity: 1;
+  font-weight: normal;
+  background: linear-gradient(#90b0e5, #8a8a8a6b);
+  border-radius: 6px 0px 0px 6px;
+  color: #ffffffdb;
+  box-shadow: 1px 0px 1px #00000026, 2px 2px 10px -5px black inset;
+}
+
+.dark .promptMessage {
+  background: linear-gradient(#96989c, #8a8a8a6b);
+}

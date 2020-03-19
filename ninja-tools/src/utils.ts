@@ -113,7 +113,7 @@ export const createElement = (html, className, tag = 'div') => {
 };
 
 export const getRandomOptimisticEmoji = () => {
-  const emojis = ['🎈', '🚀', '🌈', '🦄'];
+  const emojis = ['🎈', '🚀', '🌈', '🦄', '🍪'];
   return emojis[Math.floor(Math.random() * emojis.length)];
 };
 
