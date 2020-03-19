@@ -68,6 +68,10 @@ const commands: ICommand[] = [
     id: 'copyPostId',
     description: 'Copy Post ID to Clipboard',
   },
+  // {
+  //   id: 'modifyABTest',
+  //   description: 'Modify A/B Test',
+  // },
   ...abTestCommands.map(abCommand => ({
     id: `__ab${abCommand.id}`,
     description: 'A/B Test: ' + abCommand.description,

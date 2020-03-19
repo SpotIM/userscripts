@@ -1,0 +1,19 @@
+.abTestFormWrapper {
+  display: flex;
+}
+
+.abTestFormWrapper .formField {
+  padding: 1em;
+  height: 229px;
+  display: flex;
+  flex-direction: column;
+}
+
+.abTestFormWrapper .label {
+  margin-bottom: 1em;
+}
+
+.abTestFormWrapper .input {
+  flex: 1;
+  font-size: 7em;
+}

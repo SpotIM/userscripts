@@ -15,12 +15,12 @@ async function show({
   commands,
   getCommandImpl,
   commandPaletteId,
-  title = 'Start Typing A Command',
+  placeholder = 'Start Typing a Command...',
 }: {
   commands: ICommand[];
   getCommandImpl: ({ id }: { id: string }) => () => void;
   commandPaletteId: string;
-  title?: string;
+  placeholder?: string;
 }) {
   selectedItemIndex = 0;
   let lastCommandThatRan;
@@ -52,9 +52,8 @@ async function show({
           String(secondsSinceBuild % 60).padStart(2, '0');
 
     return /*html*/ `
-      <span class="badgeWrapper">
-        <span class="devBadge">dev</span>
-        <span class="buildAge" title="Time since built">${buildAge}</span>
+      <span class="badgeWrapper" title="Built ${buildAge} ago">
+        💡
       </span>
     `;
   }
@@ -90,14 +89,17 @@ async function show({
     /*html*/ `<style>
       ${styles}
     </style>
-    <input class="input"><div class="results"></div>`,
+    <div class="inputWrapper">
+      <div class="indicators">
+        ${process.env.NODE_ENV === 'development' ? renderDevBadge() : ''}
+        ${!utils.getLauncherEl(false) ? missingLauncherWarning : ''}
+      </div>
+      <input class="input" placeholder="${placeholder}">
+    </div>
+    <div class="results"></div>`,
     {
-      title: `${
-        !utils.getLauncherEl(false) ? missingLauncherWarning : ''
-      }${title}${
-        process.env.NODE_ENV === 'development' ? renderDevBadge() : ''
-      }${process.env.BETA ? renderBetaBadge() : ''}`,
       color: getColors().default,
+      hideCloseButton: true,
     }
   );
 
@@ -177,33 +179,33 @@ async function show({
     messageBodyEl!.querySelector(
       '.results'
     )!.innerHTML = relevantCommands.length
-      ? utils.renderTable(
-          relevantCommands.map((command, index) => [
-            `<span class="mono ${
+      ? relevantCommands
+          .map(
+            (command, index) => /*html*/ `<span
+            class="pallete_row_main_col ${
+              selectedItemIndex === index ? 'weight_bold' : 'muted_result'
+            }"
+            ${selectedItemIndex === index ? 'data-selected' : ''}
+            >
+            <div class="palette_row_description">${command.description}</div>
+            ${
+              lastCommandThatRan === command
+                ? "<div class='palette_row_recently_used'>recently used</div>"
+                : ''
+            }
+            <span class="mono ${
               !command.keyCombo ? 'hidden' : ''
             }" data-command-id="${command.id}">${
               !command.keyCombo ? '×' : command.keyCombo
-            }</span>`,
-            `<span
-                  class="pallete_row_main_col ${
-                    selectedItemIndex === index ? 'weight_bold' : 'muted_result'
-                  }"
-                  ${selectedItemIndex === index ? 'data-selected' : ''}
-                  >
-                  <div class="palette_row_description">${
-                    command.description
-                  }</div>
-                  ${
-                    lastCommandThatRan === command
-                      ? "<div class='palette_row_recently_used'>recently used</div>"
-                      : ''
-                  }
-                </span>`,
-            selectedItemIndex === index
-              ? utils.createElement('⏎', 'muted_text')
-              : '',
-          ])
-        )
+            }</span>
+            ${
+              selectedItemIndex === index
+                ? utils.createElement('⏎', 'muted_text')
+                : ''
+            }
+          </span>`
+          )
+          .join('')
       : '';
 
     function isResultLineVisible(lineEl) {
@@ -220,8 +222,7 @@ async function show({
 
     const selectedLineTr = shadowDOM.get().querySelector('[data-selected]');
     if (selectedLineTr) {
-      const selectedLine = selectedLineTr.parentNode!
-        .parentNode as HTMLTableRowElement;
+      const selectedLine = selectedLineTr as HTMLSpanElement;
       if (!isResultLineVisible(selectedLine)) {
         selectedLine.scrollIntoView(scrollAlignToTop);
       }

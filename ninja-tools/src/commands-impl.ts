@@ -9,6 +9,7 @@ import * as whatsNew from './whats-new';
 import * as help from './help';
 import * as commandPalette from './command-palette';
 import * as eventsViewer from './events-viewer';
+import * as abTest from './ab-test';
 import showFirstRunMessage from './show-first-run-message';
 import getColors from './colors';
 import pageLoadTime from './page-load-time';
@@ -258,6 +259,10 @@ let commandsImpl: ICommandImpls = {
       });
     }, 0);
   },
+
+  // modifyABTest: () => {
+  //   abTest.openModifyForm();
+  // },
 
   // show help
   showHelp: () => {
