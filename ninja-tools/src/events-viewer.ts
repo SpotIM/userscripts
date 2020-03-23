@@ -544,7 +544,9 @@ function consoleLogProxy(...args) {
   if (
     typeof args[0] === 'string' &&
     (typeof args[1] === 'object' || typeof args[3] === 'object') &&
-    (args[0].startsWith('%cSpot.IM Analytics') || args[0] === 'Analytics Track')
+    (args[0].startsWith('%cSpot.IM Analytics') ||
+      args[0] === 'Analytics Track' ||
+      args[0].startsWith('%cSpot.IM Time Spent%c'))
   ) {
     if (typeof args[3] === 'object') {
       addEvent(args[3]);
