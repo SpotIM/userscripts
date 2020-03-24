@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        SpotIM Ninja Tools
-// @version     4.2.2
+// @version     4.2.3
 // @author      dutzi
 // @description A bunch of shortcuts to make our lives easier
 // @supportURL  slack://channel?id=CSZGJD6R1&team=T0460KVUF

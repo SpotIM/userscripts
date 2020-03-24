@@ -637,8 +637,19 @@ if (prefs.get().showEventsViewer) {
 }
 
 export function shouldShowEventsInConsole() {
-  console.log(prefs.get().dontShowEventsInConsole);
-  return !prefs.get().dontShowEventsInConsole?.[unsafeWindow.location.host];
+  const dontShow = prefs.get().dontShowEventsInConsole?.[
+    unsafeWindow.location.host
+  ];
+
+  if (dontShow === true) {
+    return false;
+  }
+
+  if (dontShow === false) {
+    return true;
+  }
+
+  return !prefs.get().dontShowEventsInConsoleInAllDomains;
 }
 
 export function setShouldShowEventsInConsole(value: boolean) {

@@ -6,6 +6,15 @@ import getColors from './colors';
 
 const changelog = [
   {
+    version: '4.2.3',
+    showOnFirstLoad: false,
+    list: [
+      {
+        title: 'Added Toggle Show Events in Console on All Domains',
+      },
+    ],
+  },
+  {
     version: '4.2.2',
     showOnFirstLoad: false,
     list: [

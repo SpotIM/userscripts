@@ -225,6 +225,22 @@ let commandsImpl: ICommandImpls = {
     });
   },
 
+  toggleShowEventsInConsoleAllDomains: () => {
+    const dontShow = !prefs.get().dontShowEventsInConsoleInAllDomains;
+    prefs.set({ dontShowEventsInConsoleInAllDomains: dontShow });
+
+    message.set(
+      !dontShow
+        ? 'Showing events in all domains!'
+        : 'Stopped showing events in all domains!',
+      {
+        timeout: 6000,
+        emoji: '👍🏻',
+        color: getColors().default,
+      }
+    );
+  },
+
   toggleShowAssetsVersions: async () => {
     const showVersionsOnLoad = prefs.get().showVersionsOnLoad;
     await prefs.set({ showVersionsOnLoad: !showVersionsOnLoad });

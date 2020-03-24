@@ -11,6 +11,7 @@ export interface IPreferences {
   dontShowWhatsNew: boolean;
   useDarkTheme: boolean;
   recentlyUsedCommands: { [commandPaletteId: string]: string };
+  dontShowEventsInConsoleInAllDomains: boolean;
   dontShowEventsInConsole?: { [hostname: string]: boolean };
 }
 
