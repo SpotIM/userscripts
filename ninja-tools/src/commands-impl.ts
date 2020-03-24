@@ -9,13 +9,13 @@ import * as whatsNew from './whats-new';
 import * as help from './help';
 import * as commandPalette from './command-palette';
 import * as eventsViewer from './events-viewer';
-import * as abTest from './ab-test';
 import showFirstRunMessage from './show-first-run-message';
 import getColors from './colors';
 import pageLoadTime from './page-load-time';
 import abTestCommands from './ab-test-commands';
 import showInfoStyles from './commands-impl-show-info.css';
 import * as prompt from './prompt';
+import * as spotCommands from './spot-commands';
 
 interface ICommandImpls {
   [key: string]: () => void;
@@ -187,14 +187,22 @@ let commandsImpl: ICommandImpls = {
   },
 
   toggleEventsViewer: () => {
-    const isShowingEventsViewer = eventsViewer.toggle();
+    const { isShowing, shouldRefresh } = eventsViewer.toggle();
 
-    if (isShowingEventsViewer) {
-      message.set('I will show you events!', {
-        timeout: 3000,
-        emoji: '👍🏻',
-        color: getColors().default,
-      });
+    if (isShowing) {
+      if (shouldRefresh) {
+        message.set('Please refresh the page to see the events', {
+          timeout: 5000,
+          emoji: '⚠️',
+          color: getColors().default,
+        });
+      } else {
+        message.set('I will show you events!', {
+          timeout: 3000,
+          emoji: '👍🏻',
+          color: getColors().default,
+        });
+      }
     } else {
       message.set('Stopped showing events!', {
         timeout: 3000,
@@ -202,6 +210,19 @@ let commandsImpl: ICommandImpls = {
         color: getColors().default,
       });
     }
+  },
+
+  toggleShowEventsInConsole: () => {
+    const showing = !eventsViewer.shouldShowEventsInConsole();
+    eventsViewer.setShouldShowEventsInConsole(showing);
+
+    message.set('Please refresh the page', {
+      title: showing ? 'Showing events!' : 'Stopped showing events!',
+      styleAsMessageBox: true,
+      timeout: 6000,
+      emoji: '👍🏻',
+      color: getColors().default,
+    });
   },
 
   toggleShowAssetsVersions: async () => {
@@ -294,6 +315,10 @@ let commandsImpl: ICommandImpls = {
         emoji: '👍🏾',
       }
     );
+  },
+
+  searchSpots: () => {
+    spotCommands.showPalette();
   },
 
   // show help

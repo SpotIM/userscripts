@@ -11,6 +11,7 @@ export interface IPreferences {
   dontShowWhatsNew: boolean;
   useDarkTheme: boolean;
   recentlyUsedCommands: { [commandPaletteId: string]: string };
+  dontShowEventsInConsole?: { [hostname: string]: boolean };
 }
 
 export const get = (): IPreferences => {

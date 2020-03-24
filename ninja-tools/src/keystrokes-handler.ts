@@ -4,8 +4,7 @@ import * as message from './message';
 import * as commandPalette from './command-palette';
 import commands from './commands';
 import { isWindows } from './utils';
-import spotsData from './spot-data.json';
-import { showSpotCommands } from './spot-commands';
+import * as spotCommands from './spot-commands';
 
 export function init() {
   let lastKeyStrokesResetTimeout;
@@ -39,12 +38,7 @@ export function init() {
       ((isWindows && e.altKey) || e.ctrlKey)
     ) {
       if (e.shiftKey) {
-        commandPalette.show({
-          commands: spotsData,
-          getCommandImpl: showSpotCommands,
-          commandPaletteId: 'spotSelector',
-          placeholder: "Type a Spot's Name...",
-        });
+        spotCommands.showPalette();
       } else {
         commandPalette.show({
           commands,

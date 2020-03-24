@@ -22,7 +22,7 @@ const changelog = [
             title: "Open spot's website",
           },
           {
-            title: 'Open post page (EXPERIMENTAL)',
+            title: 'Open post page 🧪',
           },
           {
             title: 'Copy spot id',

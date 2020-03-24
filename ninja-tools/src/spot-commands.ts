@@ -112,7 +112,7 @@ export function showSpotCommands({ id }) {
     commandPalette.show({
       commands: [
         { id: 'openSite', description: 'Open Website' },
-        { id: 'openPost', description: 'Open Post Page (EXPERIMENTAL)' },
+        { id: 'openPost', description: 'Open Post Page 🧪' },
         { id: 'copySpotId', description: 'Copy Spot Id' },
         { id: 'openHostPanel', description: 'Open Host Panel' },
       ],
@@ -121,4 +121,13 @@ export function showSpotCommands({ id }) {
       commandPaletteId: 'spotCommands',
     });
   };
+}
+
+export function showPalette() {
+  commandPalette.show({
+    commands: spotsData,
+    getCommandImpl: showSpotCommands,
+    commandPaletteId: 'spotSelector',
+    placeholder: "Type a Spot's Name...",
+  });
 }

@@ -96,6 +96,7 @@ function addEventsList() {
     <div class="resizer"></div>
     <div class="query-input-wrapper">
       <input type="text" class="query-input" placeholder='Type a query, e.g., "-type:loaded"'>
+      <a class="help" href="https://github.com/SpotIM/userscripts/blob/master/ninja-tools/event-queries.md" target="_blank">﹖</a>
     </div>
     <div class="events-list"></div>
   `;
@@ -570,10 +571,13 @@ export function toggle({
 }: { waitForSpotimObject?: boolean } = {}) {
   isShowing = !isShowing;
 
+  const shouldRefresh = !shouldShowEventsInConsole();
+  setShouldShowEventsInConsole(true);
+
   if (isShowing) {
     if (waitForSpotimObject) {
       onFoundSpotimObject(show);
-    } else {
+    } else if (!shouldRefresh) {
       show();
     }
   } else {
@@ -583,7 +587,7 @@ export function toggle({
 
   prefs.set({ showEventsViewer: isShowing });
 
-  return isShowing;
+  return { isShowing, shouldRefresh };
 }
 
 function handleGlobalKeyDown(e: KeyboardEvent) {
@@ -632,4 +636,34 @@ if (prefs.get().showEventsViewer) {
   toggle({ waitForSpotimObject: true });
 }
 
-unsafeWindow.localStorage.setItem('SPOTIM_DEBUG_API', '*');
+export function shouldShowEventsInConsole() {
+  console.log(prefs.get().dontShowEventsInConsole);
+  return !prefs.get().dontShowEventsInConsole?.[unsafeWindow.location.host];
+}
+
+export function setShouldShowEventsInConsole(value: boolean) {
+  prefs.set({
+    dontShowEventsInConsole: {
+      ...(prefs.get().dontShowEventsInConsole ?? {}),
+      [unsafeWindow.location.host]: !value,
+    },
+  });
+
+  if (value) {
+    showEventsInConsole();
+  } else {
+    stopShowingEventsInConsole();
+  }
+}
+
+function showEventsInConsole() {
+  unsafeWindow.localStorage.setItem('SPOTIM_DEBUG_API', '*');
+}
+
+function stopShowingEventsInConsole() {
+  unsafeWindow.localStorage.removeItem('SPOTIM_DEBUG_API');
+}
+
+if (shouldShowEventsInConsole()) {
+  showEventsInConsole();
+}

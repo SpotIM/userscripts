@@ -162,6 +162,23 @@
   backdrop-filter: blur(10px);
 }
 
+.query-input-wrapper .help {
+  position: absolute;
+  z-index: 10;
+  right: 19px;
+  top: 17px;
+  cursor: pointer;
+  background: #ececec;
+  color: #989898;
+  border-radius: 100%;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  border: 1px solid #ddd;
+  box-shadow: 0px 0px 9px -7px black inset;
+  text-decoration: none;
+}
+
 .query-input {
   width: 300px;
   padding: 10px;
