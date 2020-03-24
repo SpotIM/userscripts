@@ -25,9 +25,16 @@
   overflow: hidden;
   background: #ffffff26;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid #00000021;
   pointer-events: all;
   /* box-shadow: 0px 0px 12px -6px black; */
+}
+
+@-moz-document url-prefix() {
+  .events-viewer {
+    background: #ffffffde;
+  }
 }
 
 .events-viewer,
@@ -156,7 +163,6 @@
 
 .query-input-wrapper {
   position: fixed;
-  right: 0px;
   background: #ffffff26;
   z-index: 10;
   backdrop-filter: blur(10px);

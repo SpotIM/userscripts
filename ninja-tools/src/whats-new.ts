@@ -29,7 +29,7 @@ const changelog = [
           'Modify any A/B test by specifying its id and a variant (A/B/C...)',
       },
       {
-        title: 'Showing Time Spent BI Events',
+        title: 'Showing time spent BI events',
       },
     ],
   },
