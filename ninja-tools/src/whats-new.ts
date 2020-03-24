@@ -6,7 +6,36 @@ import getColors from './colors';
 
 const changelog = [
   {
+    version: '4.2.2',
+    showOnFirstLoad: false,
+    list: [
+      {
+        title: 'Added Toggle Show Events in Console',
+      },
+    ],
+  },
+  {
+    version: '4.2.1',
+    showOnFirstLoad: false,
+    list: [
+      {
+        title: 'Improved UI',
+        description:
+          'UI is now more consistent with other, popular command palettes',
+      },
+      {
+        title: 'Added Modify A/B Test Command',
+        description:
+          'Modify any A/B test by specifying its id and a variant (A/B/C...)',
+      },
+      {
+        title: 'Showing Time Spent BI Events',
+      },
+    ],
+  },
+  {
     version: '4.2.0',
+    showOnFirstLoad: true,
     list: [
       {
         title: 'Performance Improvements',
@@ -36,6 +65,7 @@ const changelog = [
   },
   {
     version: '4.1.0',
+    showOnFirstLoad: true,
     list: [
       {
         title: 'Added Events Viewer',
@@ -46,6 +76,7 @@ const changelog = [
   },
   {
     version: '4.0.5',
+    showOnFirstLoad: true,
     list: [
       {
         title: 'Added Dark Mode (Toggle Dark Mode in the Command Palette)',
@@ -54,6 +85,7 @@ const changelog = [
   },
   {
     version: '4.0.2',
+    showOnFirstLoad: true,
     list: [
       {
         title: 'Added Set Credentials Command and Credentials Form',
@@ -62,6 +94,7 @@ const changelog = [
   },
   {
     version: '3.7',
+    showOnFirstLoad: true,
     list: [
       {
         title: 'Added Recently Used commands',
@@ -216,7 +249,7 @@ async function showIfUpgraded() {
 
     if (
       (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) &&
-      changelog.find(entry => entry.version === currentVersion)
+      changelog.find(entry => entry.version === currentVersion)?.showOnFirstLoad
     ) {
       show(true);
     }
