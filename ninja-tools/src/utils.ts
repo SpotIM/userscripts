@@ -130,3 +130,19 @@ export const onFoundSpotimObject = callback => {
 };
 
 export const isWindows = window.navigator.platform === 'Win32';
+
+export function gmFetch(url: string, type: string) {
+  return new Promise(resolve => {
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url,
+      onload: function(response) {
+        if (type === 'json') {
+          resolve(JSON.parse(response.responseText));
+        } else {
+          resolve(response.responseText);
+        }
+      },
+    });
+  });
+}

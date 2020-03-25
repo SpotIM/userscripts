@@ -58,7 +58,10 @@ module.exports = {
           'welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/assets/welcome-background.png',
         ],
         supportURL: 'slack://channel?id=CSZGJD6R1&team=T0460KVUF',
-        connect: ['extract-article-links.dutzi.now.sh'],
+        connect: [
+          'extract-article-links.dutzi.now.sh',
+          'raw.githubusercontent.com',
+        ],
         'run-at': 'document-start',
         iconURL:
           'https://rawcdn.githack.com/SpotIM/userscripts/b327b3d46d1c3bf681a56e05b9b88e6bbcc3153e/ninja-tools/icon64.png',

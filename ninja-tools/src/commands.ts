@@ -84,6 +84,10 @@ const commands: ICommand[] = [
     id: 'toggleShowEventsInConsoleAllDomains',
     description: 'Toggle Show Events in Console on All Domains',
   },
+  {
+    id: 'runSherlock',
+    description: 'Run Sherlock',
+  },
   ...abTestCommands.map(abCommand => ({
     id: `__ab${abCommand.id}`,
     description: 'A/B Test: ' + abCommand.description,

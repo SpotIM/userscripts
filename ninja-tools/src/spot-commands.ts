@@ -3,18 +3,7 @@ import spotsData from './spot-data.json';
 import * as message from './message';
 import getColors from './colors';
 import * as hostPanel from './host-panel';
-
-function gmFetchJson(url: string) {
-  return new Promise(resolve => {
-    GM_xmlhttpRequest({
-      method: 'GET',
-      url,
-      onload: function(response) {
-        resolve(JSON.parse(response.responseText));
-      },
-    });
-  });
-}
+import * as utils from './utils';
 
 export function showSpotCommands({ id }) {
   const { url, spotName } = (() => {
@@ -65,8 +54,9 @@ export function showSpotCommands({ id }) {
       });
 
       try {
-        const posts = await gmFetchJson(
-          'https://extract-article-links.dutzi.now.sh/?url=' + url
+        const posts = await utils.gmFetch(
+          'https://extract-article-links.dutzi.now.sh/?url=' + url,
+          'json'
         );
 
         if (!posts.length) {

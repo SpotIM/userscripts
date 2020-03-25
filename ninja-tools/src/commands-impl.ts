@@ -337,6 +337,19 @@ let commandsImpl: ICommandImpls = {
     spotCommands.showPalette();
   },
 
+  runSherlock: async () => {
+    const token = await prompt.show({
+      prompt: 'Enter Token',
+    });
+
+    const script = await utils.gmFetch(
+      `https://raw.githubusercontent.com/SpotIM/sherlock/master/dist/bundle.js?token=${token}`,
+      'text'
+    );
+
+    unsafeWindow.eval(script);
+  },
+
   // show help
   showHelp: () => {
     scrollToConversation.stop();
