@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        SpotIM Ninja Tools
-// @version     4.2.5
+// @version     4.2.6
 // @author      dutzi
 // @description A bunch of shortcuts to make our lives easier
 // @supportURL  slack://channel?id=CSZGJD6R1&team=T0460KVUF
@@ -12,6 +12,7 @@
 // @resource    welcomeImage https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/assets/welcome-background.png
 // @connect     extract-article-links.dutzi.now.sh
 // @connect     raw.githubusercontent.com
+// @connect     github.com
 // @run-at      document-start
 // @iconURL     https://rawcdn.githack.com/SpotIM/userscripts/b327b3d46d1c3bf681a56e05b9b88e6bbcc3153e/ninja-tools/icon64.png
 // @icon64URL   https://rawcdn.githack.com/SpotIM/userscripts/b327b3d46d1c3bf681a56e05b9b88e6bbcc3153e/ninja-tools/icon64.png
