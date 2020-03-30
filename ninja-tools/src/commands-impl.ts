@@ -310,22 +310,29 @@ let commandsImpl: ICommandImpls = {
 
     const abTestVariant = (
       await prompt.show({
-        prompt:
-          'Enter a Variant' + (currentVariant ? ` (${currentVariant})` : ''),
+        prompt: 'Enter a Variant',
+        initialValue: currentVariant ?? '',
       })
     ).toUpperCase();
 
-    spotAB[abTestNumber] = {
-      version: 'v2',
-      ...spotAB[abTestNumber],
-      short_name: abTestNumber,
-      variant: abTestVariant,
-    };
+    const isDeleting = abTestVariant === '';
+    if (isDeleting) {
+      delete spotAB[abTestNumber];
+    } else {
+      spotAB[abTestNumber] = {
+        version: 'v2',
+        ...spotAB[abTestNumber],
+        short_name: abTestNumber,
+        variant: abTestVariant,
+      };
+    }
 
     unsafeWindow.localStorage.setItem('SPOT_AB', JSON.stringify(spotAB));
 
     message.set(
-      `Successfully set test "${abTestNumber}" to "${abTestVariant}"!`,
+      isDeleting
+        ? `Removed test "${abTestNumber}"!`
+        : `Successfully set test "${abTestNumber}" to "${abTestVariant}"!`,
       {
         color: getColors().success,
         emoji: '👍🏾',
