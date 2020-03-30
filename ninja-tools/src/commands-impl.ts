@@ -349,9 +349,12 @@ let commandsImpl: ICommandImpls = {
 
     const existingToken = prefs.get().sherlockToken;
 
+    const sherlockURL =
+      'https://raw.githubusercontent.com/SpotIM/sherlock/master/test-unit/bundle.js';
+
     if (existingToken) {
       const script = (await utils.gmFetch(
-        `https://raw.githubusercontent.com/SpotIM/sherlock/master/dist/bundle.js?token=${existingToken}`,
+        `${sherlockURL}?token=${existingToken}`,
         'text'
       )) as string;
 
@@ -369,7 +372,7 @@ let commandsImpl: ICommandImpls = {
     prefs.set({ sherlockToken: token });
 
     const script = (await utils.gmFetch(
-      `https://raw.githubusercontent.com/SpotIM/sherlock/master/dist/bundle.js?token=${token}`,
+      `${sherlockURL}?token=${token}`,
       'text'
     )) as string;
 
