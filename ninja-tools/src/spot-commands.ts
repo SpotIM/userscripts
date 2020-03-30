@@ -1,9 +1,10 @@
 import * as commandPalette from './command-palette';
-import spotsData from './spot-data.json';
 import * as message from './message';
 import getColors from './colors';
 import * as hostPanel from './host-panel';
 import * as utils from './utils';
+
+let spotsData;
 
 export function showSpotCommands({ id }) {
   const { url, spotName } = (() => {
@@ -113,7 +114,20 @@ export function showSpotCommands({ id }) {
   };
 }
 
-export function showPalette() {
+export async function showPalette() {
+  if (!spotsData) {
+    message.set('Fetching Spot Data...', {
+      emoji: '⏳',
+      color: getColors().default,
+      progressBarDuration: 1000,
+    });
+
+    spotsData = await utils.gmFetch(
+      `https://github.com/SpotIM/userscripts/raw/master/ninja-tools/src/spot-data.json`,
+      'json'
+    );
+  }
+
   commandPalette.show({
     commands: spotsData,
     getCommandImpl: showSpotCommands,

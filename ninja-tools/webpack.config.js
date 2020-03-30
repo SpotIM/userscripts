@@ -61,6 +61,7 @@ module.exports = {
         connect: [
           'extract-article-links.dutzi.now.sh',
           'raw.githubusercontent.com',
+          'github.com',
         ],
         'run-at': 'document-start',
         iconURL:
