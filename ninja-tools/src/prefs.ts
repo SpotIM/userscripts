@@ -13,6 +13,7 @@ export interface IPreferences {
   recentlyUsedCommands: { [commandPaletteId: string]: string };
   dontShowEventsInConsoleInAllDomains: boolean;
   dontShowEventsInConsole?: { [hostname: string]: boolean };
+  sherlockToken?: string;
 }
 
 export const get = (): IPreferences => {

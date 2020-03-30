@@ -338,14 +338,45 @@ let commandsImpl: ICommandImpls = {
   },
 
   runSherlock: async () => {
+    const GITHUB_NOT_FOUND_MESSAGE = '404: Not Found';
+
+    const existingToken = prefs.get().sherlockToken;
+
+    if (existingToken) {
+      const script = (await utils.gmFetch(
+        `https://raw.githubusercontent.com/SpotIM/sherlock/master/dist/bundle.js?token=${existingToken}`,
+        'text'
+      )) as string;
+
+      if (script.trim() !== GITHUB_NOT_FOUND_MESSAGE) {
+        unsafeWindow.eval(script);
+        return;
+      }
+    }
+
     const token = await prompt.show({
       prompt: 'Enter Token',
+      initialValue: prefs.get().sherlockToken,
     });
 
-    const script = await utils.gmFetch(
+    prefs.set({ sherlockToken: token });
+
+    const script = (await utils.gmFetch(
       `https://raw.githubusercontent.com/SpotIM/sherlock/master/dist/bundle.js?token=${token}`,
       'text'
-    );
+    )) as string;
+
+    if (script.trim() === GITHUB_NOT_FOUND_MESSAGE) {
+      message.set('Are you sure your token is correct?', {
+        title: 'Error Loading Sherlock',
+        emoji: '😢',
+        styleAsMessageBox: true,
+        timeout: 7000,
+        color: getColors().error,
+      });
+
+      return;
+    }
 
     unsafeWindow.eval(script);
   },
