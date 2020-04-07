@@ -42,7 +42,7 @@ export const getLauncherEl = (displayErrorIfNotFound?: boolean) => {
   return launcher;
 };
 
-export const isProduction = launcher => {
+export const isProduction = (launcher) => {
   if (unsafeWindow.__SPOTIMENV__) {
     return unsafeWindow.__SPOTIMENV__ === 'production';
   } else {
@@ -50,11 +50,8 @@ export const isProduction = launcher => {
   }
 };
 
-export const getSpotId = launcher => {
-  const possibleSpotId = launcher.src
-    .split('/')
-    .pop()
-    .split('?')[0];
+export const getSpotId = (launcher) => {
+  const possibleSpotId = launcher.src.split('/').pop().split('?')[0];
 
   if (possibleSpotId === 'launcher-bundle.js') {
     return launcher.getAttribute('data-spot-id');
@@ -63,7 +60,7 @@ export const getSpotId = launcher => {
   }
 };
 
-export const getPostId = launcher => {
+export const getPostId = (launcher) => {
   return launcher.getAttribute('data-post-id');
 };
 
@@ -85,7 +82,11 @@ export const getConfigUrl = () => {
   )}/${getPostId(launcher)}/vendor,init,conversation`;
 };
 
-export const padTime = str => {
+export const sleep = (duration: number) => {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+};
+
+export const padTime = (str) => {
   if (str.length === 1) {
     return `0${str}`;
   } else {
@@ -93,12 +94,12 @@ export const padTime = str => {
   }
 };
 
-export const renderTable = data => {
+export const renderTable = (data) => {
   return (
     "<div class='table'><tbody>" +
     data
       .map(
-        line =>
+        (line) =>
           "<div class='tr'><div class='td'>" +
           line.join("</div><div class='td'>") +
           '</div></div>'
@@ -117,7 +118,7 @@ export const getRandomOptimisticEmoji = () => {
   return emojis[Math.floor(Math.random() * emojis.length)];
 };
 
-export const onFoundSpotimObject = callback => {
+export const onFoundSpotimObject = (callback) => {
   function updateOnFoundSpotimObject() {
     if (unsafeWindow.__SPOTIM__) {
       clearInterval(interval);
@@ -132,11 +133,11 @@ export const onFoundSpotimObject = callback => {
 export const isWindows = window.navigator.platform === 'Win32';
 
 export function gmFetch(url: string, type: string) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     GM_xmlhttpRequest({
       method: 'GET',
       url,
-      onload: function(response) {
+      onload: function (response) {
         if (type === 'json') {
           resolve(JSON.parse(response.responseText));
         } else {

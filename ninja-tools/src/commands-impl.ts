@@ -1,3 +1,4 @@
+import { IInitResponse } from './types';
 import commands from './commands';
 import * as scrollToConversation from './scroll-to-conversation';
 import * as message from './message';
@@ -45,11 +46,11 @@ let commandsImpl: ICommandImpls = {
   },
 
   // show info
-  showInfo: () => {
+  showInfo: async () => {
     scrollToConversation.stop();
 
     function renderCopyableText(text) {
-      unsafeWindow.__spotImNinjaToolsCopy = e => {
+      unsafeWindow.__spotImNinjaToolsCopy = (e) => {
         const target = e.currentTarget;
 
         GM_setClipboard(target.parentElement.children[0].innerText);
@@ -61,9 +62,6 @@ let commandsImpl: ICommandImpls = {
       };
 
       return /*html*/ `
-        <style>
-          ${showInfoStyles}
-        </style>
         <div class="infoLine">
           <div>${text}</div>
           <button onClick="__spotImNinjaToolsCopy(event)" class="copyButton">
@@ -80,17 +78,36 @@ let commandsImpl: ICommandImpls = {
       const postId = utils.getPostId(launcher);
       const env = utils.isProduction(launcher) ? 'Production' : 'Dev';
 
-      message.set(
-        utils.renderTable([
-          ['Spot Id', renderCopyableText(spotId)],
-          ['Post Id', renderCopyableText(postId)],
-          ['Environment', renderCopyableText(env)],
-        ]),
+      const messageSetRes = message.set(
+        `<style>${showInfoStyles}</style>` +
+          utils.renderTable([
+            ['Spot Id', renderCopyableText(spotId)],
+            ['Post Id', renderCopyableText(postId)],
+            ['Environment', renderCopyableText(env)],
+            [
+              'Rail',
+              renderCopyableText(
+                `<div data-rail-placeholder><div>loading...</div></div>`
+              ),
+            ],
+          ]),
         {
           color: getColors().default,
           title: 'Spot Info',
         }
       );
+
+      const [res] = await Promise.all<IInitResponse, any>([
+        fetch(utils.getConfigUrl()).then((res) => res.json()),
+        utils.sleep(1200),
+      ]);
+
+      const placeholder = messageSetRes.messageBodyEl?.querySelector<
+        HTMLElement
+      >('[data-rail-placeholder]');
+      if (placeholder) {
+        placeholder.innerText = res.asset_group_id;
+      }
     }
   },
 
@@ -103,16 +120,16 @@ let commandsImpl: ICommandImpls = {
         unsafeWindow.__SPOTIM__.SERVICES.configProvider._data.assets_config;
 
       const relevantAssets = assetsConfig.filter(
-        item => item.url.indexOf('tags') > -1
+        (item) => item.url.indexOf('tags') > -1
       );
 
       if (relevantAssets.length) {
         const table =
           utils.renderTable(
             assetsConfig
-              .filter(item => item.url.indexOf('tags') > -1)
+              .filter((item) => item.url.indexOf('tags') > -1)
               .sort((item1, item2) => (item1.name < item2.name ? -1 : 1))
-              .map(item => [
+              .map((item) => [
                 `<span class="mono"><a target="_blank" href="${item.url}">${
                   item.url.match(/tags\/(.*?)\//)[1]
                 }</a></span>`,
@@ -417,7 +434,7 @@ commandsImpl = (() => {
           );
           const nextVariant =
             abCommand.variants.find(
-              variant => variant.id === nextPossibleVariantChar
+              (variant) => variant.id === nextPossibleVariantChar
             ) || abCommand.variants[0];
 
           let statusText;
@@ -450,6 +467,6 @@ export function getCommandImpl({ id }: { id: string }) {
 
 export function getCommandImplByKeyCombo(keyCombo: string) {
   return commandsImpl[
-    commands.find(command => command.keyCombo === keyCombo)?.id ?? ''
+    commands.find((command) => command.keyCombo === keyCombo)?.id ?? ''
   ];
 }

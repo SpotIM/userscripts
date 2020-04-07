@@ -6,6 +6,17 @@ import getColors from './colors';
 
 const changelog = [
   {
+    version: '4.2.4',
+    showOnFirstLoad: true,
+    list: [
+      {
+        title: 'Displays Current Spot Rail in "Show Info"',
+        description:
+          'Open the palette, run "Show Info", the spot\'s rail will now be displayed',
+      },
+    ],
+  },
+  {
     version: '4.2.3',
     showOnFirstLoad: false,
     list: [
@@ -134,7 +145,7 @@ const changelog = [
 
 function renderList(list) {
   return list
-    .map(listItem => {
+    .map((listItem) => {
       return /*html*/ `
         <li>
           ${listItem.title}
@@ -182,7 +193,7 @@ function renderWhatsNew(isShowingWhatsNewOnUpgrade) {
         ${renderChangesInVersion(changelog[0], true)}
         ${changelog
           .slice(1)
-          .map(change => renderChangesInVersion(change))
+          .map((change) => renderChangesInVersion(change))
           .join('')}
       </div>
       <div class="whatsNewFeatureRequest">
@@ -216,7 +227,7 @@ async function show(hasUpgraded?: boolean) {
     prefs.set({ dontShowWhatsNew: !dontShowWhatsNew });
   }
 
-  whatsNew.addListeners(index => {
+  whatsNew.addListeners((index) => {
     if (index === 0) {
       handleToggleShowNextTime();
       handleClose();
@@ -258,7 +269,8 @@ async function showIfUpgraded() {
 
     if (
       (!lastWhatsNewVersion || lastWhatsNewVersion !== currentVersion) &&
-      changelog.find(entry => entry.version === currentVersion)?.showOnFirstLoad
+      changelog.find((entry) => entry.version === currentVersion)
+        ?.showOnFirstLoad
     ) {
       show(true);
     }
