@@ -6,11 +6,11 @@ import getColors from './colors';
 
 const changelog = [
   {
-    version: '4.2.4',
+    version: '4.2.8',
     showOnFirstLoad: true,
     list: [
       {
-        title: 'Displays Current Spot Rail in "Show Info"',
+        title: 'Displaying Current Spot\'s Rail in "Show Info"',
         description:
           'Open the palette, run "Show Info", the spot\'s rail will now be displayed',
       },
