@@ -439,3 +439,7 @@ pre {
   color: #ffeb3b;
   font-weight: bold;
 }
+
+.message a {
+  color: #fff;
+}

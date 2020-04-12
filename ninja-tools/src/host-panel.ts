@@ -122,16 +122,13 @@ export function openCredentialsForm(isOpeningHostPanel?: boolean) {
   // if i don't use setTimeout here the form gets submitted on mount...
   //
   setTimeout(() => {
-    shadowDOM
-      .get()
-      .querySelector<HTMLInputElement>('#emailInput')!
-      .focus();
+    shadowDOM.get().querySelector<HTMLInputElement>('#emailInput')!.focus();
   }, 10);
 
   shadowDOM
     .get()
     .querySelector('form')!
-    .addEventListener('submit', e => {
+    .addEventListener('submit', (e) => {
       e.preventDefault();
       submitForm();
     });
@@ -167,7 +164,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
 
   const networkIdJson = await fetch(
     `https://www.spot.im/api/me/network-id-by-name/${networkName}`
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   message.set('Fetching network token...', {
     color: getColors().default,
@@ -179,7 +176,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   const networkTokenJson = await fetch(
     `https://www.spot.im/api/me/network-token/${networkIdJson.network_id}`,
     { method: 'post' }
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   message.set('Logging in...', {
     color: getColors().default,
@@ -199,7 +196,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
       }),
       body: JSON.stringify({ email, password }),
     }
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   if (emailConnectJson.type === 'EmailLogin_TooManyLoginAttemptsError') {
     message.set('Too many login attempts', {
@@ -209,11 +206,19 @@ export const open = async ({ spotId }: { spotId: string }) => {
     });
     return;
   } else if (emailConnectJson.success === false) {
-    message.set("Couldn't log in to Host Panel", {
-      color: getColors().error,
-      timeout: 3500,
-      emoji: '😕',
-    });
+    message.set(
+      `Try <a href="#" onclick="
+        event.preventDefault();
+        __spotimninjatools.updateCredentials()
+      ">updating you credentials</a>`,
+      {
+        title: "Couldn't log in to Host Panel",
+        color: getColors().error,
+        // timeout: 3500,
+        emoji: '😕',
+        styleAsMessageBox: true,
+      }
+    );
     return;
   }
 
@@ -233,7 +238,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
         'x-spotim-token': networkTokenJson.token,
       }),
     }
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   message.set('Calling me-make-admin...', {
     color: getColors().default,
@@ -250,7 +255,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
         'x-spotim-token': networkTokenJson.token,
       }),
     }
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   message.set('Fetching token JSON...', {
     color: getColors().default,
@@ -262,7 +267,7 @@ export const open = async ({ spotId }: { spotId: string }) => {
   const tokenByTicketJson = await fetch(
     `https://www.spot.im/api/me/token-by-ticket/${makeMeAdminJson.token_ticket}`,
     { method: 'post' }
-  ).then(r => r.json());
+  ).then((r) => r.json());
 
   const isStaging = !utils.isProduction(utils.getLauncherEl());
   const hostPrefix = isStaging ? 'staging-' : '';
