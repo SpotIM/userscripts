@@ -96,7 +96,7 @@ function showMessage() {
 }
 
 function mouseOut() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (!isMouseOver) {
       resolve();
     } else {
@@ -231,8 +231,9 @@ function setMessage(
 
   if (progressBarDuration) {
     messageProgressEl.style.width = '0%';
-    messageProgressEl.style.transition = `width ${progressBarDuration /
-      1000}s linear`;
+    messageProgressEl.style.transition = `width ${
+      progressBarDuration / 1000
+    }s linear`;
     progressAnimationTimeout = setTimeout(() => {
       messageProgressEl.style.width = '100%';
       progressAnimationTimeout = setTimeout(() => {

@@ -216,3 +216,17 @@ export function gmFetch(url: string, type: string) {
     });
   });
 }
+
+export function awaitBody() {
+  return new Promise((resolve) => {
+    function checkForBody() {
+      if (document.body) {
+        clearInterval(interval);
+        resolve();
+      }
+    }
+    const interval = setInterval(checkForBody, 100);
+
+    checkForBody();
+  });
+}
