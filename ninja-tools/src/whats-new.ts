@@ -6,6 +6,15 @@ import getColors from './colors';
 
 const changelog = [
   {
+    version: '4.2.9',
+    showOnFirstLoad: false,
+    list: [
+      {
+        title: 'Added the options to filter through asset versions',
+      },
+    ],
+  },
+  {
     version: '4.2.8',
     showOnFirstLoad: true,
     list: [
