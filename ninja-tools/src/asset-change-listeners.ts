@@ -60,6 +60,7 @@ async function notifyOnChange() {
     const config = {
       config: configResponse.init_data.config,
       assetsConfig: configResponse.assets_config,
+      assetGroupId: configResponse.asset_group_id,
     };
 
     if (lastConfig && !isEqual(config, lastConfig)) {

@@ -414,3 +414,28 @@ pre {
   margin: 0px;
   border: 1px solid #00000029;
 }
+
+.filterTable {
+  width: 50%;
+  margin-bottom: 15px;
+  padding: 6px 9px;
+  border-radius: 5px;
+  border: 1px solid #0000004f;
+  background: #ffffff2b;
+  color: #fff;
+  font-size: inherit;
+  outline: none;
+}
+
+.filterTable:focus {
+  box-shadow: 0px 0px 0px 1px #ffffff61 inset;
+}
+
+.filterTable::placeholder {
+  color: #ffffff99;
+}
+
+.table .fuzzyHighlight {
+  color: #ffeb3b;
+  font-weight: bold;
+}

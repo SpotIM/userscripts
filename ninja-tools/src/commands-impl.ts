@@ -134,7 +134,8 @@ let commandsImpl: ICommandImpls = {
                   item.url.match(/tags\/(.*?)\//)[1]
                 }</a></span>`,
                 item.name,
-              ])
+              ]),
+            { searchable: true, searchKey: 'asset-versions' }
           ) +
           `<div class="muted_text margin_top">Page loaded at ${pageLoadTime}</div>`;
 
@@ -142,6 +143,7 @@ let commandsImpl: ICommandImpls = {
           color: getColors().default,
           emoji: utils.getRandomOptimisticEmoji(),
           title: 'Assets',
+          overflow: 'scroll',
         });
       } else {
         message.set(`No assets found. Are you running locally?`, {

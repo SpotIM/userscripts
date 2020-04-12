@@ -1,6 +1,9 @@
 import * as message from './message';
 import commonMessages from './common-messages';
 import getColors from './colors';
+import * as shadowDOM from './shadow-dom';
+import * as prefs from './prefs';
+import fuzzy from 'fuzzy';
 
 export const isTopMostFrame = () => {
   return window.parent === window;
@@ -94,8 +97,11 @@ export const padTime = (str) => {
   }
 };
 
-export const renderTable = (data) => {
-  return (
+export const renderTable = (
+  data,
+  { searchable, searchKey }: { searchable?: boolean; searchKey?: string } = {}
+) => {
+  const table =
     "<div class='table'><tbody>" +
     data
       .map(
@@ -105,8 +111,71 @@ export const renderTable = (data) => {
           '</div></div>'
       )
       .join('') +
-    '</tbody></div>'
-  );
+    '</tbody></div>';
+
+  function filterResults(value: string) {
+    const fuzzyResults = fuzzy.filter(value, data as any[], {
+      pre: '<span class="fuzzyHighlight">',
+      post: '</span>',
+      extract: (line) => line[1],
+    });
+
+    Array.from(shadowDOM.get().querySelectorAll<HTMLDivElement>('.tr')).forEach(
+      (line, index) => {
+        const fuzzyResult = fuzzyResults.find(
+          (result) => result.index === index
+        );
+        if (fuzzyResult) {
+          line.style.display = 'table-row';
+          line.children[1].innerHTML = fuzzyResult.string;
+        } else {
+          line.style.display = 'none';
+        }
+      }
+    );
+  }
+
+  if (searchable) {
+    setTimeout(() => {
+      const inputEl = shadowDOM
+        .get()
+        .querySelector<HTMLInputElement>('.filterTable');
+
+      inputEl?.focus();
+
+      if (searchKey && inputEl) {
+        const value = prefs.get().tableSearchHistory?.[searchKey] ?? '';
+
+        inputEl.value = value;
+
+        filterResults(value);
+      }
+
+      shadowDOM
+        .get()
+        .querySelector('.filterTable')
+        ?.addEventListener('keyup', (e) => {
+          const value = (e.target as HTMLInputElement).value;
+
+          filterResults(value);
+
+          if (searchKey) {
+            prefs.set({
+              tableSearchHistory: {
+                ...prefs.get().tableSearchHistory,
+                [searchKey]: value,
+              },
+            });
+          }
+        });
+    }, 0);
+
+    return (
+      `<input type="text" class="filterTable" placeholder="Search..."/>` + table
+    );
+  }
+
+  return table;
 };
 
 export const createElement = (html, className, tag = 'div') => {

@@ -34,7 +34,7 @@ export function init() {
     }
 
     if (
-      (e.key.toLowerCase() === 's' || e.key === 'ד') &&
+      (e.key?.toLowerCase() === 's' || e.key === 'ד') &&
       ((isWindows && e.altKey) || e.ctrlKey)
     ) {
       if (e.shiftKey) {
@@ -53,7 +53,7 @@ export function init() {
       return;
     }
 
-    lastKeyStrokes.push(e.key.toLowerCase());
+    lastKeyStrokes.push(e.key?.toLowerCase());
     clearTimeout(lastKeyStrokesResetTimeout);
 
     const keyCombo = lastKeyStrokes.join('');

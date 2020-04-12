@@ -14,6 +14,7 @@ export interface IPreferences {
   dontShowEventsInConsoleInAllDomains: boolean;
   dontShowEventsInConsole?: { [hostname: string]: boolean };
   sherlockToken?: string;
+  tableSearchHistory?: {};
 }
 
 export const get = (): IPreferences => {
