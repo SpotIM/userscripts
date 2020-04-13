@@ -28,7 +28,7 @@ async function show({
     const { recentlyUsedCommands } = prefs.get();
     if (recentlyUsedCommands) {
       return commands.find(
-        command => command.id === recentlyUsedCommands[commandPaletteId]
+        (command) => command.id === recentlyUsedCommands[commandPaletteId]
       );
     }
   })();
@@ -144,10 +144,10 @@ async function show({
     const fuzzyResults = fuzzy.filter(value, commands, {
       pre: '<span class="fuzzyHighlight">',
       post: '</span>',
-      extract: command => command.description,
+      extract: (command) => command.description,
     });
 
-    relevantCommands = fuzzyResults.map(result => ({
+    relevantCommands = fuzzyResults.map((result) => ({
       ...commands[result.index],
       description: result.string,
     }));
@@ -161,7 +161,7 @@ async function show({
 
     if (!value && lastCommandThatRan) {
       const lastCommandIndex = relevantCommands.findIndex(
-        command => command.id === lastCommandThatRan?.id
+        (command) => command.id === lastCommandThatRan?.id
       );
 
       relevantCommands.splice(lastCommandIndex, 1);
@@ -233,7 +233,7 @@ async function show({
     }
   }
 
-  input.addEventListener('keydown', e => {
+  input.addEventListener('keydown', (e) => {
     if (e.keyCode === 38) {
       selectedItemIndex--;
       if (selectedItemIndex < 0) {
@@ -256,10 +256,16 @@ async function show({
       }
     } else if (['Meta', 'Alt', 'Shift', 'Control'].indexOf(e.key) === -1) {
       renderResults();
+
+      if (location.host.endsWith('msn.com')) {
+        setTimeout(() => {
+          shadowDOM.get().querySelector<HTMLInputElement>('.input')?.focus();
+        }, 0);
+      }
     }
   });
 
-  input.addEventListener('keyup', e => {
+  input.addEventListener('keyup', (e) => {
     updateRelevantResults();
     if (selectedItemIndex >= relevantCommands.length) {
       selectedItemIndex = Math.max(relevantCommands.length - 1, 0);
