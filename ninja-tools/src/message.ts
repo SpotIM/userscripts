@@ -81,7 +81,7 @@ function addMessage() {
   setMessageColor(getColors().default);
 
   shadowWrapper = document.createElement('div');
-  document.body.appendChild(shadowWrapper);
+  document.body.parentElement!.appendChild(shadowWrapper);
 
   shadowDOM.set(shadowWrapper.attachShadow({ mode: 'open' }));
   shadowDOM.get().appendChild(messageEl);
@@ -91,7 +91,7 @@ function showMessage() {
   isMouseOver = false;
 
   if (!shadowWrapper.parentNode) {
-    document.body.appendChild(shadowWrapper);
+    document.body.parentElement!.appendChild(shadowWrapper);
   }
 }
 

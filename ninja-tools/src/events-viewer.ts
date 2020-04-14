@@ -96,7 +96,7 @@ function addEventsList() {
     <div class="resizer"></div>
     <div class="query-input-wrapper">
       <input type="text" class="query-input" placeholder='Type a query, e.g., "-type:loaded"'>
-      <a class="help" href="https://github.com/SpotIM/userscripts/blob/master/ninja-tools/event-queries.md" target="_blank">﹖</a>
+      <a class="help-link" href="https://github.com/SpotIM/userscripts/blob/master/ninja-tools/event-queries.md" target="_blank">Learn More About Queries</a>
     </div>
     <div class="events-list"></div>
   `;
@@ -293,7 +293,7 @@ function isBookmark(event) {
 function createUniquePropsMap() {
   uniqueProps = {};
 
-  const pushUniqueEventProps = (eventA, eventB) => key => {
+  const pushUniqueEventProps = (eventA, eventB) => (key) => {
     if (
       key !== 'time_delta' &&
       key !== 'uid' &&
@@ -305,14 +305,14 @@ function createUniquePropsMap() {
     }
   };
 
-  events.forEach(eventA => {
+  events.forEach((eventA) => {
     if (isBookmark(eventA)) {
       return;
     }
 
     uniqueProps[eventA.type] = uniqueProps[eventA.type] || [];
 
-    events.forEach(eventB => {
+    events.forEach((eventB) => {
       if (isBookmark(eventB)) {
         return;
       }
@@ -398,7 +398,7 @@ function renderEvents(scrollToBottom = true) {
 
   const mandatoryProps: string[] = [];
 
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = events.filter((event) => {
     const splitQueryParts: any[] = parse(query);
 
     if (query === '') {
@@ -485,13 +485,13 @@ function renderEvents(scrollToBottom = true) {
                           .sort()
                           .filter(filterRelevantProps),
                         ...mandatoryProps.filter(
-                          propName =>
+                          (propName) =>
                             uniqueProps[event.type].indexOf(propName) === -1
                         ),
                       ]
                   )
                     .map(
-                      propName => /*html*/ `
+                      (propName) => /*html*/ `
                       <span class="prop-name">${propName.replace(
                         /_/g,
                         ' '
@@ -513,8 +513,8 @@ function renderEvents(scrollToBottom = true) {
   }
 
   Array.from(eventsListEl.querySelectorAll('.event .remove-button')).forEach(
-    eventEl => {
-      eventEl.addEventListener('click', e => {
+    (eventEl) => {
+      eventEl.addEventListener('click', (e) => {
         e.stopPropagation();
 
         events.splice(getWrappingEventIndex(e.currentTarget!), 1);
@@ -524,8 +524,8 @@ function renderEvents(scrollToBottom = true) {
   );
 
   Array.from(eventsListEl.querySelectorAll('.event .expand-button')).forEach(
-    eventEl => {
-      eventEl.addEventListener('click', e => {
+    (eventEl) => {
+      eventEl.addEventListener('click', (e) => {
         e.stopPropagation();
         const eventIndex = getWrappingEventIndex(e.currentTarget!);
 
