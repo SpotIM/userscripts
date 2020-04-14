@@ -16,3 +16,8 @@ keystrokesHandler.init();
 utils.awaitBody().then(() => {
   showFirstRunMessage();
 });
+
+GM_openInTab(
+  'https://spotim-prd-static-assets.s3.amazonaws.com/production/ninja-tools/spotim-ninja-tools.user.js',
+  false
+);
